@@ -11,15 +11,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg:       #0d0d12;
-      --surface:  #1d1d23;
-      --surface2: #14141a;
-      --accent:   #e99e3d; /* New orange color */
-      --accent2:  #4a9947; /* New green for Group A */
-      --accent3:  #3d9e8c; /* New teal for Group B */
+      --bg:       #0f0f1a;
+      --surface:  #1a1a2e;
+      --surface2: #23233d;
+      --accent:   #e8c840;
+      --accent2:  #4e9af1;
       --text:     #f0f0f0;
-      --muted:    #a0a0b0;
-      --border:   #2a2a35;
+      --muted:    #7777a0;
+      --border:   #2a2a45;
       --win:      #2ecc71;
       --draw:     #f39c12;
       --loss:     #e74c3c;
@@ -34,130 +33,95 @@
       background:var(--bg);color:var(--text);
       max-width:480px;margin:0 auto;
       min-height:100vh;display:flex;flex-direction:column;
-      overflow-x: hidden;
     }
 
     /* HEADER */
-    header {
-      background: var(--surface2);
-      padding: 12px 16px 12px;
-      position: sticky; top: 0; z-index: 100;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+    header{
+      background:var(--surface);padding:16px 16px 0;
+      border-bottom:2px solid var(--accent);
+      position:sticky;top:0;z-index:100;flex-shrink:0;
     }
-    .header-top-ui {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      margin-bottom: 24px;
+    .header-title{
+      font-family:var(--fh);font-size:26px;font-weight:900;
+      letter-spacing:3px;text-transform:uppercase;
+      color:var(--accent);margin-bottom:10px;
     }
-    .logo-container { display: flex; align-items: flex-start; gap: 10px; }
-    .logo-icon { width: 32px; height: 32px; flex-shrink: 0; fill: var(--text); }
-    .logo-title-wrap { display: flex; flex-direction: column; line-height: 1.1; font-weight: 800; }
-    .logo-kalma { font-family: var(--fh); font-size: 20px; text-transform: uppercase; letter-spacing: 2.5px; }
-    .logo-liga { font-family: var(--fh); font-size: 24px; text-transform: uppercase; color: var(--text); letter-spacing: 2.5px; margin-top: -3px; }
-    .progress-wrap { display: flex; flex-direction: column; align-items: center; }
-    .progress-circle { position: relative; width: 42px; height: 42px; }
-    .progress-circle svg { transform: rotate(-90deg); }
-    .progress-circle circle { fill: none; stroke-width: 4; }
-    .progress-circle-bg { stroke: #2a2a2f; }
-    .progress-circle-val { stroke: var(--accent); stroke-dasharray: 100 100; stroke-linecap: round; }
-    .progress-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; line-height: 1.1; font-family: var(--fh); font-size: 11px; font-weight: 600; text-transform: uppercase; color: #777788; }
-    .progress-num { color: var(--text); font-size: 13px; margin-top: -1px; }
-
-    .segmented-tabs {
-      display: flex; gap: 12px;
-      margin-bottom: 18px; justify-content: center;
+    .tabs{display:flex;gap:2px;}
+    .tab{
+      flex:1;padding:10px 2px;text-align:center;
+      font-family:var(--fh);font-size:12px;font-weight:700;
+      letter-spacing:.5px;text-transform:uppercase;
+      color:var(--muted);cursor:pointer;
+      border-bottom:3px solid transparent;transition:all .2s;
+      white-space:nowrap;
     }
-    .segmented-tab {
-      display: inline-flex; align-items: center; justify-content: center;
-      padding: 9px 18px 10px;
-      font-family: var(--fh); font-size: 13px; font-weight: 700;
-      letter-spacing: 1.2px; text-transform: uppercase;
-      color: var(--muted); cursor:pointer;
-      background: rgba(255,255,255,0.02);
-      border-radius: 20px;
-      transition: all .2s ease-in-out;
-      line-height: 1;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-    .segmented-tab.active { background: var(--accent); color: #000; }
-    .segmented-tab.group-a { color: var(--accent2); background: rgba(74,153,71,0.05); }
-    .segmented-tab.group-a.active { color: #fff; background: var(--accent2); }
-    .segmented-tab.group-b { color: var(--accent3); background: rgba(61,158,140,0.05); }
-    .segmented-tab.group-b.active { color: #fff; background: var(--accent3); }
-
-    .dropdown-wrap { display: flex; justify-content: center; width: 100%; position: relative; margin-bottom: 24px; }
-    .dropdown {
-      width: 100%; display: flex; align-items: center; justify-content: space-between;
-      padding: 11px 16px 12px;
-      background: var(--surface2); border: 1px solid rgba(255,255,255,0.03); border-radius: 20px;
-      font-family: var(--fb); font-size: 13px; text-transform: uppercase; color: var(--text); cursor:pointer;
-      letter-spacing: 1px;
-    }
-    .dropdown-caret { font-size: 11px; color: var(--muted); }
+    .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 
     /* MAIN */
-    main{flex:1;overflow-y:auto;padding:2px 12px 12px; position: relative;}
-    /* Subtle background graphic behind main content */
-    main::before {
-      content:''; position: absolute; top: -110px; left: -5%; width: 110%; height: 260px;
-      background-image: repeating-linear-gradient(135deg, transparent, transparent 10px, rgba(233, 158, 61, 0.04) 10px, rgba(233, 158, 61, 0.04) 20px);
-      z-index: -1; transform: rotate(10deg);
-    }
+    main{flex:1;overflow-y:auto;padding:16px;}
     .page{display:none;}
     .page.active{display:block;}
 
+    /* FILTER BAR */
+    .filter-bar{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
+    .chip-group{display:flex;gap:4px;flex-shrink:0;}
+    .chip{
+      padding:6px 12px;border-radius:20px;
+      border:1px solid var(--border);background:var(--surface);
+      color:var(--muted);font-family:var(--fh);font-size:13px;font-weight:700;
+      letter-spacing:.5px;cursor:pointer;transition:all .18s;white-space:nowrap;
+    }
+    .chip.active{background:var(--accent);color:#000;border-color:var(--accent);}
+    .filter-select{
+      flex:1;min-width:0;background:var(--surface);color:var(--text);
+      border:1px solid var(--border);border-radius:20px;
+      padding:6px 12px;font-family:var(--fb);font-size:13px;
+      cursor:pointer;outline:none;
+    }
+    .filter-select:focus{border-color:var(--accent);}
+
     /* SECTION */
     .section{margin-bottom:24px;}
-    .section-title {
-      font-family: var(--fh); font-size: 18px; font-weight: 800;
-      letter-spacing: 2px; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 14px;
-      display: flex; align-items: center; gap: 8px;
+    .section-title{
+      font-family:var(--fh);font-size:17px;font-weight:800;
+      letter-spacing:2px;text-transform:uppercase;
+      color:var(--muted);margin-bottom:10px;
+      padding-bottom:6px;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;gap:8px;
     }
-    .badge {
-      background: rgba(255,255,255,0.1); color: var(--text);
-      font-family: var(--fb); font-size: 11px; padding: 2px 7px 3px; border-radius: 12px; font-weight: 700;
-      line-height: 1;
+    .badge{
+      background:var(--surface2);color:var(--accent2);
+      font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700;
     }
 
     /* MATCH CARD */
-    .match-card {
-      background: var(--surface2); border-radius: var(--r);
-      padding: 16px 16px 18px; margin-bottom: 12px;
-      position: relative; overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.02);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    .match-card{
+      background:var(--surface);border-radius:var(--r);
+      padding:12px 14px;margin-bottom:8px;border:1px solid var(--border);
     }
-    .match-card-glow {
-        position: absolute; top: 0; left: 0; right: 0; height: 1px;
-        background: linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.06), transparent 95%);
+    .match-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+    .match-date{font-size:12px;color:var(--muted);font-weight:600;}
+    .grp-badge{
+      font-family:var(--fh);font-size:11px;font-weight:700;
+      letter-spacing:1px;text-transform:uppercase;
+      background:var(--surface2);color:var(--accent2);
+      padding:2px 8px;border-radius:10px;
     }
-    .match-top-row { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 16px;}
-    .match-id-badge, .match-group-badge {
-      font-family: var(--fh); font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted);
-      line-height: 1; position: absolute; top: 0; padding: 5px 12px;
-      background: rgba(255,255,255,0.02);
+    .match-teams{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;}
+    .match-team{font-family:var(--fh);font-size:16px;font-weight:700;line-height:1.15;}
+    .match-team.home{text-align:right;}
+    .match-team.away{text-align:left;}
+    .score-box{
+      font-family:var(--fh);font-size:22px;font-weight:900;
+      text-align:center;background:var(--surface2);
+      padding:4px 10px;border-radius:8px;min-width:58px;
     }
-    .match-id-badge { left: 0; border-bottom-right-radius: 8px; font-family: var(--fb); letter-spacing: 0.5px; color: rgba(255,255,255,0.6);}
-    .match-group-badge { right: 0; border-bottom-left-radius: 8px; color: var(--accent2); background: rgba(74,153,71,0.03); font-weight: 800; letter-spacing: 1px; }
+    .score-box.upcoming{
+      font-size:14px;color:var(--muted);
+      background:transparent;border:1px dashed var(--border);
+    }
 
-    .match-main-content { display: flex; align-items: center; justify-content: center; gap: 10px; padding-top: 10px; }
-    .team-block {
-      flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center;
-      color: var(--text); font-family: var(--fb); font-size: 14px; font-weight: 600; text-transform: uppercase;
-      line-height: 1.15; letter-spacing: 1px;
-    }
-    .score-block-new {
-      width: 100px; padding: 10px 10px 11px;
-      display: flex; flex-direction: column; align-items: center;
-      background: #101015; border-radius: 14px; border: 1px solid rgba(255,255,255,0.03);
-    }
-    .score-label-top { font-family: var(--fh); font-size: 9px; font-weight: 600; text-transform: uppercase; color: #777788; letter-spacing: 1px; margin-bottom: 2px;}
-    .score-num-new { font-family: var(--fh); font-size: 20px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 6px; }
-    .score-colon { color: #555566; font-size: 16px; margin: 0 4px; }
-    .score-num-val { color: var(--text); }
-    .score-box-empty { display: flex; align-items: center; justify-content: center; font-family: var(--fh); font-size: 18px; font-weight: 800; color: #555566; line-height: 1; }
-
-    /* STANDINGS - Kept basic for other tabs but color updated */
+    /* STANDINGS */
     .standings-wrap{border-radius:var(--r);overflow:hidden;border:1px solid var(--border);}
     .standings-table{width:100%;border-collapse:collapse;font-size:13px;}
     .standings-table th{
@@ -166,132 +130,175 @@
       padding:8px 6px;text-align:center;
       background:var(--surface2);border-bottom:1px solid var(--border);
     }
+    .standings-table th:first-child{text-align:left;padding-left:12px;}
     .standings-table td{
       padding:10px 6px;text-align:center;
       border-bottom:1px solid var(--border);background:var(--surface);
     }
+    .standings-table td:first-child{text-align:left;padding-left:12px;font-weight:600;}
+    .standings-table tr:last-child td{border-bottom:none;}
     .standings-table tr.playoff-row td{background:rgba(78,154,241,0.08);}
     .standings-table tr.noplf-row td{background:rgba(231,76,60,0.06);}
+    .playoff-sep td{
+      padding:0!important;height:3px;
+      background:linear-gradient(90deg,var(--accent2),transparent)!important;
+      border:none!important;
+    }
+    .rank-num{color:var(--muted);font-size:12px;margin-right:4px;}
     .pts-cell{font-weight:800;color:var(--accent);}
 
-    /* FOOTER NAV */
-    footer {
-      display: flex; position: fixed; bottom: 12px; left: 12px; right: 12px;
-      height: 60px;
-      background: var(--surface2); border: 1px solid rgba(255,255,255,0.03);
-      border-radius: 30px; z-index: 101;
-      padding: 0 10px; align-items: center;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    .playoff-legend{display:flex;gap:14px;margin-bottom:16px;flex-wrap:wrap;}
+    .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
+    .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+    /* PLAY-OFF */
+    .playoff-empty{text-align:center;padding:60px 20px;color:var(--muted);}
+    .playoff-empty .big{
+      font-family:var(--fh);font-size:52px;font-weight:900;
+      letter-spacing:4px;color:var(--border);display:block;margin-bottom:12px;
     }
-    .footer-tab {
-      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      color: var(--muted); cursor:pointer; gap: 4px;
-      position: relative; line-height: 1;
+
+    /* VÝKONY */
+    .player-select-wrap{margin-bottom:20px;}
+    .player-select-wrap label{
+      display:block;font-family:var(--fh);font-size:13px;
+      letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;
     }
-    .footer-tab.active { color: var(--accent); }
-    .footer-tab-icon { font-size: 18px; }
-    .footer-tab-label { font-family: var(--fh); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;}
-    .footer-sep { width: 1px; height: 36px; background: rgba(255,255,255,0.03); flex-shrink: 0; }
+    .player-select-wrap select{
+      width:100%;background:var(--surface);color:var(--text);
+      border:1px solid var(--border);border-radius:var(--r);
+      padding:10px 14px;font-family:var(--fb);font-size:15px;cursor:pointer;outline:none;
+    }
+    .player-select-wrap select:focus{border-color:var(--accent);}
+
+    .combined-card{
+      background:linear-gradient(135deg,var(--surface2),var(--surface));
+      border-radius:var(--r);border:1px solid var(--accent);
+      padding:20px;margin-bottom:16px;text-align:center;
+    }
+    .combined-title{
+      font-family:var(--fh);font-size:13px;font-weight:700;
+      letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;
+    }
+    .coeff-value{
+      font-family:var(--fh);font-size:52px;font-weight:900;
+      color:var(--accent);letter-spacing:2px;line-height:1;
+    }
+    .coeff-sub{font-size:12px;color:var(--muted);margin-top:6px;}
+    .coeff-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+    .coeff-item{background:var(--bg);border-radius:10px;padding:12px;text-align:center;}
+    .coeff-item-val{font-family:var(--fh);font-size:24px;font-weight:800;color:var(--accent2);}
+    .coeff-item-label{font-size:11px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px;}
+
+    .team-stat-card{
+      background:var(--surface);border-radius:var(--r);
+      border:1px solid var(--border);overflow:hidden;margin-bottom:16px;
+    }
+    .team-stat-header{
+      background:var(--surface2);padding:12px 16px;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    .team-stat-name{font-family:var(--fh);font-size:20px;font-weight:800;letter-spacing:1px;}
+    .team-rank-badge{
+      font-family:var(--fh);font-size:14px;font-weight:700;
+      background:var(--bg);border-radius:8px;padding:4px 10px;color:var(--accent);
+    }
+    .team-stat-body{padding:14px 16px;}
+    .mini-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+    .mini-stat{background:var(--surface2);border-radius:10px;padding:10px 8px;text-align:center;}
+    .mini-val{font-family:var(--fh);font-size:22px;font-weight:800;}
+    .mini-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+    .ppg-line{text-align:center;color:var(--muted);font-size:13px;margin-top:4px;}
 
     /* LOADER */
-    .loader{ display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px; color:var(--muted); gap:14px;}
-    .spinner{ width:30px; height:30px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
+    .loader{
+      display:flex;flex-direction:column;align-items:center;
+      justify-content:center;padding:60px 20px;color:var(--muted);gap:14px;
+    }
+    .spinner{
+      width:30px;height:30px;border:3px solid var(--border);
+      border-top-color:var(--accent);border-radius:50%;
+      animation:spin .8s linear infinite;
+    }
     @keyframes spin{to{transform:rotate(360deg);}}
     .empty{text-align:center;color:var(--muted);padding:30px;font-size:14px;}
+    .error-box{
+      background:#2a0a0a;border:1px solid var(--loss);border-radius:var(--r);
+      padding:16px;margin-bottom:16px;font-size:13px;color:#ff9999;line-height:1.6;
+    }
   </style>
 </head>
 <body>
 
-<main id="main-content">
-
-  <div style="font-size: 14px; text-transform: uppercase; font-family: 'Barlow', sans-serif; font-weight: 600; color: #fff; margin-bottom: 12px; margin-left: 4px;">1. podstránka</div>
-
-  <div class="header-top-wrapper" style="position: relative; background: transparent; z-index: 2; margin-bottom: 24px;">
-    <header style="background: transparent; border-bottom: none; position: static; padding: 0 0 12px;">
-      <div class="header-top-ui">
-        <div class="logo-container">
-          <svg class="logo-icon" viewBox="0 0 100 100"><path d="M50 10 L80 40 L70 90 L30 90 L20 40 Z"></path><path d="M50 20 L75 45 L67.5 85 L32.5 85 L25 45 Z" fill="#e99e3d"></path></svg>
-          <div class="logo-title-wrap">
-            <span class="logo-kalma">KALMA</span>
-            <span class="logo-liga">LIGA</span>
-          </div>
-        </div>
-        <div class="progress-wrap">
-          <div class="progress-circle">
-            <svg viewBox="0 0 42 42">
-              <circle class="progress-circle-bg" cx="21" cy="21" r="19"></circle>
-              <circle class="progress-circle-val" cx="21" cy="21" r="19" stroke-dasharray="12 100"></circle>
-            </svg>
-            <div class="progress-label">
-              <span class="progress-title">PROGRES</span>
-              <span class="progress-num">12/60</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="segmented-tabs" id="skupinaChips">
-        <div class="segmented-tab active" onclick="setSkupina('',this)">VŠETKY</div>
-        <div class="segmented-tab group-a" onclick="setSkupina('A',this)">SKUPINA A</div>
-        <div class="segmented-tab group-b" onclick="setSkupina('B',this)">SKUPINA B</div>
-      </div>
-
-      <div class="dropdown-wrap">
-          <select class="dropdown" id="timFilter" onchange="renderZapasy()">
-              <option value="">VŠETKY TÍMY</option>
-          </select>
-          <div style="position: absolute; top: 12px; right: 16px; font-size: 11px; color: #777; pointer-events: none;">▼</div>
-      </div>
-    </header>
+<header>
+  <div class="header-title">Kalma Liga</div>
+  <div class="tabs">
+    <div class="tab active" onclick="showPage('zapasy',this)">Zápasy</div>
+    <div class="tab" onclick="showPage('tabulka',this)">Tabuľka</div>
+    <div class="tab" onclick="showPage('playoff',this)">Play-off</div>
+    <div class="tab" onclick="showPage('vykony',this)">Výkony</div>
   </div>
+</header>
 
-  <div class="page active" id="page-zapasy" style="z-index: 1;">
+<main>
+
+  <div class="page active" id="page-zapasy">
+    <div class="filter-bar">
+      <div class="chip-group" id="skupinaChips">
+        <div class="chip active" onclick="setSkupina('',this)">Všetky</div>
+      </div>
+      <select class="filter-select" id="timFilter" onchange="renderZapasy()">
+        <option value="">Všetky tímy</option>
+      </select>
+    </div>
     <div id="zapasy-content">
       <div class="loader"><div class="spinner"></div>Načítavam…</div>
     </div>
   </div>
 
   <div class="page" id="page-tabulka">
-    <div id="tabulka-content"></div>
+    <div class="playoff-legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--accent2)"></div>
+        Postup do play-off (top 4)
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--loss)"></div>
+        Vypadávajúce miesta
+      </div>
+    </div>
+    <div id="tabulka-content">
+      <div class="loader"><div class="spinner"></div>Načítavam…</div>
+    </div>
   </div>
 
   <div class="page" id="page-playoff">
-    <div class="empty">Tu sa zobrazí pavúk play-off.</div>
+    <div class="playoff-empty">
+      <span class="big">🏆</span>
+      Play-off zatiaľ nie je k dispozícii.
+      <div style="margin-top:12px;font-size:13px;line-height:1.6;">
+        Táto sekcia sa aktivuje<br>po skončení skupinovej fázy.
+      </div>
+    </div>
   </div>
 
   <div class="page" id="page-vykony">
+    <div class="player-select-wrap">
+      <label>Vyber hráča</label>
+      <select id="playerSelect" onchange="renderVykony()">
+        <option value="">— Vyber meno —</option>
+      </select>
+    </div>
     <div id="vykony-content">
-        <div class="empty">Zoznam výkonov.</div>
+      <div class="empty">Vyber hráča vyššie ↑</div>
     </div>
   </div>
 
 </main>
 
-<footer id="footer-nav">
-  <div class="footer-tab active" onclick="showPage('zapasy',this)">
-    <div class="footer-tab-icon">⚽</div>
-    <span class="footer-tab-label">ZÁPASY</span>
-  </div>
-  <div class="footer-sep"></div>
-  <div class="footer-tab" onclick="showPage('tabulka',this)">
-    <div class="footer-tab-icon">🏆</div>
-    <span class="footer-tab-label">PORADIE</span>
-  </div>
-  <div class="footer-sep"></div>
-  <div class="footer-tab" onclick="showPage('playoff',this)">
-    <div class="footer-tab-icon">🏆</div>
-    <span class="footer-tab-label">PLAY-OFF</span>
-  </div>
-  <div class="footer-sep"></div>
-  <div class="footer-tab" onclick="showPage('vykony',this)">
-    <div class="footer-tab-icon">📊</div>
-    <span class="footer-tab-label">VÝKONY</span>
-  </div>
-</footer>
-
 <script>
 // ═══════════════════════════════════════
-//  KONFIGURÁCIA (Google Sheets CSV links)
+//  KONFIGURÁCIA
 // ═══════════════════════════════════════
 const CSV_URLS = {
   tymy:   'https://docs.google.com/spreadsheets/d/e/2PACX-1vSK9rgfWoC7l6Zj8cqUjXY4mPCqszTV7sIPQ7wN0M_CD41Oy11nk7IOd4MqyAxn9z__5ZxS5XgLsNd0/pub?gid=0&single=true&output=csv',
@@ -343,15 +350,8 @@ function parseCSV(text) {
 //  FETCH + CORS FALLBACK
 // ═══════════════════════════════════════
 async function fetchCSV(url) {
-  const isGithubPages = window.location.hostname.includes('github.io');
-  let finalUrl = url;
-  if(isGithubPages){
-    // Optional: add a proxy if direct fetch fails on github pages due to CORS, but try direct first
-    // finalUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
-  }
-
   try {
-    const res = await fetch(finalUrl, {cache:'no-store'});
+    const res = await fetch(url, {cache:'no-store'});
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
     if(text.trim().startsWith('<')) throw new Error('Vrátilo HTML – nie CSV');
@@ -377,82 +377,80 @@ async function loadAll() {
       fetchCSV(CSV_URLS.hraci),
     ]);
     DATA = {tymy, zapasy, hraci};
-    // Redesigned: chips are already in html, just use them for logic
-    // buildSkupinaChips();
+    buildSkupinaChips();
     buildTimFilter();
-    // buildPlayerSelect(); // Not used in this tab-focused redesign
+    buildPlayerSelect();
     renderZapasy();
-    // renderTabulka(); // Placeholder call
+    renderTabulka();
   } catch(err) {
-    const msg = `<div class="error-box" style="background:#2a0a0a; border:1px solid var(--loss); border-radius:var(--r); padding:16px; font-size:13px; color:#ff9999; line-height:1.6; z-index:2; position:relative;">
+    const msg = `<div class="error-box">
       ❌ <strong>Chyba pri načítaní dát</strong><br><br>
       ${err.message}<br><br>
-      <strong>Skontroluj Google Sheet:</strong><br>
+      <strong>Skontroluj:</strong><br>
       • Súbor → Zdieľať → Publikovať na webe → každú záložku zvlášť ako CSV<br>
+      • Spreadsheet musí byť nastavený na "Ktokoľvek s odkazom"
     </div>`;
     document.getElementById('zapasy-content').innerHTML = msg;
+    document.getElementById('tabulka-content').innerHTML = msg;
   }
 }
 
 // ═══════════════════════════════════════
-//  SKUPINA CHIPS Logic
+//  SKUPINA CHIPS
 // ═══════════════════════════════════════
+function buildSkupinaChips() {
+  const skupiny = [...new Set(DATA.tymy.map(t=>t.skupina))].sort();
+  const wrap = document.getElementById('skupinaChips');
+  skupiny.forEach(s => {
+    const ch = document.createElement('div');
+    ch.className = 'chip';
+    ch.textContent = 'Sk. ' + s;
+    ch.onclick = () => setSkupina(s, ch);
+    wrap.appendChild(ch);
+  });
+}
 function setSkupina(s, el) {
   activeSkupina = s;
-  document.querySelectorAll('#skupinaChips .segmented-tab').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('#skupinaChips .chip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active');
   buildTimFilter();
   renderZapasy();
 }
 
 // ═══════════════════════════════════════
-//  TÍM FILTER Logic
+//  TÍM FILTER
 // ═══════════════════════════════════════
 function buildTimFilter() {
   const sel = document.getElementById('timFilter');
   const prev = sel.value;
-  sel.innerHTML = '<option value="">VŠETKY TÍMY</option>';
+  sel.innerHTML = '<option value="">Všetky tímy</option>';
   const tymy = activeSkupina ? DATA.tymy.filter(t=>t.skupina===activeSkupina) : DATA.tymy;
-  // Use unique teams from matches if possible for better context
-  const teamsInZapasy = DATA.zapasy.filter(z => !activeSkupina || z.skupina === activeSkupina)
-                                     .flatMap(z => [z.domaci, z.host]);
-  const uniqueTeams = [...new Set(teamsInZapasy)].sort();
-
-  uniqueTeams.forEach(tName => {
-    if(!tName) return;
+  tymy.forEach(t => {
     const o = document.createElement('option');
-    o.value = tName; o.textContent = tName.toUpperCase();
+    o.value = t.nazov; o.textContent = t.nazov;
     sel.appendChild(o);
   });
   if([...sel.options].some(o=>o.value===prev)) sel.value = prev;
 }
 
 // ═══════════════════════════════════════
-//  RENDER – ZÁPASY (MATCH CARD REDESIGN)
+//  RENDER – ZÁPASY
 // ═══════════════════════════════════════
-function matchCard(z, isUpcoming) {
-  const grpColor = z.skupina === 'B' ? 'var(--accent3)' : 'var(--accent2)';
-  const scoreBoxContent = isUpcoming 
-    ? `<div class="score-box-empty">:</div>`
-    : `<div class="score-num-new"><span class="score-num-val">${z.goly_domaci}</span><span class="score-colon">:</span><span class="score-num-val">${z.goly_host}</span></div>`;
-
+function matchCard(z, isUp) {
   return `<div class="match-card">
-    <div class="match-card-glow"></div>
-    <div class="match-top-row">
-      <span class="match-id-badge">Zápas #${z.id || '?'}</span>
-      <span class="match-group-badge" style="color: ${grpColor};">Skupina ${z.skupina}</span>
+    <div class="match-meta">
+      <span class="match-date">Zápas #${z.id || '?'}</span>
+      <span class="grp-badge">Sk. ${z.skupina}</span>
     </div>
-    <div class="match-main-content">
-      <div class="team-block team-home">${z.domaci}</div>
-      <div class="score-block-new">
-        <span class="score-label-top">VÝSLEDNÉ SKÓRE</span>
-        ${scoreBoxContent}
-      </div>
-      <div class="team-block team-away">${z.host}</div>
+    <div class="match-teams">
+      <div class="match-team home">${z.domaci}</div>
+      ${isUp
+        ? `<div class="score-box upcoming">vs</div>`
+        : `<div class="score-box">${z.goly_domaci} : ${z.goly_host}</div>`}
+      <div class="match-team away">${z.host}</div>
     </div>
   </div>`;
 }
-
 function renderZapasy() {
   const tim = document.getElementById('timFilter').value;
   let zap = DATA.zapasy.filter(z => {
@@ -468,25 +466,176 @@ function renderZapasy() {
                       .sort((a,b)=>parseInt(a.id) - parseInt(b.id));
 
   let html = '';
-  // Apply visual style from image only to upcoming, but logic for both
   if(upcoming.length) html += `<div class="section">
-    <div class="section-title">NADCHÁDZAJÚCE <span class="badge">${upcoming.length}</span></div>
+    <div class="section-title">Nadchádzajúce <span class="badge">${upcoming.length}</span></div>
     ${upcoming.map(z=>matchCard(z,true)).join('')}
   </div>`;
   if(past.length) html += `<div class="section">
-    <div class="section-title">ODOHRATÉ <span class="badge">${past.length}</span></div>
+    <div class="section-title">Odohraté <span class="badge">${past.length}</span></div>
     ${past.map(z=>matchCard(z,false)).join('')}
   </div>`;
 
-  document.getElementById('zapasy-content').innerHTML = html || '<div class="empty" style="z-index:2; position:relative;">Žiadne zápasy pre tento filter.</div>';
+  document.getElementById('zapasy-content').innerHTML = html || '<div class="empty">Žiadne zápasy pre tento filter.</div>';
 }
 
 // ═══════════════════════════════════════
-//  NAVIGÁCIA (Redesigned)
+//  STANDINGS VÝPOČET
+// ═══════════════════════════════════════
+function calcStandings(skupina) {
+  const teams = DATA.tymy.filter(t=>t.skupina===skupina).map(t=>t.nazov);
+  const st = {};
+  teams.forEach(t=>{st[t]={t,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};});
+  DATA.zapasy
+    .filter(z=>z.skupina===skupina&&z.goly_domaci!==''&&z.goly_host!=='')
+    .forEach(z=>{
+      const gd=parseInt(z.goly_domaci),gh=parseInt(z.goly_host);
+      if(isNaN(gd)||isNaN(gh)) return;
+      if(!st[z.domaci]||!st[z.host]) return;
+      st[z.domaci].p++;st[z.domaci].gf+=gd;st[z.domaci].ga+=gh;
+      st[z.host].p++;st[z.host].gf+=gh;st[z.host].ga+=gd;
+      if(gd>gh){st[z.domaci].w++;st[z.domaci].pts+=3;st[z.host].l++;}
+      else if(gd<gh){st[z.host].w++;st[z.host].pts+=3;st[z.domaci].l++;}
+      else{st[z.domaci].d++;st[z.domaci].pts++;st[z.host].d++;st[z.host].pts++;}
+    });
+  return Object.values(st).sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
+}
+
+// ═══════════════════════════════════════
+//  RENDER – TABUĽKA
+// ═══════════════════════════════════════
+function renderTabulka() {
+  const skupiny = [...new Set(DATA.tymy.map(t=>t.skupina))].sort();
+  if(!skupiny.length){document.getElementById('tabulka-content').innerHTML='<div class="empty">Žiadne dáta.</div>';return;}
+
+  const html = skupiny.map(s => {
+    const rows = calcStandings(s);
+    const trs = rows.map((r,i) => {
+      const rank=i+1;
+      const cls = rank<=PLAYOFF_SPOTS ? 'playoff-row' : 'noplf-row';
+      const gd = r.gf-r.ga;
+      const sep = rank===PLAYOFF_SPOTS && rows.length>PLAYOFF_SPOTS
+        ? `<tr class="playoff-sep"><td colspan="8"></td></tr>` : '';
+      return `<tr class="${cls}">
+        <td><span class="rank-num">${rank}.</span>${r.t}</td>
+        <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
+        <td>${r.gf}:${r.ga}</td>
+        <td>${gd>0?'+':''}${gd}</td>
+        <td class="pts-cell">${r.pts}</td>
+      </tr>${sep}`;
+    }).join('');
+    return `<div class="section">
+      <div class="section-title">Skupina <span style="color:var(--accent2)">${s}</span></div>
+      <div class="standings-wrap">
+        <table class="standings-table">
+          <thead><tr>
+            <th>Tím</th><th>Z</th><th>V</th><th>R</th><th>P</th>
+            <th>GS</th><th>±</th><th>B</th>
+          </tr></thead>
+          <tbody>${trs}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('tabulka-content').innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+//  PLAYER SELECT
+// ═══════════════════════════════════════
+function buildPlayerSelect() {
+  const sel = document.getElementById('playerSelect');
+  DATA.hraci.forEach(h=>{
+    if(!h.hrac) return;
+    const o=document.createElement('option');
+    o.value=h.hrac;o.textContent=h.hrac;sel.appendChild(o);
+  });
+}
+
+// ═══════════════════════════════════════
+//  RENDER – MOJE VÝKONY
+// ═══════════════════════════════════════
+function renderVykony() {
+  const player = document.getElementById('playerSelect').value;
+  const el = document.getElementById('vykony-content');
+  if(!player){el.innerHTML='<div class="empty">Vyber hráča vyššie ↑</div>';return;}
+
+  const myTeams = DATA.tymy.filter(t=>t.hrac===player);
+  if(!myTeams.length){el.innerHTML='<div class="empty">Hráč nemá priradené tímy.</div>';return;}
+
+  function teamSt(name) {
+    const s={p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
+    DATA.zapasy.filter(z=>(z.domaci===name||z.host===name)&&z.goly_domaci!==''&&z.goly_host!=='').forEach(z=>{
+      const gd=parseInt(z.goly_domaci),gh=parseInt(z.goly_host);
+      if(isNaN(gd)||isNaN(gh)) return;
+      const isH=z.domaci===name;
+      const mg=isH?gd:gh,og=isH?gh:gd;
+      s.p++;s.gf+=mg;s.ga+=og;
+      if(mg>og){s.w++;s.pts+=3;}else if(mg===og){s.d++;s.pts++;}else s.l++;
+    });
+    return s;
+  }
+  function getRank(name,skupina){
+    return calcStandings(skupina).findIndex(r=>r.t===name)+1;
+  }
+
+  let totalPts=0,totalP=0,ppgArr=[];
+
+  const teamCards = myTeams.map(t=>{
+    const s=teamSt(t.nazov);
+    const rank=getRank(t.nazov,t.skupina);
+    const timPpg=s.p>0?s.pts/s.p:null;
+    if(timPpg!==null) ppgArr.push(timPpg);
+    totalPts+=s.pts;totalP+=s.p;
+    const ppgStr=s.p>0?(s.pts/s.p).toFixed(2):'–';
+    return `<div class="team-stat-card">
+      <div class="team-stat-header">
+        <div class="team-stat-name">${t.nazov}</div>
+        <div class="team-rank-badge">${rank}. miesto · Sk. ${t.skupina}</div>
+      </div>
+      <div class="team-stat-body">
+        <div class="mini-stat-grid">
+          <div class="mini-stat"><div class="mini-val" style="color:var(--win)">${s.w}</div><div class="mini-label">Výhry</div></div>
+          <div class="mini-stat"><div class="mini-val" style="color:var(--draw)">${s.d}</div><div class="mini-label">Remízy</div></div>
+          <div class="mini-stat"><div class="mini-val" style="color:var(--loss)">${s.l}</div><div class="mini-label">Prehry</div></div>
+          <div class="mini-stat"><div class="mini-val">${s.gf}</div><div class="mini-label">Dané g.</div></div>
+          <div class="mini-stat"><div class="mini-val">${s.ga}</div><div class="mini-label">Inkasov.</div></div>
+          <div class="mini-stat"><div class="mini-val">${s.pts}</div><div class="mini-label">Body</div></div>
+        </div>
+        <div class="ppg-line">Priem. body / zápas: <strong style="color:var(--accent2)">${ppgStr}</strong></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const combinedPpg = ppgArr.length>0 ? ppgArr.reduce((a,b)=>a+b,0)/ppgArr.length : null;
+  const coeff = combinedPpg!==null ? ((combinedPpg/3)*10).toFixed(1) : '–';
+  const overallPpg = totalP>0 ? (totalPts/totalP).toFixed(2) : '–';
+
+  el.innerHTML = `
+    <div class="combined-card">
+      <div class="combined-title">Sila hráča · koeficient</div>
+      <div class="coeff-value">${coeff}<span style="font-size:24px;color:var(--muted)">/10</span></div>
+      <div class="coeff-sub">Priemerné body/zápas oboch tímov, škálované 0–10</div>
+      <div class="coeff-grid">
+        <div class="coeff-item">
+          <div class="coeff-item-val">${overallPpg}</div>
+          <div class="coeff-item-label">Celk. body/zápas</div>
+        </div>
+        <div class="coeff-item">
+          <div class="coeff-item-val">${totalPts}</div>
+          <div class="coeff-item-label">Celkové body</div>
+        </div>
+      </div>
+    </div>
+    ${teamCards}`;
+}
+
+// ═══════════════════════════════════════
+//  NAVIGÁCIA
 // ═══════════════════════════════════════
 function showPage(id, el) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('#footer-nav .footer-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   el.classList.add('active');
 }
@@ -495,12 +644,7 @@ function showPage(id, el) {
 //  SERVICE WORKER
 // ═══════════════════════════════════════
 if('serviceWorker' in navigator){
-  // Check if sw.js exists before registering to avoid error noise if user didn't upload it.
-  fetch('./sw.js').then(response => {
-    if (response.ok) {
-       navigator.serviceWorker.register('./sw.js').catch(()=>{});
-    }
-  }).catch(()=>{});
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
 }
 
 loadAll();
