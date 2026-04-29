@@ -21,9 +21,9 @@
       --group-a-dark: #997A00; /* Tmavožltá pre tlačidlo */
       --group-b: #00A896; 
       
-      /* Farby pre tabuľku a legendu */
-      --playoff-bg: #223446; /* Pozadie postupových miest a kruhu */
-      --playoff-border: #4e9af1;
+      /* Farby pre tabuľku a legendu (vrátená na sivú) */
+      --playoff-bg: #2c2c2c; /* Jemná sivá pre postupové miesta */
+      --playoff-border: #555555; /* Sivé ohraničenie pre kruh */
       --relegation: rgba(231, 76, 60, 0.15);
       
       --text: #ffffff;
@@ -49,7 +49,7 @@
       position: relative;
     }
 
-    /* DIAGONAL STRIPES BACKGROUND - Upravená šírka na dvojnásobok (30px) a medzera ponechaná (15px) */
+    /* DIAGONAL STRIPES BACKGROUND */
     body::before {
       content: "";
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -106,7 +106,6 @@
       cursor: pointer; transition: 0.2s;
     }
     .f-btn.active.all { background: var(--accent); border-color: var(--accent); color: #000; }
-    /* Upravené pozadie pre aktívne tlačidlo Skupiny A na tmavožltú */
     .f-btn.active.ga { background: var(--group-a-dark); border-color: var(--group-a-dark); color: #fff; }
     .f-btn.active.gb { background: var(--group-b); border-color: var(--group-b); color: #fff; }
 
@@ -141,12 +140,17 @@
     .mc-header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 12px; padding: 0 10px;
+      position: relative; /* Dôležité pre absolútne centrovanie */
     }
     .mc-match-num { background: #333; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
-    .mc-score-label { font-size: 9px; font-weight: 700; color: var(--muted); }
-    .mc-group { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; }
     
-    /* Dynamická podfarbovacia farba pre Skupinu A s novou žltou */
+    .mc-score-label { 
+      font-size: 9px; font-weight: 700; color: var(--muted); 
+      position: absolute; left: 50%; transform: translateX(-50%); /* Zabezpečí stálu pozíciu v strede */
+      white-space: nowrap;
+    }
+    
+    .mc-group { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; }
     .mc-group.ga { background: rgba(255, 204, 0, 0.15); color: var(--group-a); }
     .mc-group.gb { background: rgba(0,168,150,0.2); color: var(--group-b); }
 
@@ -162,7 +166,7 @@
     .legend-item { display: flex; align-items: center; gap: 6px; }
     .dot { width: 10px; height: 10px; border-radius: 50%; }
     
-    /* Zosynchronizovanie farby bodky a riadku */
+    /* Sivá pre postupové miesta v legende */
     .dot.safe { background-color: var(--playoff-bg); border: 1px solid var(--playoff-border); }
     .dot.danger { border: 2px solid var(--loss); background-color: transparent; }
 
@@ -178,7 +182,7 @@
     .standings-table td:last-child { border-radius: 0 8px 8px 0; color: var(--accent); font-weight: 800; }
     .standings-table td:nth-child(2) { text-align: left; }
     
-    /* Playoff a Zostupové Riadky */
+    /* Sivá pre postupové riadky */
     .row-playoff td { background-color: var(--playoff-bg); }
     .row-danger td { background: var(--relegation); color: #ff9999; }
     .row-danger td:last-child { color: #ff9999; }
@@ -186,7 +190,8 @@
 
     /* PLAYOFF */
     .playoff-wrap { text-align: center; padding-top: 40px; position: relative; }
-    .po-logo { width: 150px; opacity: 0.1; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: -1; }
+    /* Zväčšené logo zo 150px na 300px */
+    .po-logo { width: 300px; opacity: 0.1; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: -1; }
     .po-title { font-size: 24px; font-weight: 800; color: var(--accent); margin-bottom: 12px; }
     .po-text { color: var(--muted); font-size: 14px; line-height: 1.5; font-weight: 500; }
 
