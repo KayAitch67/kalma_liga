@@ -111,7 +111,7 @@
     /* FILTERS (ZÁPASY) */
     .filter-buttons { display: flex; gap: 8px; margin-bottom: 12px; }
     .f-btn {
-      flex: 1; padding: 8px 0; border-radius: 20px;
+      flex: 1; padding: 8px 0; border-radius: 12px; /* Zmenené na 12px rovnako ako dropdown */
       font-family: var(--font); font-size: 11px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 1px;
       background: transparent; border: 1px solid var(--muted); color: var(--muted);
@@ -130,11 +130,17 @@
       background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 12px auto;
     }
 
+    .section-header-row {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+    }
     .section-title {
       font-size: 14px; font-weight: 800; letter-spacing: 1px;
-      color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+      color: var(--accent); display: flex; align-items: center; gap: 8px; margin-bottom: 0;
     }
     .badge { background: #333; color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+    
+    .compact-toggle { color: var(--muted); cursor: pointer; font-size: 18px; transition: 0.2s; }
+    .compact-toggle:hover { color: var(--text); }
 
     /* MATCH CARDS */
     .match-card {
@@ -143,11 +149,14 @@
       overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }
     .match-card::before, .match-card::after {
-      content: ""; position: absolute; top: 0; bottom: 0; width: 12px;
+      content: ""; position: absolute; top: 0; bottom: 0; width: 6px; /* Zúžené na 6px */
       background: var(--accent);
     }
     .match-card::before { left: 0; }
     .match-card::after { right: 0; }
+    
+    /* Kompaktný režim schováva hlavičku zápasu */
+    .match-card.compact .mc-header { display: none; }
 
     .mc-header {
       display: flex; justify-content: space-between; align-items: center;
@@ -272,7 +281,7 @@
       height: 90px;
       transition: height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
       box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
-      overflow: hidden; /* Skryje 2. riadok, kým nie je menu vysunuté */
+      overflow: hidden; 
     }
     nav.expanded {
       height: 30vh;
@@ -286,13 +295,18 @@
     .nav-drag-area:hover .nav-handle { background: var(--accent); }
     
     .nav-items-container {
-      display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start;
+      display: flex; flex-wrap: wrap; justify-content: flex-start; align-content: flex-start;
       width: 100%; padding-top: 5px; height: calc(100% - 24px);
     }
     .nav-item {
+      position: relative;
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
       color: var(--muted); cursor: pointer; transition: 0.2s;
-      width: 25%; height: 60px; /* fixná výška pre zarovnanie riadkov */
+      width: 25%; height: 60px; 
+    }
+    /* Sivé oddeľovacie čiary */
+    .nav-item:not(:nth-child(4n))::after {
+      content: ""; position: absolute; right: 0; top: 25%; bottom: 25%; width: 2px; background: #333;
     }
     .nav-item i { font-size: 20px; }
     .nav-item span { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;}
@@ -394,7 +408,7 @@
         <i class="fa-solid fa-chart-simple"></i><span>Výkony</span>
       </div>
       <div class="nav-item" onclick="navTo('strelci', this)">
-        <i class="fa-solid fa-shoe-prints"></i><span>Strelci</span>
+        <i class="fa-solid fa-bullseye"></i><span>Strelci</span>
       </div>
     </div>
   </nav>
@@ -411,6 +425,7 @@ const CSV_URLS = {
 
 let DATA = { tymy:[], zapasy:[], hraci:[] };
 let activeSkupina = '';
+let isCompactMatches = false; // Globálna premenná pre scvrknutý režim
 
 // ═══════════════════════════════════════
 // PARSOVANIE A NAČÍTANIE
@@ -513,6 +528,11 @@ function getPlayerForTeam(teamName) {
   return team ? team.hrac : 'Neznámy';
 }
 
+function toggleCompactMode() {
+  isCompactMatches = !isCompactMatches;
+  renderZapasy();
+}
+
 function createMatchCard(z, isUp) {
   const gClass = z.skupina === 'A' ? 'ga' : 'gb';
   const pDomaci = getPlayerForTeam(z.domaci);
@@ -528,8 +548,10 @@ function createMatchCard(z, isUp) {
       else if (gh < gd) classHost += " loser";
   }
 
+  const compactClass = isCompactMatches ? 'compact' : '';
+
   return `
-    <div class="match-card">
+    <div class="match-card ${compactClass}">
       <div class="mc-header">
         <span class="mc-match-num">ZÁPAS #${z.id || '?'}</span>
         <span class="mc-score-label">${isUp ? 'N/A' : 'VÝSLEDNÉ SKÓRE'}</span>
@@ -561,14 +583,32 @@ function renderZapasy() {
   const upcoming = zap.filter(z=>z.goly_domaci===''||z.goly_host==='').sort((a,b)=>parseInt(a.id) - parseInt(b.id));
 
   let html = '';
+  let eyeIconDrawn = false;
+  
+  function getEyeIcon() {
+      if(eyeIconDrawn) return '';
+      eyeIconDrawn = true;
+      return `<i class="fa-solid ${isCompactMatches ? 'fa-eye-slash' : 'fa-eye'} compact-toggle" onclick="toggleCompactMode()"></i>`;
+  }
+
   if(upcoming.length) {
-    html += `<div class="section-title">NADCHÁDZAJÚCE <span class="badge">${upcoming.length}</span></div>`;
+    html += `
+      <div class="section-header-row">
+        <div class="section-title">NADCHÁDZAJÚCE <span class="badge">${upcoming.length}</span></div>
+        ${getEyeIcon()}
+      </div>`;
     html += upcoming.map(z=>createMatchCard(z, true)).join('');
   }
   if(past.length) {
-    html += `<div class="section-title" style="margin-top:20px;">ODOHRATÉ <span class="badge">${past.length}</span></div>`;
+    const mt = upcoming.length ? 'style="margin-top:20px;"' : '';
+    html += `
+      <div class="section-header-row" ${mt}>
+        <div class="section-title">ODOHRATÉ <span class="badge">${past.length}</span></div>
+        ${getEyeIcon()}
+      </div>`;
     html += past.map(z=>createMatchCard(z, false)).join('');
   }
+  
   document.getElementById('zapasy-content').innerHTML = html || '<div class="empty">Zápasy nenájdené.</div>';
 }
 
@@ -681,13 +721,13 @@ function renderVykony() {
   const avgRank = ranks.length > 0 ? (ranks.reduce((a,b)=>a+b,0)/ranks.length).toFixed(1) : '0.0';
   const coeff = totalP > 0 ? ((totalPts / totalP) / 3 * 10).toFixed(1) : '0.0';
 
-  // Stanovenie farby a žiary koeficientu na základe hodnoty
+  // Stupnica farieb: Biela do oranžovej
   const coeffNum = parseFloat(coeff);
-  let cStyle = { c: '#555555', s: 'none' };
+  let cStyle = { c: '#FFFFFF', s: 'none' };
   if (coeffNum >= 8) cStyle = { c: 'var(--accent)', s: '0 0 25px rgba(255,115,0,0.9)' };
-  else if (coeffNum >= 6) cStyle = { c: '#EE7600', s: '0 0 16px rgba(238,118,0,0.7)' };
-  else if (coeffNum >= 4) cStyle = { c: '#CD6600', s: '0 0 12px rgba(205,102,0,0.5)' };
-  else if (coeffNum >= 2) cStyle = { c: '#8B5A2B', s: '0 0 8px rgba(139,90,43,0.3)' };
+  else if (coeffNum >= 6) cStyle = { c: '#FF9933', s: '0 0 16px rgba(255,153,51,0.7)' };
+  else if (coeffNum >= 4) cStyle = { c: '#FFB870', s: '0 0 12px rgba(255,184,112,0.5)' };
+  else if (coeffNum >= 2) cStyle = { c: '#FFE0C2', s: '0 0 8px rgba(255,224,194,0.3)' };
 
   el.innerHTML = `
     <div class="coeff-card">
