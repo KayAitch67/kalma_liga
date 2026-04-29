@@ -16,14 +16,12 @@
       --surface-light: #2a2a2a;
       --accent: #FF7300;
       
-      /* Úprava farieb pre Skupinu A a B */
-      --group-a: #FFCC00; /* Žltá */
-      --group-a-dark: #997A00; /* Tmavožltá pre tlačidlo */
+      --group-a: #FFCC00;
+      --group-a-dark: #997A00;
       --group-b: #00A896; 
       
-      /* Farby pre tabuľku a legendu (vrátená na sivú) */
-      --playoff-bg: #2c2c2c; /* Jemná sivá pre postupové miesta */
-      --playoff-border: #555555; /* Sivé ohraničenie pre kruh */
+      --playoff-bg: #2c2c2c;
+      --playoff-border: #555555;
       --relegation: rgba(231, 76, 60, 0.15);
       
       --text: #ffffff;
@@ -91,8 +89,8 @@
     }
 
     /* MAIN AREA */
-    main { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 80px; }
-    .page { display: none; animation: fadeIn 0.3s; }
+    main { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 80px; display: flex; flex-direction: column; }
+    .page { display: none; animation: fadeIn 0.3s; flex: 1; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -140,16 +138,14 @@
     .mc-header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 12px; padding: 0 10px;
-      position: relative; /* Dôležité pre absolútne centrovanie */
+      position: relative;
     }
     .mc-match-num { background: #333; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
-    
     .mc-score-label { 
       font-size: 9px; font-weight: 700; color: var(--muted); 
-      position: absolute; left: 50%; transform: translateX(-50%); /* Zabezpečí stálu pozíciu v strede */
+      position: absolute; left: 50%; transform: translateX(-50%);
       white-space: nowrap;
     }
-    
     .mc-group { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; }
     .mc-group.ga { background: rgba(255, 204, 0, 0.15); color: var(--group-a); }
     .mc-group.gb { background: rgba(0,168,150,0.2); color: var(--group-b); }
@@ -165,35 +161,55 @@
     .legend { display: flex; gap: 16px; margin-bottom: 16px; font-size: 11px; font-weight: 600; }
     .legend-item { display: flex; align-items: center; gap: 6px; }
     .dot { width: 10px; height: 10px; border-radius: 50%; }
-    
-    /* Sivá pre postupové miesta v legende */
     .dot.safe { background-color: var(--playoff-bg); border: 1px solid var(--playoff-border); }
     .dot.danger { border: 2px solid var(--loss); background-color: transparent; }
 
-    .standings-table { width: 100%; border-collapse: separate; border-spacing: 0 4px; font-size: 12px; margin-bottom: 24px; }
+    /* Fixná tabuľka - zabraňuje poskakovaniu šírok pri zmene cifier */
+    .standings-table { 
+      width: 100%; border-collapse: separate; border-spacing: 0 4px; 
+      font-size: 12px; margin-bottom: 24px;
+      table-layout: fixed; 
+    }
     .s-title { font-size: 14px; font-weight: 800; padding: 4px 12px; display: inline-block; border-radius: 4px; margin-bottom: 8px;}
     .s-title.ga { color: var(--group-a); border-bottom: 2px solid var(--group-a); }
     .s-title.gb { color: var(--group-b); border-bottom: 2px solid var(--group-b); }
     
-    .standings-table th { color: var(--muted); font-weight: 600; padding: 8px; text-align: center; border-bottom: 1px solid #333;}
-    .standings-table th:nth-child(2) { text-align: left; }
-    .standings-table td { background: var(--surface); padding: 12px 8px; text-align: center; font-weight: 600; }
-    .standings-table td:first-child { border-radius: 8px 0 0 8px; }
+    /* Definovanie fixných šírok stĺpcov */
+    .standings-table th:nth-child(1) { width: 38%; } /* Názov tímu */
+    .standings-table th:nth-child(2) { width: 10%; } /* OZ */
+    .standings-table th:nth-child(3) { width: 8%; }  /* V */
+    .standings-table th:nth-child(4) { width: 8%; }  /* R */
+    .standings-table th:nth-child(5) { width: 8%; }  /* P */
+    .standings-table th:nth-child(6) { width: 10%; } /* GS */
+    .standings-table th:nth-child(7) { width: 8%; }  /* +/- */
+    .standings-table th:nth-child(8) { width: 10%; } /* B */
+
+    .standings-table th { color: var(--muted); font-weight: 600; padding: 8px 0; text-align: center; border-bottom: 1px solid #333;}
+    .standings-table th:nth-child(1) { text-align: left; padding-left: 8px; }
+    .standings-table td { background: var(--surface); padding: 12px 0; text-align: center; font-weight: 600; }
+    .standings-table td:first-child { border-radius: 8px 0 0 8px; padding-left: 8px; }
     .standings-table td:last-child { border-radius: 0 8px 8px 0; color: var(--accent); font-weight: 800; }
-    .standings-table td:nth-child(2) { text-align: left; }
+    .standings-table td:nth-child(1) { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
-    /* Sivá pre postupové riadky */
     .row-playoff td { background-color: var(--playoff-bg); }
     .row-danger td { background: var(--relegation); color: #ff9999; }
     .row-danger td:last-child { color: #ff9999; }
-    .s-rank { font-size: 11px; color: var(--muted); margin-right: 6px; }
+    
+    /* Pevná šírka pre číslo v tabuľke, aby neposkakovali názvy tímov */
+    .s-rank { display: inline-block; width: 14px; text-align: center; font-size: 11px; color: var(--muted); margin-right: 4px; }
 
-    /* PLAYOFF */
-    .playoff-wrap { text-align: center; padding-top: 40px; position: relative; }
-    /* Zväčšené logo zo 150px na 300px */
-    .po-logo { width: 300px; opacity: 0.1; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: -1; }
-    .po-title { font-size: 24px; font-weight: 800; color: var(--accent); margin-bottom: 12px; }
-    .po-text { color: var(--muted); font-size: 14px; line-height: 1.5; font-weight: 500; }
+    /* PLAYOFF - Prerobené na dokonalé vertikálne aj horizontálne centrovanie */
+    .page.active#page-playoff {
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      min-height: 65vh; position: relative; text-align: center; overflow: hidden;
+    }
+    .po-logo { 
+      width: 450px; opacity: 0.1; 
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+      z-index: -1; pointer-events: none;
+    }
+    .po-title { font-size: 24px; font-weight: 800; color: var(--accent); margin-bottom: 12px; z-index: 1;}
+    .po-text { color: var(--muted); font-size: 14px; line-height: 1.5; font-weight: 500; z-index: 1;}
 
     /* VÝKONY (STATS) */
     .coeff-card {
@@ -247,7 +263,7 @@
     .nav-item.active { color: var(--accent); }
 
     /* LOADER & EMPTY */
-    .loader, .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-weight: 600; }
+    .loader, .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-weight: 600; width: 100%; }
     .spinner {
       width: 30px; height: 30px; border: 3px solid #333; border-top-color: var(--accent);
       border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px;
@@ -301,11 +317,9 @@
     </div>
 
     <div class="page" id="page-playoff">
-      <div class="playoff-wrap">
-        <img src="logo transparent.png" alt="Logo Watermark" class="po-logo" onerror="this.style.display='none'">
-        <div class="po-title">Play-off zatiaľ nie<br>je k dispozícii.</div>
-        <div class="po-text">Táto sekcia sa aktivuje po<br>skončení skupinovej fázy.</div>
-      </div>
+      <img src="logo transparent.png" alt="Logo Watermark" class="po-logo" onerror="this.style.display='none'">
+      <div class="po-title">Play-off zatiaľ nie<br>je k dispozícii.</div>
+      <div class="po-text">Táto sekcia sa aktivuje po<br>skončení skupinovej fázy.</div>
     </div>
 
     <div class="page" id="page-vykony">
@@ -508,7 +522,6 @@ function renderTabulka() {
     const rows = calcStandings(s);
     const gClass = s === 'A' ? 'ga' : 'gb';
     const trs = rows.map((r,i) => {
-      // Podmienky pre triedy riadkov (Postup vs. Vypadnutie)
       const isPlayoff = i < 4; 
       const isDanger = i >= rows.length - 2; 
       let rowClass = '';
@@ -591,8 +604,6 @@ function renderVykony() {
   const avgPPG = totalP > 0 ? (totalPts / totalP).toFixed(1) : '0.0';
   const avgGPG = totalP > 0 ? (totalGF / totalP).toFixed(1) : '0.0';
   const avgRank = ranks.length > 0 ? (ranks.reduce((a,b)=>a+b,0)/ranks.length).toFixed(1) : '0.0';
-  
-  // Výpočet koeficientu: Priemerné PPG na báze max 3 bodov, transformované na stupnicu do 10
   const coeff = totalP > 0 ? ((totalPts / totalP) / 3 * 10).toFixed(1) : '0.0';
 
   el.innerHTML = `
@@ -601,8 +612,8 @@ function renderVykony() {
       <div class="coeff-val">${coeff}<span class="coeff-max">/10</span></div>
     </div>
     <div class="global-stats">
-      <div class="g-stat"><div class="g-val">${avgPPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>BODY NA ZÁPAS</div></div>
-      <div class="g-stat"><div class="g-val">${avgGPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>GÓLY NA ZÁPAS</div></div>
+      <div class="g-stat"><div class="g-val">${avgPPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>BODOV NA ZÁPAS</div></div>
+      <div class="g-stat"><div class="g-val">${avgGPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>GÓLOV NA ZÁPAS</div></div>
       <div class="g-stat"><div class="g-val">${avgRank}</div><div class="g-label">CELKOVÝ PRIEMER<br>PORADIA</div></div>
     </div>
     ${teamCards}
