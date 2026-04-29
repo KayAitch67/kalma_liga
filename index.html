@@ -15,7 +15,7 @@
       --surface: #1e1e1e;
       --surface-light: #2a2a2a;
       --accent: #FF7300;
-      --group-a: #5C9E31;
+      --group-a: #1e1e1e;
       --group-b: #00A896;
       --text: #ffffff;
       --muted: #a0a0a0;
@@ -429,7 +429,7 @@ function createMatchCard(z, isUp) {
     <div class="match-card">
       <div class="mc-header">
         <span class="mc-match-num">ZÁPAS #${z.id || '?'}</span>
-        <span class="mc-score-label">${isUp ? 'NADCHÁDZAJÚCI' : 'VÝSLEDNÉ SKÓRE'}</span>
+        <span class="mc-score-label">${isUp ? 'N/A' : 'VÝSLEDNÉ SKÓRE'}</span>
         <span class="mc-group ${gClass}">SKUPINA ${z.skupina}</span>
       </div>
       <div class="mc-teams">
@@ -575,9 +575,9 @@ function renderVykony() {
       <div class="coeff-val">${coeff}<span class="coeff-max">/10</span></div>
     </div>
     <div class="global-stats">
-      <div class="g-stat"><div class="g-val">${avgPPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>BODY NA ZÁPAS</div></div>
-      <div class="g-stat"><div class="g-val">${avgGPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>GÓLY NA ZÁPAS</div></div>
-      <div class="g-stat"><div class="g-val">${avgRank}</div><div class="g-label">CELKOVÝ PRIEMER<br>PORADIA</div></div>
+      <div class="g-stat"><div class="g-val">${avgPPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>BODOV NA ZÁPAS</div></div>
+      <div class="g-stat"><div class="g-val">${avgGPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>GÓLOV NA ZÁPAS</div></div>
+      <div class="g-stat"><div class="g-val">${avgRank}</div><div class="g-label">CELKOVÝ PRIEMER<br>PORADIA HRÁČA</div></div>
     </div>
     ${teamCards}
   `;
