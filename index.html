@@ -7,513 +7,328 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="theme-color" content="#121212"/>
   <title>Kalma Liga</title>
-  <link rel="manifest" href="manifest.json"/>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     :root {
-      /* Farebná paleta podľa mockupu */
-      --bg:       #121212;
-      --surface:  #1e1e1e;
-      --surface2: #2a2a2a;
-      --accent:   #ff7b00; /* Hlavná oranžová */
-      --accent-hover: #e66e00;
-      --accent-green: #00d26a;
-      --text:     #ffffff;
-      --muted:    #888888;
-      --border:   #333333;
-      --loss-bg:  #3a0f0f; /* Tmavá červená pre vypadávajúcich */
-      --loss-border:#ff4d4d;
-      --r:        12px;
-      --nav-h:    70px;
-      --fh:       'Barlow Condensed', sans-serif;
-      --fb:       'Barlow', sans-serif;
+      --bg: #121212;
+      --surface: #1e1e1e;
+      --surface-light: #2a2a2a;
+      --accent: #FF7300;
+      --group-a: #5C9E31;
+      --group-b: #00A896;
+      --text: #ffffff;
+      --muted: #a0a0a0;
+      --win: #2ecc71;
+      --draw: #f39c12;
+      --loss: #e74c3c;
+      --relegation: rgba(231, 76, 60, 0.15);
+      --font: 'Montserrat', sans-serif;
     }
-    *{box-sizing:border-box;margin:0;padding:0;}
-    html,body{height:100%;}
-    body{
-      font-family:var(--fb);
-      background:var(--bg);
-      color:var(--text);
-      max-width:480px;
-      margin:0 auto;
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text);
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       position: relative;
-      /* Jemný pattern pozadia pre herný feel */
-      background-image: radial-gradient(circle at 50% 0%, #1f1f1f 0%, transparent 70%);
+    }
+
+    /* DIAGONAL STRIPES BACKGROUND */
+    body::before {
+      content: "";
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(-45deg, rgba(255,115,0,0.02), rgba(255,115,0,0.02) 15px, transparent 15px, transparent 30px);
+      z-index: -1;
+      pointer-events: none;
     }
 
     /* HEADER */
     header {
-      padding: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 16px 10px;
       background: var(--bg);
-      border-bottom: 1px dashed var(--border);
+      position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px dashed #333;
     }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .header-logo { width: 45px; height: auto; }
+    .header-title-wrap { display: flex; flex-direction: column; line-height: 1; }
+    .header-title { font-size: 20px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+    .header-subtitle { font-size: 20px; font-weight: 900; letter-spacing: 2px; color: var(--accent); }
+
+    .header-right { display: flex; align-items: center; gap: 10px; text-align: right; }
+    .progress-info { display: flex; flex-direction: column; }
+    .progress-label { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 1px; }
+    .progress-val { font-size: 11px; font-weight: 800; color: var(--text); }
+    
+    /* DONUT CHART */
+    .donut {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: conic-gradient(var(--accent) calc(var(--pct) * 1%), #333 0);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 10px rgba(255,115,0,0.2);
+      transition: background 0.5s ease-out;
     }
-    .brand-logo {
-      width: 32px;
-      height: 32px;
-      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff7b00"><path d="M12 2L2 22h20L12 2zm0 6l5.5 11h-11L12 8z"/></svg>') no-repeat center/contain;
-    }
-    .header-title {
-      font-family: var(--fh);
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: 2px;
-      line-height: 1;
-      text-transform: uppercase;
-    }
-    .header-title span {
-      display: block;
-      color: var(--accent);
-      font-size: 28px;
+    .donut::before {
+      content: ""; width: 26px; height: 26px;
+      background: var(--bg); border-radius: 50%;
     }
 
-    /* KRUHOVÝ DIAGRAM PROGRESU */
-    .progress-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .progress-info {
-      text-align: right;
-    }
-    .progress-label {
-      font-family: var(--fh);
-      font-size: 10px;
-      color: var(--muted);
-      letter-spacing: 1px;
-    }
-    .progress-val {
-      font-family: var(--fh);
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--accent);
-    }
-    .progress-ring {
-      position: relative;
-      width: 36px;
-      height: 36px;
-    }
-    .progress-ring svg {
-      transform: rotate(-90deg);
-      width: 100%;
-      height: 100%;
-    }
-    .progress-ring circle {
-      fill: transparent;
-      stroke-width: 4;
-    }
-    .ring-bg { stroke: var(--surface2); }
-    .ring-fill {
-      stroke: var(--accent);
-      stroke-linecap: round;
-      transition: stroke-dashoffset 0.5s ease-out;
-    }
-
-    /* MAIN CONTENT */
-    main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      padding-bottom: calc(var(--nav-h) + 20px); /* Miesto pre spodné menu */
-    }
-    .page { display: none; animation: fadeIn 0.3s ease; }
+    /* MAIN AREA */
+    main { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 80px; }
+    .page { display: none; animation: fadeIn 0.3s; }
     .page.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* FILTER BAR (Zápasy) */
-    .filter-bar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-    .chip-group { display: flex; gap: 8px; flex-wrap: wrap; }
-    .chip {
-      padding: 6px 16px;
-      border-radius: 20px;
-      border: 1px solid var(--accent);
-      background: transparent;
-      color: var(--accent);
-      font-family: var(--fh);
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-transform: uppercase;
+    /* FILTERS (ZÁPASY) */
+    .filter-buttons { display: flex; gap: 8px; margin-bottom: 12px; }
+    .f-btn {
+      flex: 1; padding: 8px 0; border-radius: 20px;
+      font-family: var(--font); font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      background: transparent; border: 1px solid var(--muted); color: var(--muted);
+      cursor: pointer; transition: 0.2s;
     }
-    .chip.active {
-      background: var(--accent);
-      color: var(--bg);
-    }
-    .filter-select {
-      width: 100%;
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-family: var(--fh);
-      font-size: 16px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      cursor: pointer;
-      outline: none;
-      appearance: none;
-    }
-    .filter-select:focus { border-color: var(--accent); }
+    .f-btn.active.all { background: var(--accent); border-color: var(--accent); color: #000; }
+    .f-btn.active.ga { background: var(--group-a); border-color: var(--group-a); color: #fff; }
+    .f-btn.active.gb { background: var(--group-b); border-color: var(--group-b); color: #fff; }
 
-    /* MATCH CARD (Podľa predlohy) */
+    .dropdown {
+      width: 100%; padding: 12px 16px; border-radius: 12px;
+      background: var(--surface-light); border: 1px solid #444; color: var(--text);
+      font-family: var(--font); font-size: 13px; font-weight: 600;
+      outline: none; margin-bottom: 20px; appearance: none;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 12px auto;
+    }
+
     .section-title {
-      font-family: var(--fh);
-      font-size: 14px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 14px; font-weight: 800; letter-spacing: 1px;
+      color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
     }
-    .section-title::after {
-      content: ''; flex: 1; height: 1px; background: var(--accent); opacity: 0.5;
-    }
+    .badge { background: #333; color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+
+    /* MATCH CARDS */
     .match-card {
-      background: var(--surface);
-      border-radius: 8px;
-      padding: 12px 16px;
-      margin-bottom: 12px;
-      border: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
+      position: relative; background: var(--surface);
+      border-radius: 16px; padding: 16px; margin-bottom: 12px;
+      overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }
-    /* Oranžový pásik naľavo */
-    .match-card::before {
-      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent);
+    .match-card::before, .match-card::after {
+      content: ""; position: absolute; top: 0; bottom: 0; width: 12px;
+      background: repeating-linear-gradient(-45deg, var(--accent), var(--accent) 8px, #8c4200 8px, #8c4200 16px);
     }
-    .match-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: var(--fh);
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .match-header .match-title { color: var(--text); font-weight: 700; }
-    .match-header .match-group { color: var(--accent-green); font-weight: 700; }
-    .match-body {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 12px;
-    }
-    .team { font-family: var(--fh); font-size: 18px; font-weight: 700; text-transform: uppercase; }
-    .team.home { text-align: right; }
-    .team.away { text-align: left; }
-    .score {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 4px 16px;
-      font-family: var(--fh);
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--text);
-      min-width: 70px;
-      text-align: center;
-    }
-    .score.upcoming { color: var(--muted); border-style: dashed; }
+    .match-card::before { left: 0; }
+    .match-card::after { right: 0; }
 
-    /* TABUĽKA (Standings) */
-    .legend-wrap {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 16px;
-      font-family: var(--fh);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    .mc-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px; padding: 0 10px;
     }
+    .mc-match-num { background: #333; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
+    .mc-score-label { font-size: 9px; font-weight: 700; color: var(--muted); }
+    .mc-group { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; }
+    .mc-group.ga { background: rgba(92,158,49,0.2); color: var(--group-a); }
+    .mc-group.gb { background: rgba(0,168,150,0.2); color: var(--group-b); }
+
+    .mc-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 10px; gap: 10px; }
+    .mc-team { font-size: 14px; font-weight: 700; text-align: center; }
+    .mc-score {
+      background: #111; border: 1px solid #333; border-radius: 12px;
+      padding: 8px 16px; font-size: 16px; font-weight: 900; color: var(--accent);
+    }
+
+    /* STANDINGS */
+    .legend { display: flex; gap: 16px; margin-bottom: 16px; font-size: 11px; font-weight: 600; }
     .legend-item { display: flex; align-items: center; gap: 6px; }
-    .legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #000; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid; }
+    .dot.safe { border-color: var(--group-a); }
+    .dot.danger { border-color: var(--loss); }
+
+    .standings-table { width: 100%; border-collapse: separate; border-spacing: 0 4px; font-size: 12px; margin-bottom: 24px; }
+    .s-title { font-size: 14px; font-weight: 800; padding: 4px 12px; display: inline-block; border-radius: 4px; margin-bottom: 8px;}
+    .s-title.ga { color: var(--group-a); border-bottom: 2px solid var(--group-a); }
+    .s-title.gb { color: var(--group-b); border-bottom: 2px solid var(--group-b); }
     
-    .table-container {
-      background: var(--surface);
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-      margin-bottom: 24px;
-    }
-    .table-header-group {
-      background: #000;
-      padding: 8px 12px;
-      font-family: var(--fh);
-      font-weight: 800;
-      color: var(--accent-green);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      font-size: 14px;
-    }
-    .standings-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .standings-table th {
-      font-family: var(--fh);
-      font-size: 11px;
-      color: var(--muted);
-      padding: 8px 4px;
-      text-align: center;
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-    }
-    .standings-table th:first-child { text-align: left; padding-left: 12px; }
-    .standings-table td {
-      padding: 10px 4px;
-      text-align: center;
-      border-bottom: 1px solid var(--border);
-      font-family: var(--fb);
-      font-weight: 600;
-    }
-    .standings-table td:first-child {
-      text-align: left;
-      padding-left: 12px;
-      font-family: var(--fh);
-      text-transform: uppercase;
-      font-size: 15px;
-    }
-    /* Zvýraznenie riadkov */
-    .standings-table tr.playoff-row { border-left: 3px solid var(--text); }
-    .standings-table tr.noplf-row { background: var(--loss-bg); border-left: 3px solid var(--loss-border); }
-    .standings-table td.pts { color: var(--accent-green); font-weight: 800; }
+    .standings-table th { color: var(--muted); font-weight: 600; padding: 8px; text-align: center; border-bottom: 1px solid #333;}
+    .standings-table th:nth-child(2) { text-align: left; }
+    .standings-table td { background: var(--surface); padding: 12px 8px; text-align: center; font-weight: 600; }
+    .standings-table td:first-child { border-radius: 8px 0 0 8px; }
+    .standings-table td:last-child { border-radius: 0 8px 8px 0; color: var(--accent); font-weight: 800; }
+    .standings-table td:nth-child(2) { text-align: left; }
+    
+    .row-danger td { background: var(--relegation); color: #ff9999; }
+    .row-danger td:last-child { color: #ff9999; }
+    .s-rank { font-size: 11px; color: var(--muted); margin-right: 6px; }
 
-    /* PLAY-OFF ZÁSTUPNÁ OBRAZOVKA */
-    .playoff-empty {
-      text-align: center;
-      padding: 80px 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 60vh;
-    }
-    .playoff-icon {
-      width: 120px;
-      height: 120px;
-      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ff7b00" opacity="0.8"><path d="M12 2L2 22h20L12 2zm0 6l5.5 11h-11L12 8z"/></svg>') no-repeat center/contain;
-      margin-bottom: 24px;
-      filter: drop-shadow(0 0 20px rgba(255,123,0,0.4));
-    }
-    .playoff-empty h2 {
-      font-family: var(--fh);
-      font-size: 28px;
-      font-weight: 900;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 10px;
-    }
-    .playoff-empty p {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.5;
-    }
+    /* PLAYOFF */
+    .playoff-wrap { text-align: center; padding-top: 40px; position: relative; }
+    .po-logo { width: 150px; opacity: 0.1; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: -1; }
+    .po-title { font-size: 24px; font-weight: 800; color: var(--accent); margin-bottom: 12px; }
+    .po-text { color: var(--muted); font-size: 14px; line-height: 1.5; font-weight: 500; }
 
-    /* VÝKONY */
-    .score-card {
-      background: var(--surface);
-      border: 1px dashed var(--border);
-      border-radius: 12px;
-      padding: 30px;
-      text-align: center;
-      margin-bottom: 20px;
-      position: relative;
-      overflow: hidden;
+    /* VÝKONY (STATS) */
+    .coeff-card {
+      background: linear-gradient(145deg, #252525, #151515);
+      border: 1px solid #444; border-radius: 16px; padding: 20px;
+      text-align: center; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     }
-    .score-card::after {
-      content: ''; position: absolute; right: -20px; bottom: -20px; width: 100px; height: 100px;
-      background: var(--accent); opacity: 0.1; transform: rotate(45deg);
+    .coeff-title { font-size: 13px; font-weight: 800; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+    .coeff-val { font-size: 48px; font-weight: 900; color: var(--accent); line-height: 1; }
+    .coeff-max { font-size: 20px; color: #555; }
+    
+    .global-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+    .g-stat {
+      background: var(--surface); border: 1px solid #333; border-radius: 12px;
+      padding: 16px 10px; text-align: center;
     }
-    .coeff-val {
-      font-family: var(--fh);
-      font-size: 56px;
-      font-weight: 900;
-      color: var(--accent);
-      line-height: 1;
-    }
-    .coeff-val span { font-size: 24px; color: var(--muted); }
+    .g-val { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .g-label { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; line-height: 1.3;}
 
-    /* BOTTOM NAVIGATION */
-    nav.bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 480px;
-      height: var(--nav-h);
-      background: #0a0a0a;
-      border-top: 1px dashed var(--border);
-      display: flex;
-      z-index: 1000;
-      border-radius: 20px 20px 0 0;
+    .team-stat-card {
+      background: var(--surface); border-radius: 16px; overflow: hidden;
+      margin-bottom: 16px; border: 1px solid #333; position: relative;
+    }
+    .team-stat-card::before {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+      background: repeating-linear-gradient(-45deg, var(--accent), var(--accent) 6px, #8c4200 6px, #8c4200 12px);
+    }
+    .ts-header {
+      background: var(--surface-light); padding: 12px 16px 12px 20px;
+      font-size: 12px; font-weight: 700; color: var(--muted);
+      border-bottom: 1px solid #333;
+    }
+    .ts-name { color: #fff; font-size: 14px; font-weight: 800; }
+    .ts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: #333; }
+    .ts-item { background: var(--surface); padding: 16px 10px; text-align: center; }
+    .ts-val { font-size: 24px; font-weight: 900; margin-bottom: 4px; }
+    .ts-label { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+
+    /* BOTTOM NAV */
+    nav {
+      position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto;
+      background: var(--bg); border-top: 1px solid #333;
+      display: flex; justify-content: space-around; padding: 12px 0 20px; z-index: 100;
     }
     .nav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all 0.2s;
-      gap: 4px;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      color: var(--muted); cursor: pointer; transition: 0.2s; flex: 1;
     }
-    .nav-item svg {
-      width: 20px;
-      height: 20px;
-      fill: currentColor;
-    }
-    .nav-item span {
-      font-family: var(--fh);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-    .nav-item.active {
-      color: var(--accent);
-    }
-    .nav-item.active svg { filter: drop-shadow(0 0 5px rgba(255,123,0,0.5)); }
+    .nav-item i { font-size: 20px; }
+    .nav-item span { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;}
+    .nav-item.active { color: var(--accent); }
 
-    /* OSTATNÉ (Loader, atď) */
-    .loader{display:flex;flex-direction:column;align-items:center;padding:60px 20px;color:var(--muted);gap:14px;}
-    .spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
-    @keyframes spin{to{transform:rotate(360deg);}}
-    .empty{text-align:center;color:var(--muted);padding:30px;font-size:14px;}
-    .error-box{background:var(--loss-bg);border:1px solid var(--loss-border);border-radius:var(--r);padding:16px;margin-bottom:16px;font-size:13px;color:#ffcccc;line-height:1.6;}
+    /* LOADER & EMPTY */
+    .loader, .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-weight: 600; }
+    .spinner {
+      width: 30px; height: 30px; border: 3px solid #333; border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="brand">
-    <div class="brand-logo"></div>
-    <div class="header-title">
-      Kalma<span>Liga</span>
-    </div>
-  </div>
-  <div class="progress-container">
-    <div class="progress-info">
-      <div class="progress-label">PROGRES</div>
-      <div class="progress-val" id="prog-text">0/0</div>
-    </div>
-    <div class="progress-ring">
-      <svg>
-        <circle class="ring-bg" cx="18" cy="18" r="14"></circle>
-        <circle class="ring-fill" id="prog-circle" cx="18" cy="18" r="14" stroke-dasharray="88" stroke-dashoffset="88"></circle>
-      </svg>
-    </div>
-  </div>
-</header>
-
-<main>
-  <div class="page active" id="page-zapasy">
-    <div class="filter-bar">
-      <div class="chip-group" id="skupinaChips">
-        <div class="chip active" onclick="setSkupina('',this)">Všetky</div>
+  <header>
+    <div class="header-left">
+      <img src="logo transparent.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
+      <div class="header-title-wrap">
+        <span class="header-title">KALMA</span>
+        <span class="header-subtitle">LIGA</span>
       </div>
-      <select class="filter-select" id="timFilter" onchange="renderZapasy()">
+    </div>
+    <div class="header-right">
+      <div class="progress-info">
+        <span class="progress-label">PROGRES</span>
+        <span class="progress-val" id="prog-text">0/0</span>
+      </div>
+      <div class="donut" id="prog-donut" style="--pct: 0;"></div>
+    </div>
+  </header>
+
+  <main>
+    
+    <div class="page active" id="page-zapasy">
+      <div class="filter-buttons">
+        <button class="f-btn active all" onclick="setSkupina('', this)">VŠETKY</button>
+        <button class="f-btn ga" onclick="setSkupina('A', this)">SKUPINA A</button>
+        <button class="f-btn gb" onclick="setSkupina('B', this)">SKUPINA B</button>
+      </div>
+      <select class="dropdown" id="timFilter" onchange="renderZapasy()">
         <option value="">VŠETKY TÍMY</option>
       </select>
-    </div>
-    <div id="zapasy-content">
-      <div class="loader"><div class="spinner"></div></div>
-    </div>
-  </div>
-
-  <div class="page" id="page-tabulka">
-    <div class="legend-wrap">
-      <div class="legend-item">
-        <div class="legend-dot" style="background:var(--text)"></div>
-        Postup do play-off
-      </div>
-      <div class="legend-item">
-        <div class="legend-dot" style="background:var(--loss-bg); border-color:var(--loss-border)"></div>
-        Vypadnutie z turnaja
+      <div id="zapasy-content">
+        <div class="loader"><div class="spinner"></div>Načítavam zápasy...</div>
       </div>
     </div>
-    <div id="tabulka-content">
-      <div class="loader"><div class="spinner"></div></div>
-    </div>
-  </div>
 
-  <div class="page" id="page-playoff">
-    <div class="playoff-empty">
-      <div class="playoff-icon"></div>
-      <h2>Play-off zatiaľ<br>nie je k dispozícii.</h2>
-      <p>Táto sekcia sa aktivuje po skončení skupinovej fázy.</p>
+    <div class="page" id="page-poradie">
+      <div class="legend">
+        <div class="legend-item"><div class="dot safe"></div> postup do play-off</div>
+        <div class="legend-item"><div class="dot danger"></div> vypadnutie z turnaja</div>
+      </div>
+      <div id="tabulka-content">
+        <div class="loader"><div class="spinner"></div>Načítavam poradie...</div>
+      </div>
     </div>
-  </div>
 
-  <div class="page" id="page-vykony">
-    <div class="filter-bar" style="margin-bottom: 24px;">
-      <select class="filter-select" id="playerSelect" onchange="renderVykony()">
-        <option value="">— VYBER HRÁČA —</option>
+    <div class="page" id="page-playoff">
+      <div class="playoff-wrap">
+        <img src="logo transparent.png" alt="Logo Watermark" class="po-logo" onerror="this.style.display='none'">
+        <div class="po-title">Play-off zatiaľ nie<br>je k dispozícii.</div>
+        <div class="po-text">Táto sekcia sa aktivuje po<br>skončení skupinovej fázy.</div>
+      </div>
+    </div>
+
+    <div class="page" id="page-vykony">
+      <select class="dropdown" id="playerSelect" onchange="renderVykony()">
+        <option value="">VYBER HRÁČA</option>
       </select>
+      <div id="vykony-content">
+        <div class="empty">Zvoľte hráča z ponuky vyššie.</div>
+      </div>
     </div>
-    <div id="vykony-content">
-      <div class="score-card" style="opacity:0.3; height:150px;"></div>
-      <div class="score-card" style="opacity:0.2; height:150px;"></div>
-    </div>
-  </div>
-</main>
 
-<nav class="bottom-nav">
-  <div class="nav-item active" onclick="showPage('zapasy',this)">
-    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
-    <span>Zápasy</span>
-  </div>
-  <div class="nav-item" onclick="showPage('tabulka',this)">
-    <svg viewBox="0 0 24 24"><path d="M3 3h18v18H3V3zm16 16V5H5v14h14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z"/></svg>
-    <span>Poradie</span>
-  </div>
-  <div class="nav-item" onclick="showPage('playoff',this)">
-    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-7-2h2V7h-4v2h2z"/></svg>
-    <span>Play-off</span>
-  </div>
-  <div class="nav-item" onclick="showPage('vykony',this)">
-    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-    <span>Výkony</span>
-  </div>
-</nav>
+  </main>
+
+  <nav>
+    <div class="nav-item active" onclick="navTo('zapasy', this)">
+      <i class="fa-solid fa-futbol"></i><span>Zápasy</span>
+    </div>
+    <div class="nav-item" onclick="navTo('poradie', this)">
+      <i class="fa-solid fa-list-ol"></i><span>Poradie</span>
+    </div>
+    <div class="nav-item" onclick="navTo('playoff', this)">
+      <i class="fa-solid fa-trophy"></i><span>Play-off</span>
+    </div>
+    <div class="nav-item" onclick="navTo('vykony', this)">
+      <i class="fa-solid fa-chart-simple"></i><span>Výkony</span>
+    </div>
+  </nav>
 
 <script>
 // ═══════════════════════════════════════
-//  KONFIGURÁCIA & STAV
+// KONFIGURÁCIA CSV
 // ═══════════════════════════════════════
 const CSV_URLS = {
   tymy:   'https://docs.google.com/spreadsheets/d/e/2PACX-1vSK9rgfWoC7l6Zj8cqUjXY4mPCqszTV7sIPQ7wN0M_CD41Oy11nk7IOd4MqyAxn9z__5ZxS5XgLsNd0/pub?gid=0&single=true&output=csv',
   zapasy: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSK9rgfWoC7l6Zj8cqUjXY4mPCqszTV7sIPQ7wN0M_CD41Oy11nk7IOd4MqyAxn9z__5ZxS5XgLsNd0/pub?gid=441403134&single=true&output=csv',
   hraci:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vSK9rgfWoC7l6Zj8cqUjXY4mPCqszTV7sIPQ7wN0M_CD41Oy11nk7IOd4MqyAxn9z__5ZxS5XgLsNd0/pub?gid=1788671607&single=true&output=csv',
 };
-const PLAYOFF_SPOTS = 4;
 
 let DATA = { tymy:[], zapasy:[], hraci:[] };
 let activeSkupina = '';
 
 // ═══════════════════════════════════════
-//  CSV PARSING
+// PARSOVANIE A NAČÍTANIE (s CORS proxy zálohou)
 // ═══════════════════════════════════════
 function parseLine(line) {
   const vals=[]; let cur='', inQ=false;
@@ -525,14 +340,11 @@ function parseLine(line) {
   vals.push(cur);
   return vals.map(v=>v.trim().replace(/^"|"$/g,''));
 }
+
 function parseCSV(text) {
   const lines = text.trim().split(/\r?\n/);
   if(lines.length < 2) return [];
-  
-  const headers = parseLine(lines[0]).map(h => {
-    return h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().replace(/\s+/g, '_');
-  });
-
+  const headers = parseLine(lines[0]).map(h => h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().replace(/\s+/g, '_'));
   return lines.slice(1).map(line => {
     const vals = parseLine(line);
     const obj = {};
@@ -544,83 +356,57 @@ function parseCSV(text) {
 async function fetchCSV(url) {
   try {
     const res = await fetch(url, {cache:'no-store'});
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
-    if(text.trim().startsWith('<')) throw new Error('Vrátilo HTML – nie CSV');
-    return parseCSV(text);
-  } catch(_) {}
-
-  const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
-  const res2 = await fetch(proxy, {cache:'no-store'});
-  if(!res2.ok) throw new Error(`Proxy zlyhala (HTTP ${res2.status})`);
-  const text2 = await res2.text();
-  return parseCSV(text2);
+    if(!res.ok) throw new Error();
+    return parseCSV(await res.text());
+  } catch(_) {
+    const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
+    const res2 = await fetch(proxy, {cache:'no-store'});
+    return parseCSV(await res2.text());
+  }
 }
 
-// ═══════════════════════════════════════
-//  LOAD ALL
-// ═══════════════════════════════════════
 async function loadAll() {
   try {
     const [tymy, zapasy, hraci] = await Promise.all([
-      fetchCSV(CSV_URLS.tymy),
-      fetchCSV(CSV_URLS.zapasy),
-      fetchCSV(CSV_URLS.hraci),
+      fetchCSV(CSV_URLS.tymy), fetchCSV(CSV_URLS.zapasy), fetchCSV(CSV_URLS.hraci)
     ]);
     DATA = {tymy, zapasy, hraci};
-    
-    updateProgress(); // Aktualizácia kruhového diagramu
-    buildSkupinaChips();
+    updateProgress();
     buildTimFilter();
     buildPlayerSelect();
     renderZapasy();
     renderTabulka();
   } catch(err) {
-    const msg = `<div class="error-box">❌ Chyba pri načítaní dát<br>${err.message}</div>`;
-    document.getElementById('zapasy-content').innerHTML = msg;
-    document.getElementById('tabulka-content').innerHTML = msg;
+    document.querySelectorAll('.loader').forEach(l => l.innerHTML = '❌ Chyba pri načítaní dát.');
   }
 }
 
 // ═══════════════════════════════════════
-//  KRUHOVÝ DIAGRAM PROGRESU
+// LOGIKA - PROGRESS A DONUT
 // ═══════════════════════════════════════
 function updateProgress() {
   const total = DATA.zapasy.length;
-  if(total === 0) return;
   const played = DATA.zapasy.filter(z => z.goly_domaci !== '' && z.goly_host !== '').length;
+  const pct = total === 0 ? 0 : (played / total) * 100;
   
   document.getElementById('prog-text').textContent = `${played}/${total}`;
-  
-  const circle = document.getElementById('prog-circle');
-  const radius = circle.r.baseVal.value;
-  const circumference = radius * 2 * Math.PI;
-  
-  // Progress ratio
-  const offset = circumference - (played / total) * circumference;
-  
-  circle.style.strokeDasharray = `${circumference} ${circumference}`;
-  circle.style.strokeDashoffset = offset;
+  document.getElementById('prog-donut').style.setProperty('--pct', pct);
 }
 
 // ═══════════════════════════════════════
-//  UI FILTRE
+// LOGIKA - ZÁPASY
 // ═══════════════════════════════════════
-function buildSkupinaChips() {
-  const skupiny = [...new Set(DATA.tymy.map(t=>t.skupina))].sort();
-  const wrap = document.getElementById('skupinaChips');
-  skupiny.forEach(s => {
-    const ch = document.createElement('div');
-    ch.className = 'chip';
-    ch.textContent = 'SKUPINA ' + s;
-    ch.onclick = () => setSkupina(s, ch);
-    wrap.appendChild(ch);
-  });
-}
 function setSkupina(s, el) {
   activeSkupina = s;
-  document.querySelectorAll('#skupinaChips .chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
+  document.querySelectorAll('.f-btn').forEach(b => {
+    b.classList.remove('active', 'all', 'ga', 'gb');
+    if(b === el) {
+      b.classList.add('active');
+      if(s==='') b.classList.add('all');
+      if(s==='A') b.classList.add('ga');
+      if(s==='B') b.classList.add('gb');
+    }
+  });
   buildTimFilter();
   renderZapasy();
 }
@@ -631,30 +417,27 @@ function buildTimFilter() {
   sel.innerHTML = '<option value="">VŠETKY TÍMY</option>';
   const tymy = activeSkupina ? DATA.tymy.filter(t=>t.skupina===activeSkupina) : DATA.tymy;
   tymy.forEach(t => {
-    const o = document.createElement('option');
-    o.value = t.nazov; o.textContent = t.nazov.toUpperCase();
+    const o = document.createElement('option'); o.value = t.nazov; o.textContent = t.nazov.toUpperCase();
     sel.appendChild(o);
   });
   if([...sel.options].some(o=>o.value===prev)) sel.value = prev;
 }
 
-// ═══════════════════════════════════════
-//  RENDER – ZÁPASY
-// ═══════════════════════════════════════
-function matchCard(z, isUp) {
+function createMatchCard(z, isUp) {
+  const gClass = z.skupina === 'A' ? 'ga' : 'gb';
   return `
-  <div class="match-card">
-    <div class="match-header">
-      <span class="match-id">ZÁPAS #${z.id || '?'}</span>
-      <span class="match-title">VÝSLEDKOVÉ SKÓRE</span>
-      <span class="match-group">SKUPINA ${z.skupina}</span>
-    </div>
-    <div class="match-body">
-      <div class="team home">${z.domaci}</div>
-      <div class="score ${isUp ? 'upcoming' : ''}">${isUp ? '- : -' : `${z.goly_domaci} : ${z.goly_host}`}</div>
-      <div class="team away">${z.host}</div>
-    </div>
-  </div>`;
+    <div class="match-card">
+      <div class="mc-header">
+        <span class="mc-match-num">ZÁPAS #${z.id || '?'}</span>
+        <span class="mc-score-label">${isUp ? 'NADCHÁDZAJÚCI' : 'VÝSLEDNÉ SKÓRE'}</span>
+        <span class="mc-group ${gClass}">SKUPINA ${z.skupina}</span>
+      </div>
+      <div class="mc-teams">
+        <div class="mc-team">${z.domaci}</div>
+        <div class="mc-score">${isUp ? '- : -' : `${z.goly_domaci} : ${z.goly_host}`}</div>
+        <div class="mc-team">${z.host}</div>
+      </div>
+    </div>`;
 }
 
 function renderZapasy() {
@@ -664,90 +447,73 @@ function renderZapasy() {
     if(tim && z.domaci!==tim && z.host!==tim) return false;
     return true;
   });
-  
+
   const past = zap.filter(z=>z.goly_domaci!==''&&z.goly_host!=='').sort((a,b)=>parseInt(b.id) - parseInt(a.id));
   const upcoming = zap.filter(z=>z.goly_domaci===''||z.goly_host==='').sort((a,b)=>parseInt(a.id) - parseInt(b.id));
 
   let html = '';
   if(upcoming.length) {
-    html += `<div class="section-title">NADCHÁDZAJÚCE <span>(${upcoming.length})</span></div>`;
-    html += upcoming.map(z=>matchCard(z,true)).join('');
+    html += `<div class="section-title">NADCHÁDZAJÚCE <span class="badge">${upcoming.length}</span></div>`;
+    html += upcoming.map(z=>createMatchCard(z, true)).join('');
   }
   if(past.length) {
-    html += `<div class="section-title" style="margin-top:20px;">ODOHRATÉ <span>(${past.length})</span></div>`;
-    html += past.map(z=>matchCard(z,false)).join('');
+    html += `<div class="section-title" style="margin-top:20px;">ODOHRATÉ <span class="badge">${past.length}</span></div>`;
+    html += past.map(z=>createMatchCard(z, false)).join('');
   }
-
-  document.getElementById('zapasy-content').innerHTML = html || '<div class="empty">Žiadne zápasy pre tento filter.</div>';
+  document.getElementById('zapasy-content').innerHTML = html || '<div class="empty">Zápasy nenájdené.</div>';
 }
 
 // ═══════════════════════════════════════
-//  STANDINGS VÝPOČET & RENDER
+// LOGIKA - PORADIE
 // ═══════════════════════════════════════
 function calcStandings(skupina) {
   const teams = DATA.tymy.filter(t=>t.skupina===skupina).map(t=>t.nazov);
   const st = {};
   teams.forEach(t=>{st[t]={t,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};});
-  DATA.zapasy
-    .filter(z=>z.skupina===skupina&&z.goly_domaci!==''&&z.goly_host!=='')
-    .forEach(z=>{
+  DATA.zapasy.filter(z=>z.skupina===skupina&&z.goly_domaci!==''&&z.goly_host!=='').forEach(z=>{
       const gd=parseInt(z.goly_domaci),gh=parseInt(z.goly_host);
-      if(isNaN(gd)||isNaN(gh)) return;
-      if(!st[z.domaci]||!st[z.host]) return;
+      if(isNaN(gd)||isNaN(gh)||!st[z.domaci]||!st[z.host]) return;
       st[z.domaci].p++;st[z.domaci].gf+=gd;st[z.domaci].ga+=gh;
       st[z.host].p++;st[z.host].gf+=gh;st[z.host].ga+=gd;
       if(gd>gh){st[z.domaci].w++;st[z.domaci].pts+=3;st[z.host].l++;}
       else if(gd<gh){st[z.host].w++;st[z.host].pts+=3;st[z.domaci].l++;}
       else{st[z.domaci].d++;st[z.domaci].pts++;st[z.host].d++;st[z.host].pts++;}
-    });
+  });
   return Object.values(st).sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
 }
 
 function renderTabulka() {
   const skupiny = [...new Set(DATA.tymy.map(t=>t.skupina))].sort();
-  if(!skupiny.length){document.getElementById('tabulka-content').innerHTML='<div class="empty">Žiadne dáta.</div>';return;}
-
-  const html = skupiny.map(s => {
+  let html = skupiny.map(s => {
     const rows = calcStandings(s);
+    const gClass = s === 'A' ? 'ga' : 'gb';
     const trs = rows.map((r,i) => {
-      const rank=i+1;
-      // Ak je mimo TOP 4, aplikuje sa červený styling noplf-row
-      const cls = rank<=PLAYOFF_SPOTS ? 'playoff-row' : 'noplf-row';
-      const gd = r.gf-r.ga;
-      return `<tr class="${cls}">
-        <td>${rank}&nbsp;&nbsp;${r.t}</td>
+      // Posledné 2 miesta sú vypadávajúce (červené podfarbenie) podľa dizajnu
+      const isDanger = i >= rows.length - 2; 
+      return `<tr class="${isDanger ? 'row-danger' : ''}">
+        <td><span class="s-rank">${i+1}</span> ${r.t}</td>
         <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
-        <td>${r.gf}:${r.ga}</td>
-        <td>${gd>0?'+':''}${gd}</td>
-        <td class="pts">${r.pts}</td>
+        <td>${r.gf}:${r.ga}</td><td>${(r.gf-r.ga)>0?'+':''}${r.gf-r.ga}</td><td>${r.pts}</td>
       </tr>`;
     }).join('');
-    
     return `
-    <div class="table-container">
-      <div class="table-header-group">SKUPINA ${s}</div>
+      <div class="s-title ${gClass}">SKUPINA ${s}</div>
       <table class="standings-table">
-        <thead><tr>
-          <th>TÍM</th><th>Z</th><th>V</th><th>R</th><th>P</th>
-          <th>SKÓRE</th><th>+/-</th><th>B</th>
-        </tr></thead>
+        <thead><tr><th># TÍM</th><th>OZ</th><th>V</th><th>R</th><th>P</th><th>GS</th><th>+/-</th><th>B</th></tr></thead>
         <tbody>${trs}</tbody>
-      </table>
-    </div>`;
+      </table>`;
   }).join('');
-
   document.getElementById('tabulka-content').innerHTML = html;
 }
 
 // ═══════════════════════════════════════
-//  VÝKONY & PLAYER SELECT
+// LOGIKA - VÝKONY
 // ═══════════════════════════════════════
 function buildPlayerSelect() {
   const sel = document.getElementById('playerSelect');
   DATA.hraci.forEach(h=>{
     if(!h.hrac) return;
-    const o=document.createElement('option');
-    o.value=h.hrac;o.textContent=h.hrac.toUpperCase();
+    const o=document.createElement('option'); o.value=h.hrac; o.textContent=h.hrac.toUpperCase();
     sel.appendChild(o);
   });
 }
@@ -755,53 +521,79 @@ function buildPlayerSelect() {
 function renderVykony() {
   const player = document.getElementById('playerSelect').value;
   const el = document.getElementById('vykony-content');
-  if(!player) return; // Zostane placeholder
+  if(!player){el.innerHTML='<div class="empty">Zvoľte hráča z ponuky.</div>';return;}
 
   const myTeams = DATA.tymy.filter(t=>t.hrac===player);
   if(!myTeams.length){el.innerHTML='<div class="empty">Hráč nemá priradené tímy.</div>';return;}
 
-  function teamSt(name) {
-    const s={p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
-    DATA.zapasy.filter(z=>(z.domaci===name||z.host===name)&&z.goly_domaci!==''&&z.goly_host!=='').forEach(z=>{
+  let totalPts=0, totalP=0, totalGF=0, ranks=[];
+
+  const teamCards = myTeams.map((t, idx) => {
+    const st={p:0,w:0,d:0,l:0,gf:0,pts:0};
+    DATA.zapasy.filter(z=>(z.domaci===t.nazov||z.host===t.nazov)&&z.goly_domaci!==''&&z.goly_host!=='').forEach(z=>{
       const gd=parseInt(z.goly_domaci),gh=parseInt(z.goly_host);
-      if(isNaN(gd)||isNaN(gh)) return;
-      const isH=z.domaci===name;
-      const mg=isH?gd:gh,og=isH?gh:gd;
-      s.p++;s.gf+=mg;s.ga+=og;
-      if(mg>og){s.w++;s.pts+=3;}else if(mg===og){s.d++;s.pts++;}else s.l++;
+      const isH=z.domaci===t.nazov; const mg=isH?gd:gh, og=isH?gh:gd;
+      st.p++; st.gf+=mg;
+      if(mg>og){st.w++;st.pts+=3;} else if(mg===og){st.d++;st.pts++;} else st.l++;
     });
-    return s;
-  }
+    
+    totalPts += st.pts; totalP += st.p; totalGF += st.gf;
+    const rank = calcStandings(t.skupina).findIndex(r=>r.t===t.nazov)+1;
+    ranks.push(rank);
 
-  let ppgArr=[];
-  myTeams.forEach(t=>{
-    const s=teamSt(t.nazov);
-    if(s.p>0) ppgArr.push(s.pts/s.p);
-  });
+    const gClass = t.skupina === 'A' ? 'var(--group-a)' : 'var(--group-b)';
+    const gpg = st.p > 0 ? (st.gf / st.p).toFixed(1) : '0.0';
+    const ppg = st.p > 0 ? (st.pts / st.p).toFixed(1) : '0.0';
 
-  const combinedPpg = ppgArr.length>0 ? ppgArr.reduce((a,b)=>a+b,0)/ppgArr.length : null;
-  const coeff = combinedPpg!==null ? ((combinedPpg/3)*10).toFixed(1) : '0.0';
+    return `
+      <div class="team-stat-card">
+        <div class="ts-header">
+          TÍM #${idx+1} | <span class="ts-name">${t.nazov}</span> | <span style="color:${gClass}">skupina ${t.skupina}</span> | #${rank}
+        </div>
+        <div class="ts-grid">
+          <div class="ts-item"><div class="ts-val" style="color:var(--win)">${st.w}</div><div class="ts-label">Výhry</div></div>
+          <div class="ts-item"><div class="ts-val">${st.d}</div><div class="ts-label">Remízy</div></div>
+          <div class="ts-item"><div class="ts-val" style="color:var(--loss)">${st.l}</div><div class="ts-label">Prehry</div></div>
+          <div class="ts-item"><div class="ts-val">${st.pts}</div><div class="ts-label">Body</div></div>
+          <div class="ts-item"><div class="ts-val">${gpg}</div><div class="ts-label">Góly na zápas</div></div>
+          <div class="ts-item"><div class="ts-val">${ppg}</div><div class="ts-label">Body na zápas</div></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Globálne výpočty
+  const avgPPG = totalP > 0 ? (totalPts / totalP).toFixed(1) : '0.0';
+  const avgGPG = totalP > 0 ? (totalGF / totalP).toFixed(1) : '0.0';
+  const avgRank = ranks.length > 0 ? (ranks.reduce((a,b)=>a+b,0)/ranks.length).toFixed(1) : '0.0';
+  
+  // Výpočet koeficientu: Priemerné PPG na báze max 3 bodov, transformované na stupnicu do 10
+  const coeff = totalP > 0 ? ((totalPts / totalP) / 3 * 10).toFixed(1) : '0.0';
 
   el.innerHTML = `
-    <div class="score-card">
-      <div class="coeff-val">${coeff}<span>/10</span></div>
-      <div style="color:var(--muted); font-size:12px; margin-top:10px; text-transform:uppercase; letter-spacing:1px;">Skóre hráča</div>
+    <div class="coeff-card">
+      <div class="coeff-title">VÝKONNOSTNÝ KOEFICIENT HRÁČA</div>
+      <div class="coeff-val">${coeff}<span class="coeff-max">/10</span></div>
     </div>
-    <div class="score-card" style="opacity:0.3; height:150px;"></div>
+    <div class="global-stats">
+      <div class="g-stat"><div class="g-val">${avgPPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>BODY NA ZÁPAS</div></div>
+      <div class="g-stat"><div class="g-val">${avgGPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>GÓLY NA ZÁPAS</div></div>
+      <div class="g-stat"><div class="g-val">${avgRank}</div><div class="g-label">CELKOVÝ PRIEMER<br>PORADIA</div></div>
+    </div>
+    ${teamCards}
   `;
 }
 
 // ═══════════════════════════════════════
-//  NAVIGÁCIA
+// NAVIGÁCIA
 // ═══════════════════════════════════════
-function showPage(id, el) {
+function navTo(id, el) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   el.classList.add('active');
-  window.scrollTo(0, 0);
 }
 
+// Štart aplikácie
 loadAll();
 </script>
 </body>
