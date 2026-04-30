@@ -48,15 +48,6 @@
       position: relative;
     }
 
-    /* DIAGONAL STRIPES BACKGROUND */
-    body::before {
-      content: "";
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: repeating-linear-gradient(-45deg, rgba(255,115,0,0.02), rgba(255,115,0,0.02) 30px, transparent 30px, transparent 45px);
-      z-index: -1;
-      pointer-events: none;
-    }
-
     /* HEADER */
     header {
       display: flex; justify-content: space-between; align-items: center;
@@ -325,6 +316,15 @@
       color: var(--muted); cursor: pointer; transition: 0.2s;
       width: 25%; height: 60px; 
     }
+    
+    /* Jemné nadvihnutie prvých 4 položiek */
+    .nav-item:nth-child(1),
+    .nav-item:nth-child(2),
+    .nav-item:nth-child(3),
+    .nav-item:nth-child(4) {
+      transform: translateY(-5px);
+    }
+
     .nav-item:not(:nth-child(4n))::after {
       content: ""; position: absolute; right: 0; top: 25%; bottom: 25%; width: 2px; background: #333;
     }
@@ -404,7 +404,7 @@
     </div>
 
     <div class="page" id="page-strelci">
-      <div class="section-title">STRELCI</div>
+      <div class="section-title" style="margin-bottom: 24px; line-height: 1.4; flex-wrap: wrap;">BOJ O ZLATÚ KOPAČKU (NAJLEPŠÍ STRELEC TURNAJA)</div>
       <div id="strelci-content">
         <div class="loader"><div class="spinner"></div>Načítavam strelcov...</div>
       </div>
@@ -679,7 +679,7 @@ function renderTabulka() {
     return `
       <div class="s-title ${gClass}">SKUPINA ${s}</div>
       <table class="standings-table">
-        <thead><tr><th># TÍM</th><th>OZ</th><th>V</th><th>R</th><th>P</th><th>GS</th><th>+/-</th><th>B</th></tr></thead>
+        <thead><tr><th><span class="s-rank">#</span> TÍM</th><th>OZ</th><th>V</th><th>R</th><th>P</th><th>GS</th><th>+/-</th><th>B</th></tr></thead>
         <tbody>${trs}</tbody>
       </table>`;
   }).join('');
