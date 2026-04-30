@@ -71,7 +71,7 @@
     .header-title { 
       font-size: 20px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; 
       color: var(--accent);
-      text-shadow: 0 0 10px rgba(255, 115, 0, 0.5); /* Glow efekt */
+      text-shadow: 0 0 10px rgba(255, 115, 0, 0.5);
     }
     .season-dropdown {
       background: transparent; border: none; color: #fff; font-size: 10px; font-weight: 700;
@@ -111,7 +111,7 @@
     /* FILTERS (ZÁPASY) */
     .filter-buttons { display: flex; gap: 8px; margin-bottom: 12px; }
     .f-btn {
-      flex: 1; padding: 8px 0; border-radius: 12px; /* Zmenené na 12px rovnako ako dropdown */
+      flex: 1; padding: 8px 0; border-radius: 12px;
       font-family: var(--font); font-size: 11px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 1px;
       background: transparent; border: 1px solid var(--muted); color: var(--muted);
@@ -149,13 +149,12 @@
       overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }
     .match-card::before, .match-card::after {
-      content: ""; position: absolute; top: 0; bottom: 0; width: 6px; /* Zúžené na 6px */
+      content: ""; position: absolute; top: 0; bottom: 0; width: 6px;
       background: var(--accent);
     }
     .match-card::before { left: 0; }
     .match-card::after { right: 0; }
     
-    /* Kompaktný režim schováva hlavičku zápasu */
     .match-card.compact .mc-header { display: none; }
 
     .mc-header {
@@ -304,7 +303,6 @@
       color: var(--muted); cursor: pointer; transition: 0.2s;
       width: 25%; height: 60px; 
     }
-    /* Sivé oddeľovacie čiary */
     .nav-item:not(:nth-child(4n))::after {
       content: ""; position: absolute; right: 0; top: 25%; bottom: 25%; width: 2px; background: #333;
     }
@@ -425,7 +423,7 @@ const CSV_URLS = {
 
 let DATA = { tymy:[], zapasy:[], hraci:[] };
 let activeSkupina = '';
-let isCompactMatches = false; // Globálna premenná pre scvrknutý režim
+let isCompactMatches = false; 
 
 // ═══════════════════════════════════════
 // PARSOVANIE A NAČÍTANIE
@@ -549,12 +547,21 @@ function createMatchCard(z, isUp) {
   }
 
   const compactClass = isCompactMatches ? 'compact' : '';
+  
+  // Detekcia kontumacie na základe nového stĺpca v Google Sheets
+  const isKontumacia = z.kontumacia && (z.kontumacia.toLowerCase() === 'ano' || z.kontumacia === '1' || z.kontumacia.toLowerCase() === 'x');
+  
+  // Zmena nadpisu skóre
+  const labelText = isUp ? 'N/A' : (isKontumacia ? 'KONTUMAČNÁ VÝHRA' : 'VÝSLEDNÉ SKÓRE');
+  
+  // Zmena farby skóre (biela, ak je kontumácia a zápas je už odohratý)
+  const scoreColorStyle = (isKontumacia && !isUp) ? 'color: #ffffff;' : '';
 
   return `
     <div class="match-card ${compactClass}">
       <div class="mc-header">
         <span class="mc-match-num">ZÁPAS #${z.id || '?'}</span>
-        <span class="mc-score-label">${isUp ? 'N/A' : 'VÝSLEDNÉ SKÓRE'}</span>
+        <span class="mc-score-label">${labelText}</span>
         <span class="mc-group ${gClass}">SKUPINA ${z.skupina}</span>
       </div>
       <div class="mc-teams">
@@ -562,7 +569,7 @@ function createMatchCard(z, isUp) {
           <div class="${classDomaci}">${z.domaci}</div>
           <div class="mc-player">(${pDomaci})</div>
         </div>
-        <div class="mc-score">${isUp ? '- : -' : `${z.goly_domaci} : ${z.goly_host}`}</div>
+        <div class="mc-score" style="${scoreColorStyle}">${isUp ? '- : -' : `${z.goly_domaci} : ${z.goly_host}`}</div>
         <div class="mc-team">
           <div class="${classHost}">${z.host}</div>
           <div class="mc-player">(${pHost})</div>
@@ -721,7 +728,6 @@ function renderVykony() {
   const avgRank = ranks.length > 0 ? (ranks.reduce((a,b)=>a+b,0)/ranks.length).toFixed(1) : '0.0';
   const coeff = totalP > 0 ? ((totalPts / totalP) / 3 * 10).toFixed(1) : '0.0';
 
-  // Stupnica farieb: Biela do oranžovej
   const coeffNum = parseFloat(coeff);
   let cStyle = { c: '#FFFFFF', s: 'none' };
   if (coeffNum >= 8) cStyle = { c: 'var(--accent)', s: '0 0 25px rgba(255,115,0,0.9)' };
