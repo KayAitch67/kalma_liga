@@ -271,6 +271,28 @@
     .ts-val { font-size: 24px; font-weight: 900; margin-bottom: 4px; }
     .ts-label { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
 
+    /* STRELCI - PORADIE */
+    .scorer-card {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--surface); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px;
+      border-left: 6px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .scorer-card.gold {
+      border-left: 6px solid var(--group-a);
+      background: linear-gradient(90deg, rgba(255, 204, 0, 0.1) 0%, var(--surface) 100%);
+      box-shadow: 0 0 15px rgba(255,204,0,0.15);
+    }
+    .scorer-left { display: flex; align-items: center; gap: 12px; }
+    .scorer-rank { font-size: 14px; font-weight: 800; color: var(--muted); width: 24px; text-align: center; }
+    .scorer-card.gold .scorer-rank { color: var(--group-a); }
+    .scorer-name { font-size: 14px; font-weight: 700; color: var(--text); text-transform: uppercase; }
+    .scorer-card.gold .scorer-name { color: var(--group-a); font-weight: 800; }
+    
+    .scorer-right-wrap { text-align: right; }
+    .scorer-val { font-size: 18px; font-weight: 900; color: var(--accent); }
+    .scorer-card.gold .scorer-val { color: var(--group-a); }
+    .scorer-label { font-size: 9px; font-weight: 700; color: var(--muted); display: block; margin-top: 2px; }
+
     /* BOTTOM NAV - Drawer Style */
     nav {
       position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto;
@@ -383,7 +405,9 @@
 
     <div class="page" id="page-strelci">
       <div class="section-title">STRELCI</div>
-      <div class="empty">Zoznam najlepších strelcov bude k dispozícii neskôr.</div>
+      <div id="strelci-content">
+        <div class="loader"><div class="spinner"></div>Načítavam strelcov...</div>
+      </div>
     </div>
 
   </main>
@@ -474,6 +498,7 @@ async function loadAll() {
     buildPlayerSelect();
     renderZapasy();
     renderTabulka();
+    renderStrelci(); // Načítanie a render strelcov
   } catch(err) {
     document.querySelectorAll('.loader').forEach(l => l.innerHTML = '❌ Chyba pri načítaní dát.');
   }
@@ -547,14 +572,8 @@ function createMatchCard(z, isUp) {
   }
 
   const compactClass = isCompactMatches ? 'compact' : '';
-  
-  // Detekcia kontumacie na základe nového stĺpca v Google Sheets
   const isKontumacia = z.kontumacia && (z.kontumacia.toLowerCase() === 'ano' || z.kontumacia === '1' || z.kontumacia.toLowerCase() === 'x');
-  
-  // Zmena nadpisu skóre
   const labelText = isUp ? 'N/A' : (isKontumacia ? 'KONTUMAČNÁ VÝHRA' : 'VÝSLEDNÉ SKÓRE');
-  
-  // Zmena farby skóre (biela, ak je kontumácia a zápas je už odohratý)
   const scoreColorStyle = (isKontumacia && !isUp) ? 'color: #ffffff;' : '';
 
   return `
@@ -749,6 +768,71 @@ function renderVykony() {
     </div>
     ${teamCards}
   `;
+}
+
+// ═══════════════════════════════════════
+// LOGIKA - STRELCI
+// ═══════════════════════════════════════
+function renderStrelci() {
+  const players = DATA.hraci.map(h => h.hrac).filter(Boolean);
+  const stats = [];
+
+  players.forEach(player => {
+    const myTeams = DATA.tymy.filter(t => t.hrac === player);
+    if (!myTeams.length) return;
+
+    let totalP = 0;
+    let totalGF = 0;
+
+    myTeams.forEach(t => {
+      DATA.zapasy.filter(z => (z.domaci === t.nazov || z.host === t.nazov) && z.goly_domaci !== '' && z.goly_host !== '').forEach(z => {
+        const gd = parseInt(z.goly_domaci);
+        const gh = parseInt(z.goly_host);
+        if(isNaN(gd) || isNaN(gh)) return;
+        
+        const isH = z.domaci === t.nazov;
+        const mg = isH ? gd : gh;
+        totalP++;
+        totalGF += mg;
+      });
+    });
+
+    if (totalP > 0) {
+      stats.push({
+        name: player,
+        gpg: totalGF / totalP,
+        totalGF: totalGF
+      });
+    }
+  });
+
+  // Zoradenie podľa GPG a v prípade zhody podľa počtu celkových gólov
+  stats.sort((a, b) => b.gpg - a.gpg || b.totalGF - a.totalGF);
+
+  let html = '';
+  if (stats.length === 0) {
+    html = '<div class="empty">Zatiaľ nie sú k dispozícii žiadne štatistiky.</div>';
+  } else {
+    html = stats.map((s, i) => {
+      const isGold = i === 0;
+      const goldClass = isGold ? 'gold' : '';
+      const gpgStr = s.gpg.toFixed(2);
+      return `
+        <div class="scorer-card ${goldClass}">
+          <div class="scorer-left">
+            <span class="scorer-rank">${i + 1}.</span>
+            <span class="scorer-name">${s.name}</span>
+          </div>
+          <div class="scorer-right-wrap">
+            <div class="scorer-val">${gpgStr}</div>
+            <span class="scorer-label">GÓLOV/ZÁPAS</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  document.getElementById('strelci-content').innerHTML = html;
 }
 
 // ═══════════════════════════════════════
