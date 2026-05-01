@@ -18,10 +18,10 @@
       --accent: #FF7300;
       
       --group-a: #FFCC00;
-      --group-a-bg: #332900; /* Tmavozlté pozadie */
+      --group-a-bg: #332900; 
       
       --group-b: #00A896; 
-      --group-b-bg: #00332D; /* Tmavotyrkysové pozadie */
+      --group-b-bg: #00332D; 
       
       --playoff-bg: #2c2c2c;
       --playoff-border: #555555;
@@ -54,7 +54,7 @@
     header {
       display: flex; justify-content: space-between; align-items: center;
       padding: 20px 16px 10px;
-      background: var(--bg);
+      background: #1d0d00; /* Tmavooranžová, takmer čierna */
       position: sticky; top: 0; z-index: 100;
       border-bottom: 1px dashed #333;
     }
@@ -92,7 +92,8 @@
     }
     .donut::before {
       content: ""; width: 26px; height: 26px;
-      background: var(--bg); border-radius: 50%;
+      background: #1d0d00; /* Zosúladené s novou hlavičkou */
+      border-radius: 50%;
     }
 
     /* MAIN AREA */
@@ -112,7 +113,6 @@
     }
     .f-btn.active.all { background: var(--accent); border-color: var(--accent); color: #000; }
     
-    /* Zmenené farby filtrov pre skupiny */
     .f-btn.active.ga { background: var(--group-a-bg); border-color: var(--group-a-bg); color: var(--group-a); }
     .f-btn.active.gb { background: var(--group-b-bg); border-color: var(--group-b-bg); color: var(--group-b); }
 
@@ -210,7 +210,6 @@
       white-space: nowrap;
     }
     
-    /* Zmenené nálepky skupín */
     .mc-group { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; }
     .mc-group.ga { background: var(--group-a-bg); color: var(--group-a); }
     .mc-group.gb { background: var(--group-b-bg); color: var(--group-b); }
@@ -239,7 +238,6 @@
       table-layout: fixed; 
     }
     
-    /* Zmenené hlavičky skupín v tabuľke */
     .s-title { 
       font-size: 11px; font-weight: 800; padding: 4px 10px; 
       display: inline-block; border-radius: 8px; margin-bottom: 8px;
@@ -472,8 +470,8 @@
         padding: 20px 40px;
         padding-bottom: 40px;
         display: grid !important;
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-        grid-template-rows: calc(100vh - 120px) calc(100vh - 120px); /* Jeden riadok na výšku obrazovky */
+        grid-template-columns: 1fr 1fr 1fr; /* Nové rozloženie: 3 stĺpce */
+        grid-template-rows: calc(100vh - 120px) calc(100vh - 120px); 
         gap: 20px;
       }
       
@@ -489,12 +487,13 @@
         box-shadow: 0 8px 30px rgba(0,0,0,0.5);
       }
       
-      #page-zapasy  { grid-column: 1 / 3; grid-row: 1 / 2; display: block !important; }
-      #page-poradie { grid-column: 3 / 4; grid-row: 1 / 2; display: block !important; }
-      #page-vykony  { grid-column: 4 / 5; grid-row: 1 / 2; display: block !important; }
+      /* Nové priradenie do 3 stĺpcov */
+      #page-zapasy  { grid-column: 1 / 2; grid-row: 1 / 2; display: block !important; }
+      #page-poradie { grid-column: 2 / 3; grid-row: 1 / 2; display: block !important; }
+      #page-vykony  { grid-column: 3 / 4; grid-row: 1 / 2; display: block !important; }
       #page-strelci { grid-column: 1 / 2; grid-row: 2 / 3; display: block !important; }
       #page-playoff { 
-        grid-column: 2 / 5; grid-row: 2 / 3; 
+        grid-column: 2 / 4; grid-row: 2 / 3; 
         justify-content: center; align-items: center; 
       }
       
