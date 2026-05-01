@@ -8,7 +8,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="theme-color" content="#121212"/>
   <title>Kalma Liga</title>
-  <!-- Pridaný font Audiowide -->
   <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
@@ -61,7 +60,7 @@
     .header-logo { width: 45px; height: auto; }
     .header-title-wrap { display: flex; flex-direction: column; justify-content: center; }
     .header-title { 
-      font-family: 'Audiowide', cursive; /* Použitý font Audiowide */
+      font-family: 'Audiowide', cursive;
       font-size: 24px; letter-spacing: 2px; text-transform: uppercase; 
       color: var(--accent); line-height: 1; margin-bottom: 2px;
       text-shadow: 0 0 10px rgba(255, 115, 0, 0.5);
@@ -376,12 +375,12 @@
     .scorer-card.gold .scorer-val { color: var(--group-a); }
     .scorer-label { font-size: 9px; font-weight: 700; color: var(--muted); display: block; margin-top: 2px; }
 
-    /* NASTAVENIA (Zatiaľ prázdne) */
+    /* NASTAVENIA */
     .settings-title {
       font-size: 16px; font-weight: 800; color: var(--accent); margin-bottom: 20px;
     }
 
-    /* BOTTOM NAV - Drawer Style */
+    /* BOTTOM NAV */
     nav {
       position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto;
       background: var(--bg); border-top: 1px solid #333;
@@ -506,7 +505,6 @@
       </div>
     </div>
 
-    <!-- Nová záložka NASTAVENIA -->
     <div class="page" id="page-nastavenia">
       <div class="settings-title">NASTAVENIA</div>
       <div class="empty">Tu neskôr pribudnú nastavenia aplikácie.</div>
@@ -531,7 +529,6 @@
       <div class="nav-item" onclick="navTo('vykony', this)">
         <i class="fa-solid fa-chart-simple"></i><span>Výkony</span>
       </div>
-      <!-- Zostávajúce položky v druhom riadku -->
       <div class="nav-item" onclick="navTo('strelci', this)">
         <i class="fa-solid fa-bullseye"></i><span>Strelci</span>
       </div>
@@ -844,18 +841,20 @@ function renderVykony() {
   const myTeams = DATA.tymy.filter(t=>t.hrac===player);
   if(!myTeams.length){el.innerHTML='<div class="empty">Hráč nemá priradené tímy.</div>';return;}
 
-  let totalPts=0, totalP=0, totalGF=0, ranks=[];
+  let totalPts=0, totalP=0, totalGF=0, totalGA=0, totalW=0, totalD=0, ranks=[];
 
   const teamCards = myTeams.map((t, idx) => {
-    const st={p:0,w:0,d:0,l:0,gf:0,pts:0};
+    const st={p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0};
     DATA.zapasy.filter(z=>(z.domaci===t.nazov||z.host===t.nazov)&&z.goly_domaci!==''&&z.goly_host!=='').forEach(z=>{
       const gd=parseInt(z.goly_domaci),gh=parseInt(z.goly_host);
       const isH=z.domaci===t.nazov; const mg=isH?gd:gh, og=isH?gh:gd;
-      st.p++; st.gf+=mg;
+      st.p++; st.gf+=mg; st.ga+=og;
       if(mg>og){st.w++;st.pts+=3;} else if(mg===og){st.d++;st.pts++;} else st.l++;
     });
     
-    totalPts += st.pts; totalP += st.p; totalGF += st.gf;
+    totalPts += st.pts; totalP += st.p; totalGF += st.gf; totalGA += st.ga;
+    totalW += st.w; totalD += st.d;
+    
     const rank = calcStandings(t.skupina).findIndex(r=>r.t===t.nazov)+1;
     ranks.push(rank);
 
@@ -886,7 +885,16 @@ function renderVykony() {
   const avgPPG = totalP > 0 ? (totalPts / totalP).toFixed(2) : '0.00';
   const avgGPG = totalP > 0 ? (totalGF / totalP).toFixed(2) : '0.00';
   const avgRank = ranks.length > 0 ? (ranks.reduce((a,b)=>a+b,0)/ranks.length).toFixed(1) : '0.0';
-  const coeff = totalP > 0 ? ((totalPts / totalP) / 3 * 10).toFixed(1) : '0.0';
+  
+  // Nový sofistikovaný výpočet koeficientu (WCPM)
+  let coeff = '0.0';
+  if (totalP > 0) {
+      const BPI = (3 * totalW + totalD) / (3 * totalP);
+      const GDI = (totalGF === 0 && totalGA === 0) ? 0.5 : (totalGF ** 2) / (totalGF ** 2 + totalGA ** 2);
+      const OAI = Math.min(1, (totalGF / totalP) / 3.5);
+      const K = 10 * (0.60 * BPI + 0.30 * GDI + 0.10 * OAI);
+      coeff = K.toFixed(1);
+  }
 
   // Farba pre PPG (Body na zápas)
   const ppgNum = parseFloat(avgPPG);
@@ -919,7 +927,7 @@ function renderVykony() {
         <span style="color:${cStyle.c}; text-shadow:${cStyle.s}; transition: 0.3s;">${coeff}</span><span class="coeff-max">/10</span>
       </div>
       <div id="coeff-info" class="coeff-info">
-        Tento koeficient odráža tvoju celkovú hernú efektivitu. Vypočítava sa na základe pomeru získaných bodov voči maximálnemu možnému počtu bodov zo všetkých tvojich odohratých zápasov a je prepočítaný na stupnicu od 0 do 10.
+        Tento koeficient využíva pokročilý matematický model a hodnotí tvoju hru v 3 zložkách: <b>60%</b> tvorí bodová efektivita (pomer získaných bodov voči maximu), <b>30%</b> Pytagorovská gólová dominancia (matematický pomer strelených a inkasovaných gólov, ktorý prísne trestá debakle a odmeňuje pevnú obranu) a <b>10%</b> index ofenzívnej atraktivity (bonus za vysoký priemer gólov na zápas).
       </div>
     </div>
     <div class="global-stats">
