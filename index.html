@@ -54,9 +54,9 @@
     header {
       display: flex; justify-content: space-between; align-items: center;
       padding: 20px 16px 10px;
-      background: #1d0d00; /* Tmavooranžová, takmer čierna */
+      background: var(--bg); /* Vrátené na pôvodné tmavé pozadie */
       position: sticky; top: 0; z-index: 100;
-      border-bottom: 1px dashed #333;
+      border-bottom: 1px solid #333; /* Plná (solid) čiara */
     }
     .header-left { display: flex; align-items: center; gap: 10px; }
     .header-logo { width: 45px; height: auto; }
@@ -92,7 +92,7 @@
     }
     .donut::before {
       content: ""; width: 26px; height: 26px;
-      background: #1d0d00; /* Zosúladené s novou hlavičkou */
+      background: var(--bg); /* Vrátené na pôvodné pozadie */
       border-radius: 50%;
     }
 
@@ -470,24 +470,33 @@
         padding: 20px 40px;
         padding-bottom: 40px;
         display: grid !important;
-        grid-template-columns: 1fr 1fr 1fr; /* Nové rozloženie: 3 stĺpce */
+        grid-template-columns: 1fr 1fr 1fr;
         grid-template-rows: calc(100vh - 120px) calc(100vh - 120px); 
         gap: 20px;
       }
       
+      /* Úprava panelov: Priesvitné pozadie s 3D skleneným efektom */
       .page {
         display: flex !important;
         flex-direction: column;
-        background: var(--surface-light);
-        border: 1px solid #333;
+        
+        background: rgba(18, 18, 18, 0.4); /* Priesvitné tmavé pozadie */
+        backdrop-filter: blur(12px); /* Glassmorphism blur */
+        border: 1px solid rgba(255, 255, 255, 0.12); /* Jemný takmer biely outline */
+        
         border-radius: 16px;
         padding: 20px;
         overflow-y: auto; 
         animation: none;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+        
+        /* 3D efekt a žiara (Shadows) */
+        box-shadow: 
+            0 20px 40px rgba(0,0,0,0.8), /* Hlboký tieň pre 3D hĺbku */
+            0 0 20px rgba(255,255,255,0.05), /* Jemná vonkajšia žiara */
+            inset 0 1px 1px rgba(255,255,255,0.15), /* 3D vrchná hrana (odlesk) */
+            inset 0 -1px 1px rgba(0,0,0,0.6); /* 3D spodná hrana (tieň) */
       }
       
-      /* Nové priradenie do 3 stĺpcov */
       #page-zapasy  { grid-column: 1 / 2; grid-row: 1 / 2; display: block !important; }
       #page-poradie { grid-column: 2 / 3; grid-row: 1 / 2; display: block !important; }
       #page-vykony  { grid-column: 3 / 4; grid-row: 1 / 2; display: block !important; }
@@ -507,9 +516,12 @@
         transform: translate(-50%, -50%);
         width: 400px; max-width: 90%;
         height: auto; min-height: 300px;
-        background: var(--surface);
+        
+        /* Modal rovnako v 3D skle */
+        background: rgba(18, 18, 18, 0.8);
+        backdrop-filter: blur(15px);
         border: 1px solid var(--accent);
-        box-shadow: 0 10px 50px rgba(0,0,0,0.9);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.2);
         z-index: 1000;
       }
       .close-modal { display: block; position: absolute; top: 15px; right: 15px; color: var(--muted); cursor: pointer; font-size: 18px; }
