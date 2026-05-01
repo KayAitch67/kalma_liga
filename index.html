@@ -148,24 +148,51 @@
       width: 220px;
       height: 220px;
       object-fit: contain;
-      opacity: 0.25;
+      opacity: 0.15; /* Znížené na 0.15 */
       z-index: 0;
       pointer-events: none;
     }
     .mc-bg-logo.left { left: -90px; }
     .mc-bg-logo.right { right: -90px; }
 
+    /* Pozadie pre tabuľku (Standings) */
+    .st-bg-logo {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: -30px;
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      opacity: 0.15;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Pozadie pre hlavičku tímu (Výkony) */
+    .ts-bg-logo {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      right: -20px;
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      opacity: 0.15;
+      z-index: 0;
+      pointer-events: none;
+    }
+
     .match-card::before, .match-card::after {
       content: ""; position: absolute; top: 0; bottom: 0; width: 6px;
       background: var(--accent);
-      z-index: 2; /* Navrch, aby prekryli aj logá */
+      z-index: 2;
     }
     .match-card::before { left: 0; }
     .match-card::after { right: 0; }
     
     .match-card.compact .mc-header { display: none; }
 
-    /* Vrstvenie obsahu nad logá */
     .mc-header, .mc-teams {
       position: relative;
       z-index: 1; 
@@ -225,8 +252,17 @@
     .standings-table th:nth-child(1) { text-align: left; padding-left: 8px; }
     .standings-table td { background: var(--surface); padding: 12px 0; text-align: center; font-weight: 600; }
     .standings-table td:first-child { border-radius: 8px 0 0 8px; padding-left: 8px; }
+    
+    /* Vylepšenie pre bunku s názvom tímu a logom */
+    .standings-table td:nth-child(1) { 
+      text-align: left; 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+      position: relative; /* Umožní pozíciovanie masky a loga */
+    }
+
     .standings-table td:last-child { border-radius: 0 8px 8px 0; color: var(--accent); font-weight: 800; }
-    .standings-table td:nth-child(1) { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
     .row-playoff td { background-color: var(--playoff-bg); }
     .row-danger td { background: var(--relegation); color: #ff9999; }
@@ -273,10 +309,17 @@
       content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
       background: var(--accent);
     }
+    
     .ts-header {
       background: var(--surface-light); padding: 12px 16px 12px 20px;
       font-size: 12px; font-weight: 700; color: var(--muted);
       border-bottom: 1px solid #333;
+      position: relative; /* Umožní pozíciovanie masky a loga */
+      overflow: hidden;
+    }
+    .ts-header-content {
+      position: relative;
+      z-index: 1;
     }
     .ts-name { color: #fff; font-size: 14px; font-weight: 800; }
     .ts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: #333; }
@@ -597,7 +640,6 @@ function createMatchCard(z, isUp) {
   const labelText = isUp ? 'N/A' : (isKontumacia ? 'KONTUMAČNÁ VÝHRA' : 'VÝSLEDNÉ SKÓRE');
   const scoreColorStyle = (isKontumacia && !isUp) ? 'color: #ffffff;' : '';
   
-  // Cesty k logám tímov (funguje priamo na názov tímu napr. "Atletico Madrid.png")
   const logoDomaci = `loga_timov/${z.domaci}.png`;
   const logoHost = `loga_timov/${z.host}.png`;
 
@@ -699,7 +741,10 @@ function renderTabulka() {
       else if(isDanger) rowClass = 'row-danger';
       
       return `<tr class="${rowClass}">
-        <td><span class="s-rank">${i+1}</span> ${r.t}</td>
+        <td>
+          <img src="loga_timov/${r.t}.png" class="st-bg-logo" onerror="this.style.display='none'" alt="">
+          <span style="position: relative; z-index: 2;"><span class="s-rank">${i+1}</span> ${r.t}</span>
+        </td>
         <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
         <td>${r.gf}:${r.ga}</td><td>${(r.gf-r.ga)>0?'+':''}${r.gf-r.ga}</td><td>${r.pts}</td>
       </tr>`;
@@ -756,7 +801,10 @@ function renderVykony() {
     return `
       <div class="team-stat-card">
         <div class="ts-header">
-          TÍM #${idx+1} | <span class="ts-name">${t.nazov}</span> | <span style="color:${gClass}">skupina ${t.skupina}</span> | #${rank}
+          <img src="loga_timov/${t.nazov}.png" class="ts-bg-logo" onerror="this.style.display='none'" alt="">
+          <div class="ts-header-content">
+            TÍM #${idx+1} | <span class="ts-name">${t.nazov}</span> | <span style="color:${gClass}">skupina ${t.skupina}</span> | #${rank}
+          </div>
         </div>
         <div class="ts-grid">
           <div class="ts-item"><div class="ts-val" style="color:var(--win)">${st.w}</div><div class="ts-label">Výhry</div></div>
