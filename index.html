@@ -18,8 +18,10 @@
       --accent: #FF7300;
       
       --group-a: #FFCC00;
-      --group-a-dark: #997A00;
+      --group-a-bg: #332900; /* Tmavozlté pozadie */
+      
       --group-b: #00A896; 
+      --group-b-bg: #00332D; /* Tmavotyrkysové pozadie */
       
       --playoff-bg: #2c2c2c;
       --playoff-border: #555555;
@@ -46,15 +48,6 @@
       display: flex;
       flex-direction: column;
       position: relative;
-    }
-
-    /* DIAGONAL STRIPES BACKGROUND */
-    body::before {
-      content: "";
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: repeating-linear-gradient(-45deg, rgba(255,115,0,0.02), rgba(255,115,0,0.02) 30px, transparent 30px, transparent 45px);
-      z-index: -1;
-      pointer-events: none;
     }
 
     /* HEADER */
@@ -118,8 +111,10 @@
       cursor: pointer; transition: 0.2s;
     }
     .f-btn.active.all { background: var(--accent); border-color: var(--accent); color: #000; }
-    .f-btn.active.ga { background: var(--group-a-dark); border-color: var(--group-a-dark); color: #fff; }
-    .f-btn.active.gb { background: var(--group-b); border-color: var(--group-b); color: #fff; }
+    
+    /* Zmenené farby filtrov pre skupiny */
+    .f-btn.active.ga { background: var(--group-a-bg); border-color: var(--group-a-bg); color: var(--group-a); }
+    .f-btn.active.gb { background: var(--group-b-bg); border-color: var(--group-b-bg); color: var(--group-b); }
 
     .dropdown {
       width: 100%; padding: 12px 16px; border-radius: 12px;
@@ -208,7 +203,6 @@
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 12px; padding: 0 10px;
     }
-    /* Vylepšené číslo zápasu - Biele pozadie, sivý text */
     .mc-match-num { background: #ffffff; color: #555; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; }
     .mc-score-label { 
       font-size: 9px; font-weight: 700; color: var(--muted); 
@@ -216,10 +210,10 @@
       white-space: nowrap;
     }
     
-    /* Vylepšené štítky skupín - Plná farba */
+    /* Zmenené nálepky skupín */
     .mc-group { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; }
-    .mc-group.ga { background: var(--group-a); color: #111; }
-    .mc-group.gb { background: var(--group-b); color: #fff; }
+    .mc-group.ga { background: var(--group-a-bg); color: var(--group-a); }
+    .mc-group.gb { background: var(--group-b-bg); color: var(--group-b); }
 
     .mc-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 10px; gap: 10px; }
     .mc-team { display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -245,13 +239,14 @@
       table-layout: fixed; 
     }
     
+    /* Zmenené hlavičky skupín v tabuľke */
     .s-title { 
       font-size: 11px; font-weight: 800; padding: 4px 10px; 
       display: inline-block; border-radius: 8px; margin-bottom: 8px;
       text-transform: uppercase; letter-spacing: 1px;
     }
-    .s-title.ga { background: var(--group-a); color: #111; }
-    .s-title.gb { background: var(--group-b); color: #fff; }
+    .s-title.ga { background: var(--group-a-bg); color: var(--group-a); }
+    .s-title.gb { background: var(--group-b-bg); color: var(--group-b); }
     
     .standings-table th:nth-child(1) { width: 38%; }
     .standings-table th:nth-child(2) { width: 10%; }
@@ -288,7 +283,6 @@
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       min-height: 65vh; position: relative; text-align: center; overflow: hidden;
     }
-    /* Zmazané logo vodoznaku podľa zadania */
     .po-title { font-size: 24px; font-weight: 800; color: var(--accent); margin-bottom: 12px; z-index: 1;}
     .po-text { color: var(--muted); font-size: 14px; line-height: 1.5; font-weight: 500; z-index: 1;}
 
@@ -388,7 +382,6 @@
       font-size: 16px; font-weight: 800; color: var(--accent); margin-bottom: 20px;
     }
     
-    /* ZATVÁRACIE TLAČIDLO (Viditeľné len v desktop modale) */
     .close-modal { display: none; }
 
     /* BOTTOM NAV */
@@ -448,20 +441,17 @@
     
     /* ════════════════════════════════════════════════════════════════
        DESKTOP OPTIMALIZÁCIA (GRID DASHBOARD)
-       Aktivuje sa iba pre obrazovky širšie ako 1024px
     ═════════════════════════════════════════════════════════════════ */
     @media (min-width: 1024px) {
       body {
         max-width: 100%;
-        height: 100vh;
-        overflow: hidden; /* Skryjeme hlavný scrollbar */
+        min-height: 100vh;
       }
       
       header {
         padding: 15px 40px;
       }
       
-      /* Tlačidlo Nastavení pre Desktop */
       .desktop-settings-wrap {
         display: flex;
         align-items: center;
@@ -480,28 +470,25 @@
       
       main {
         padding: 20px 40px;
-        padding-bottom: 20px;
+        padding-bottom: 40px;
         display: grid !important;
-        grid-template-columns: 1fr 1fr 1fr 1fr; /* 4 dieliky horizontálne */
-        grid-template-rows: 1fr 1fr; /* 2 dieliky vertikálne */
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-rows: calc(100vh - 120px) calc(100vh - 120px); /* Jeden riadok na výšku obrazovky */
         gap: 20px;
-        height: calc(100vh - 70px);
       }
       
-      /* Prepis mobilného správania záložiek */
       .page {
-        display: flex !important; /* Záložky sú na desktope viditeľné naraz */
+        display: flex !important;
         flex-direction: column;
         background: var(--surface-light);
         border: 1px solid #333;
         border-radius: 16px;
         padding: 20px;
-        overflow-y: auto; /* Vnútorný scrool pre každý panel */
+        overflow-y: auto; 
         animation: none;
         box-shadow: 0 8px 30px rgba(0,0,0,0.5);
       }
       
-      /* Priradenie súradníc v mriežke */
       #page-zapasy  { grid-column: 1 / 3; grid-row: 1 / 2; display: block !important; }
       #page-poradie { grid-column: 3 / 4; grid-row: 1 / 2; display: block !important; }
       #page-vykony  { grid-column: 4 / 5; grid-row: 1 / 2; display: block !important; }
@@ -511,9 +498,8 @@
         justify-content: center; align-items: center; 
       }
       
-      /* Nastavenia fungujú ako plávajúce okno (Modal) */
       #page-nastavenia {
-        display: none !important; /* Štandardne skryté v mriežke */
+        display: none !important; 
       }
       #page-nastavenia.desktop-modal {
         display: block !important;
@@ -530,17 +516,14 @@
       .close-modal { display: block; position: absolute; top: 15px; right: 15px; color: var(--muted); cursor: pointer; font-size: 18px; }
       .close-modal:hover { color: var(--text); }
       
-      /* Vlastný dizajn scrollbaru pre panely */
       .page::-webkit-scrollbar { width: 6px; }
       .page::-webkit-scrollbar-track { background: transparent; }
       .page::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
       .page::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-      /* Vypnutie spodného menu na ploche */
       #bottom-nav { display: none !important; }
     }
     
-    /* Vypnutie desktop tlačidla nastavení na mobile */
     @media (max-width: 1023px) {
       .desktop-settings-wrap { display: none; }
     }
@@ -564,7 +547,6 @@
         <span class="progress-val" id="prog-text">0/0</span>
       </div>
       <div class="donut" id="prog-donut" style="--pct: 0;"></div>
-      <!-- Tlačidlo nastavení pre Desktop -->
       <div class="desktop-settings-wrap">
         <i class="fa-solid fa-gear desktop-settings-btn" onclick="toggleSettingsModal()"></i>
       </div>
@@ -588,7 +570,6 @@
     </div>
 
     <div class="page" id="page-poradie">
-      <div class="section-title" style="margin-bottom: 16px;">TABUĽKY</div>
       <div class="legend">
         <div class="legend-item"><div class="dot safe"></div> postup do play-off</div>
         <div class="legend-item"><div class="dot danger"></div> vypadnutie z turnaja</div>
