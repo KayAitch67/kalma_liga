@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="theme-color" content="#121212"/>
   <title>Kalma Liga</title>
-  <!-- Pridaný mimoriadne hrubý font Anton a pôvodný Montserrat -->
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <!-- Pridaný font Audiowide -->
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     :root {
@@ -61,9 +61,8 @@
     .header-logo { width: 45px; height: auto; }
     .header-title-wrap { display: flex; flex-direction: column; justify-content: center; }
     .header-title { 
-      font-family: 'Anton', sans-serif;
-      font-size: 26px; /* Zväčšené pre lepšiu viditeľnosť športového fontu */
-      letter-spacing: 2px; text-transform: uppercase; 
+      font-family: 'Audiowide', cursive; /* Použitý font Audiowide */
+      font-size: 24px; letter-spacing: 2px; text-transform: uppercase; 
       color: var(--accent); line-height: 1; margin-bottom: 2px;
       text-shadow: 0 0 10px rgba(255, 115, 0, 0.5);
     }
@@ -173,7 +172,7 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      right: -35px; /* Posunuté mierne doprava */
+      right: -35px;
       width: 120px;
       height: 120px;
       object-fit: contain;
@@ -235,7 +234,6 @@
       table-layout: fixed; 
     }
     
-    /* Vylepšené hlavičky skupín v Poradí */
     .s-title { 
       font-size: 11px; font-weight: 800; padding: 4px 10px; 
       display: inline-block; border-radius: 8px; margin-bottom: 8px;
@@ -295,7 +293,6 @@
       text-align: center; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.5);
       overflow: hidden; 
     }
-    /* SVG textúra hviezdičiek menšia, opacity na 0.075 */
     .coeff-card::after {
       content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' fill-opacity='0.075' d='M12 6l1.2 3.7h3.8l-3 2.3 1.1 3.7-3.1-2.4-3.1 2.4 1.1-3.7-3-2.3h3.8z'/%3E%3C/svg%3E");
@@ -311,7 +308,6 @@
     .coeff-val { font-size: 48px; font-weight: 900; line-height: 1; }
     .coeff-max { font-size: 20px; color: #555; text-shadow: none !important; }
     
-    /* Box s info textom pod koeficientom */
     .coeff-info {
       display: none; position: relative; z-index: 1;
       font-size: 10px; font-weight: 500; color: #ccc;
@@ -379,6 +375,11 @@
     .scorer-val { font-size: 18px; font-weight: 900; color: var(--accent); }
     .scorer-card.gold .scorer-val { color: var(--group-a); }
     .scorer-label { font-size: 9px; font-weight: 700; color: var(--muted); display: block; margin-top: 2px; }
+
+    /* NASTAVENIA (Zatiaľ prázdne) */
+    .settings-title {
+      font-size: 16px; font-weight: 800; color: var(--accent); margin-bottom: 20px;
+    }
 
     /* BOTTOM NAV - Drawer Style */
     nav {
@@ -505,6 +506,12 @@
       </div>
     </div>
 
+    <!-- Nová záložka NASTAVENIA -->
+    <div class="page" id="page-nastavenia">
+      <div class="settings-title">NASTAVENIA</div>
+      <div class="empty">Tu neskôr pribudnú nastavenia aplikácie.</div>
+    </div>
+
   </main>
 
   <nav id="bottom-nav">
@@ -524,8 +531,12 @@
       <div class="nav-item" onclick="navTo('vykony', this)">
         <i class="fa-solid fa-chart-simple"></i><span>Výkony</span>
       </div>
+      <!-- Zostávajúce položky v druhom riadku -->
       <div class="nav-item" onclick="navTo('strelci', this)">
         <i class="fa-solid fa-bullseye"></i><span>Strelci</span>
+      </div>
+      <div class="nav-item" onclick="navTo('nastavenia', this)">
+        <i class="fa-solid fa-gear"></i><span>Nastavenia</span>
       </div>
     </div>
   </nav>
@@ -543,12 +554,6 @@ const CSV_URLS = {
 let DATA = { tymy:[], zapasy:[], hraci:[] };
 let activeSkupina = '';
 let isCompactMatches = false; 
-
-// Pomocná funkcia pre invertovanie loga Tottenhamu
-function getLogoStyle(teamName) {
-  if (!teamName) return '';
-  return teamName.toLowerCase().includes('tottenham') ? 'filter: brightness(0) invert(1); opacity: 0.8;' : '';
-}
 
 // ═══════════════════════════════════════
 // PARSOVANIE A NAČÍTANIE
@@ -679,13 +684,11 @@ function createMatchCard(z, isUp) {
   
   const logoDomaci = `loga_timov/${z.domaci}.png`;
   const logoHost = `loga_timov/${z.host}.png`;
-  const sDomaci = getLogoStyle(z.domaci);
-  const sHost = getLogoStyle(z.host);
 
   return `
     <div class="match-card ${compactClass}">
-      <img src="${logoDomaci}" style="${sDomaci}" class="mc-bg-logo left" onerror="this.style.display='none'" alt="">
-      <img src="${logoHost}" style="${sHost}" class="mc-bg-logo right" onerror="this.style.display='none'" alt="">
+      <img src="${logoDomaci}" class="mc-bg-logo left" onerror="this.style.display='none'" alt="">
+      <img src="${logoHost}" class="mc-bg-logo right" onerror="this.style.display='none'" alt="">
       
       <div class="mc-header">
         <span class="mc-match-num">ZÁPAS #${z.id || '?'}</span>
@@ -779,11 +782,9 @@ function renderTabulka() {
       if(isPlayoff) rowClass = 'row-playoff';
       else if(isDanger) rowClass = 'row-danger';
       
-      const sLogo = getLogoStyle(r.t);
-      
       return `<tr class="${rowClass}">
         <td>
-          <img src="loga_timov/${r.t}.png" style="${sLogo}" class="st-bg-logo" onerror="this.style.display='none'" alt="">
+          <img src="loga_timov/${r.t}.png" class="st-bg-logo" onerror="this.style.display='none'" alt="">
           <span style="position: relative; z-index: 2;"><span class="s-rank">${i+1}</span> ${r.t}</span>
         </td>
         <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
@@ -861,13 +862,11 @@ function renderVykony() {
     const gClass = t.skupina === 'A' ? 'var(--group-a)' : 'var(--group-b)';
     const gpg = st.p > 0 ? (st.gf / st.p).toFixed(2) : '0.00';
     const ppg = st.p > 0 ? (st.pts / st.p).toFixed(2) : '0.00';
-    
-    const sLogo = getLogoStyle(t.nazov);
 
     return `
       <div class="team-stat-card">
         <div class="ts-header">
-          <img src="loga_timov/${t.nazov}.png" style="${sLogo}" class="ts-bg-logo" onerror="this.style.display='none'" alt="">
+          <img src="loga_timov/${t.nazov}.png" class="ts-bg-logo" onerror="this.style.display='none'" alt="">
           <div class="ts-header-content">
             TÍM #${idx+1} | <span class="ts-name">${t.nazov}</span> | <span style="color:${gClass}">skupina ${t.skupina}</span> | #${rank}
           </div>
@@ -1012,7 +1011,6 @@ function toggleNav() {
   document.getElementById('bottom-nav').classList.toggle('expanded');
 }
 
-// Potiahnutie prstom pre vysunutie menu
 const dragArea = document.getElementById('navDragArea');
 let startY = 0; let isSwiping = false;
 
@@ -1030,11 +1028,11 @@ dragArea.addEventListener('touchend', e => {
    let diff = startY - endY;
    
    if (isSwiping && diff > 30) {
-     document.getElementById('bottom-nav').classList.add('expanded'); // Potiahnutie hore
+     document.getElementById('bottom-nav').classList.add('expanded');
    } else if (isSwiping && diff < -30) {
-     document.getElementById('bottom-nav').classList.remove('expanded'); // Potiahnutie dole
+     document.getElementById('bottom-nav').classList.remove('expanded');
    } else {
-     toggleNav(); // Klasické kliknutie (ak nedošlo k swipu)
+     toggleNav();
    }
 });
 
