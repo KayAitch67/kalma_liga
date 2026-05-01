@@ -139,19 +139,41 @@
       border-radius: 16px; padding: 16px; margin-bottom: 12px;
       overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }
+    
+    /* Logos as Backgrounds */
+    .mc-bg-logo {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 220px;
+      height: 220px;
+      object-fit: contain;
+      opacity: 0.25;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .mc-bg-logo.left { left: -90px; }
+    .mc-bg-logo.right { right: -90px; }
+
     .match-card::before, .match-card::after {
       content: ""; position: absolute; top: 0; bottom: 0; width: 6px;
       background: var(--accent);
+      z-index: 2; /* Navrch, aby prekryli aj logá */
     }
     .match-card::before { left: 0; }
     .match-card::after { right: 0; }
     
     .match-card.compact .mc-header { display: none; }
 
+    /* Vrstvenie obsahu nad logá */
+    .mc-header, .mc-teams {
+      position: relative;
+      z-index: 1; 
+    }
+
     .mc-header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 12px; padding: 0 10px;
-      position: relative;
     }
     .mc-match-num { background: #333; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
     .mc-score-label { 
@@ -317,7 +339,6 @@
       width: 25%; height: 60px; 
     }
     
-    /* Jemné nadvihnutie prvých 4 položiek */
     .nav-item:nth-child(1),
     .nav-item:nth-child(2),
     .nav-item:nth-child(3),
@@ -498,7 +519,7 @@ async function loadAll() {
     buildPlayerSelect();
     renderZapasy();
     renderTabulka();
-    renderStrelci(); // Načítanie a render strelcov
+    renderStrelci(); 
   } catch(err) {
     document.querySelectorAll('.loader').forEach(l => l.innerHTML = '❌ Chyba pri načítaní dát.');
   }
@@ -575,9 +596,16 @@ function createMatchCard(z, isUp) {
   const isKontumacia = z.kontumacia && (z.kontumacia.toLowerCase() === 'ano' || z.kontumacia === '1' || z.kontumacia.toLowerCase() === 'x');
   const labelText = isUp ? 'N/A' : (isKontumacia ? 'KONTUMAČNÁ VÝHRA' : 'VÝSLEDNÉ SKÓRE');
   const scoreColorStyle = (isKontumacia && !isUp) ? 'color: #ffffff;' : '';
+  
+  // Cesty k logám tímov (funguje priamo na názov tímu napr. "Atletico Madrid.png")
+  const logoDomaci = `loga_timov/${z.domaci}.png`;
+  const logoHost = `loga_timov/${z.host}.png`;
 
   return `
     <div class="match-card ${compactClass}">
+      <img src="${logoDomaci}" class="mc-bg-logo left" onerror="this.style.display='none'" alt="">
+      <img src="${logoHost}" class="mc-bg-logo right" onerror="this.style.display='none'" alt="">
+      
       <div class="mc-header">
         <span class="mc-match-num">ZÁPAS #${z.id || '?'}</span>
         <span class="mc-score-label">${labelText}</span>
