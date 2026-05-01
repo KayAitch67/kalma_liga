@@ -8,8 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="theme-color" content="#121212"/>
   <title>Kalma Liga</title>
-  <!-- Pridaný športový font Russo One -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Russo+One&display=swap" rel="stylesheet"/>
+  <!-- Pridaný mimoriadne hrubý font Anton a pôvodný Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     :root {
@@ -59,11 +59,12 @@
     }
     .header-left { display: flex; align-items: center; gap: 10px; }
     .header-logo { width: 45px; height: auto; }
-    .header-title-wrap { display: flex; flex-direction: column; line-height: 1.2; justify-content: center; }
+    .header-title-wrap { display: flex; flex-direction: column; justify-content: center; }
     .header-title { 
-      font-family: 'Russo One', sans-serif; /* Použitý športový font */
-      font-size: 22px; letter-spacing: 2px; text-transform: uppercase; 
-      color: var(--accent);
+      font-family: 'Anton', sans-serif;
+      font-size: 26px; /* Zväčšené pre lepšiu viditeľnosť športového fontu */
+      letter-spacing: 2px; text-transform: uppercase; 
+      color: var(--accent); line-height: 1; margin-bottom: 2px;
       text-shadow: 0 0 10px rgba(255, 115, 0, 0.5);
     }
     .season-dropdown {
@@ -71,7 +72,6 @@
       font-family: var(--font); appearance: none; padding-right: 12px; cursor: pointer; outline: none;
       background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%2210%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M0%202.5l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E");
       background-repeat: no-repeat; background-position: right center; background-size: 8px auto;
-      margin-top: 2px;
       width: fit-content;
       align-self: flex-start;
     }
@@ -173,7 +173,7 @@
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      right: -20px;
+      right: -35px; /* Posunuté mierne doprava */
       width: 120px;
       height: 120px;
       object-fit: contain;
@@ -234,9 +234,15 @@
       font-size: 12px; margin-bottom: 24px;
       table-layout: fixed; 
     }
-    .s-title { font-size: 14px; font-weight: 800; padding: 4px 12px; display: inline-block; border-radius: 4px; margin-bottom: 8px;}
-    .s-title.ga { color: var(--group-a); border-bottom: 2px solid var(--group-a); }
-    .s-title.gb { color: var(--group-b); border-bottom: 2px solid var(--group-b); }
+    
+    /* Vylepšené hlavičky skupín v Poradí */
+    .s-title { 
+      font-size: 11px; font-weight: 800; padding: 4px 10px; 
+      display: inline-block; border-radius: 8px; margin-bottom: 8px;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .s-title.ga { background: rgba(255, 204, 0, 0.15); color: var(--group-a); }
+    .s-title.gb { background: rgba(0,168,150,0.2); color: var(--group-b); }
     
     .standings-table th:nth-child(1) { width: 38%; }
     .standings-table th:nth-child(2) { width: 10%; }
@@ -283,34 +289,47 @@
 
     /* VÝKONY (STATS) */
     .coeff-card {
-      position: relative; /* Pridané kvôli prekrývaniu */
+      position: relative;
       background: linear-gradient(145deg, #252525, #151515);
       border: 1px solid #444; border-radius: 16px; padding: 20px;
       text-align: center; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-      overflow: hidden; /* Skryje textúru mimo kartu */
+      overflow: hidden; 
     }
-    /* SVG textúra hviezdičiek v pozadí */
+    /* SVG textúra hviezdičiek menšia, opacity na 0.075 */
     .coeff-card::after {
       content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' fill-opacity='0.15' d='M12 2l2.4 7.4h7.6l-6 4.6 2.3 7.4-6.3-4.8-6.3 4.8 2.3-7.4-6-4.6h7.6z'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' fill-opacity='0.075' d='M12 6l1.2 3.7h3.8l-3 2.3 1.1 3.7-3.1-2.4-3.1 2.4 1.1-3.7-3-2.3h3.8z'/%3E%3C/svg%3E");
       background-size: 30px 30px;
       z-index: 0;
       pointer-events: none;
     }
     .coeff-title, .coeff-val {
-      position: relative; z-index: 1; /* Vystúpenie nad textúru */
+      position: relative; z-index: 1; 
     }
 
     .coeff-title { font-size: 13px; font-weight: 800; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
     .coeff-val { font-size: 48px; font-weight: 900; line-height: 1; }
     .coeff-max { font-size: 20px; color: #555; text-shadow: none !important; }
     
+    /* Box s info textom pod koeficientom */
+    .coeff-info {
+      display: none; position: relative; z-index: 1;
+      font-size: 10px; font-weight: 500; color: #ccc;
+      background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px;
+      margin-top: 15px; text-align: left; text-transform: none; letter-spacing: 0;
+      border: 1px solid #333; line-height: 1.4;
+    }
+    .coeff-info.show { display: block; animation: fadeIn 0.3s; }
+    
+    .info-icon { cursor: pointer; color: var(--muted); transition: 0.2s; margin-left: 6px; }
+    .info-icon:hover { color: var(--text); }
+
     .global-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; }
     .g-stat {
       background: var(--surface); border: 1px solid #333; border-radius: 12px;
-      padding: 16px 10px; text-align: center;
+      padding: 16px 10px; text-align: center; transition: 0.3s;
     }
-    .g-val { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .g-val { font-size: 22px; font-weight: 800; margin-bottom: 4px; transition: 0.3s; }
     .g-label { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; line-height: 1.3;}
 
     .team-stat-card {
@@ -489,7 +508,7 @@
   </main>
 
   <nav id="bottom-nav">
-    <div class="nav-drag-area" onclick="toggleNav()">
+    <div class="nav-drag-area" id="navDragArea">
       <div class="nav-handle"></div>
     </div>
     <div class="nav-items-container">
@@ -524,6 +543,12 @@ const CSV_URLS = {
 let DATA = { tymy:[], zapasy:[], hraci:[] };
 let activeSkupina = '';
 let isCompactMatches = false; 
+
+// Pomocná funkcia pre invertovanie loga Tottenhamu
+function getLogoStyle(teamName) {
+  if (!teamName) return '';
+  return teamName.toLowerCase().includes('tottenham') ? 'filter: brightness(0) invert(1); opacity: 0.8;' : '';
+}
 
 // ═══════════════════════════════════════
 // PARSOVANIE A NAČÍTANIE
@@ -654,11 +679,13 @@ function createMatchCard(z, isUp) {
   
   const logoDomaci = `loga_timov/${z.domaci}.png`;
   const logoHost = `loga_timov/${z.host}.png`;
+  const sDomaci = getLogoStyle(z.domaci);
+  const sHost = getLogoStyle(z.host);
 
   return `
     <div class="match-card ${compactClass}">
-      <img src="${logoDomaci}" class="mc-bg-logo left" onerror="this.style.display='none'" alt="">
-      <img src="${logoHost}" class="mc-bg-logo right" onerror="this.style.display='none'" alt="">
+      <img src="${logoDomaci}" style="${sDomaci}" class="mc-bg-logo left" onerror="this.style.display='none'" alt="">
+      <img src="${logoHost}" style="${sHost}" class="mc-bg-logo right" onerror="this.style.display='none'" alt="">
       
       <div class="mc-header">
         <span class="mc-match-num">ZÁPAS #${z.id || '?'}</span>
@@ -752,9 +779,11 @@ function renderTabulka() {
       if(isPlayoff) rowClass = 'row-playoff';
       else if(isDanger) rowClass = 'row-danger';
       
+      const sLogo = getLogoStyle(r.t);
+      
       return `<tr class="${rowClass}">
         <td>
-          <img src="loga_timov/${r.t}.png" class="st-bg-logo" onerror="this.style.display='none'" alt="">
+          <img src="loga_timov/${r.t}.png" style="${sLogo}" class="st-bg-logo" onerror="this.style.display='none'" alt="">
           <span style="position: relative; z-index: 2;"><span class="s-rank">${i+1}</span> ${r.t}</span>
         </td>
         <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
@@ -772,7 +801,7 @@ function renderTabulka() {
 }
 
 // ═══════════════════════════════════════
-// LOGIKA - VÝKONY
+// LOGIKA - VÝKONY A TOP STRELEC
 // ═══════════════════════════════════════
 function buildPlayerSelect() {
   const sel = document.getElementById('playerSelect');
@@ -781,6 +810,29 @@ function buildPlayerSelect() {
     const o=document.createElement('option'); o.value=h.hrac; o.textContent=h.hrac.toUpperCase();
     sel.appendChild(o);
   });
+}
+
+function getTopScorer() {
+  const players = DATA.hraci.map(h => h.hrac).filter(Boolean);
+  const stats = [];
+  players.forEach(player => {
+    const myTeams = DATA.tymy.filter(t => t.hrac === player);
+    if (!myTeams.length) return;
+    let totalP = 0; let totalGF = 0;
+    myTeams.forEach(t => {
+      DATA.zapasy.filter(z => (z.domaci === t.nazov || z.host === t.nazov) && z.goly_domaci !== '' && z.goly_host !== '').forEach(z => {
+        totalP++;
+        totalGF += (z.domaci === t.nazov ? parseInt(z.goly_domaci) : parseInt(z.goly_host));
+      });
+    });
+    if (totalP > 0) stats.push({ name: player, gpg: totalGF / totalP, totalGF });
+  });
+  stats.sort((a, b) => b.gpg - a.gpg || b.totalGF - a.totalGF);
+  return stats.length ? stats[0].name : null;
+}
+
+function toggleCoeffInfo() {
+  document.getElementById('coeff-info').classList.toggle('show');
 }
 
 function renderVykony() {
@@ -809,11 +861,13 @@ function renderVykony() {
     const gClass = t.skupina === 'A' ? 'var(--group-a)' : 'var(--group-b)';
     const gpg = st.p > 0 ? (st.gf / st.p).toFixed(2) : '0.00';
     const ppg = st.p > 0 ? (st.pts / st.p).toFixed(2) : '0.00';
+    
+    const sLogo = getLogoStyle(t.nazov);
 
     return `
       <div class="team-stat-card">
         <div class="ts-header">
-          <img src="loga_timov/${t.nazov}.png" class="ts-bg-logo" onerror="this.style.display='none'" alt="">
+          <img src="loga_timov/${t.nazov}.png" style="${sLogo}" class="ts-bg-logo" onerror="this.style.display='none'" alt="">
           <div class="ts-header-content">
             TÍM #${idx+1} | <span class="ts-name">${t.nazov}</span> | <span style="color:${gClass}">skupina ${t.skupina}</span> | #${rank}
           </div>
@@ -835,12 +889,18 @@ function renderVykony() {
   const avgRank = ranks.length > 0 ? (ranks.reduce((a,b)=>a+b,0)/ranks.length).toFixed(1) : '0.0';
   const coeff = totalP > 0 ? ((totalPts / totalP) / 3 * 10).toFixed(1) : '0.0';
 
-  // Farba pre PPG
+  // Farba pre PPG (Body na zápas)
   const ppgNum = parseFloat(avgPPG);
-  let ppgColor = '#ffffff';
+  let ppgColor = 'var(--text)';
   if (ppgNum >= 2) ppgColor = 'var(--win)';
   else if (ppgNum >= 1) ppgColor = 'var(--group-a)';
   else ppgColor = 'var(--loss)';
+
+  // Zlaté zvýraznenie GPG (Góly na zápas), ak je top strelec
+  const topScorer = getTopScorer();
+  const isTopScorer = (player === topScorer);
+  const goldGpgStyle = isTopScorer ? 'background: linear-gradient(145deg, rgba(255,204,0,0.15), var(--surface)); border-color: var(--group-a); box-shadow: 0 0 15px rgba(255,204,0,0.2);' : '';
+  const goldGpgValStyle = isTopScorer ? 'color: var(--group-a); text-shadow: 0 0 10px rgba(255,204,0,0.5);' : '';
 
   // Farba pre Koeficient
   const coeffNum = parseFloat(coeff);
@@ -852,14 +912,20 @@ function renderVykony() {
 
   el.innerHTML = `
     <div class="coeff-card">
-      <div class="coeff-title">VÝKONNOSTNÝ KOEFICIENT HRÁČA</div>
+      <div class="coeff-title">
+        VÝKONNOSTNÝ KOEFICIENT HRÁČA
+        <i class="fa-solid fa-circle-info info-icon" onclick="toggleCoeffInfo()"></i>
+      </div>
       <div class="coeff-val">
         <span style="color:${cStyle.c}; text-shadow:${cStyle.s}; transition: 0.3s;">${coeff}</span><span class="coeff-max">/10</span>
+      </div>
+      <div id="coeff-info" class="coeff-info">
+        Tento koeficient odráža tvoju celkovú hernú efektivitu. Vypočítava sa na základe pomeru získaných bodov voči maximálnemu možnému počtu bodov zo všetkých tvojich odohratých zápasov a je prepočítaný na stupnicu od 0 do 10.
       </div>
     </div>
     <div class="global-stats">
       <div class="g-stat"><div class="g-val" style="color:${ppgColor}">${avgPPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>BODOV NA ZÁPAS</div></div>
-      <div class="g-stat"><div class="g-val">${avgGPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>GÓLOV NA ZÁPAS</div></div>
+      <div class="g-stat" style="${goldGpgStyle}"><div class="g-val" style="${goldGpgValStyle}">${avgGPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>GÓLOV NA ZÁPAS</div></div>
       <div class="g-stat"><div class="g-val">${avgRank}</div><div class="g-label">CELKOVÝ PRIEMER<br>PORADIA</div></div>
     </div>
     ${teamCards}
@@ -931,7 +997,7 @@ function renderStrelci() {
 }
 
 // ═══════════════════════════════════════
-// NAVIGÁCIA
+// NAVIGÁCIA (A GESTÁ)
 // ═══════════════════════════════════════
 function navTo(id, el) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -945,6 +1011,32 @@ function navTo(id, el) {
 function toggleNav() {
   document.getElementById('bottom-nav').classList.toggle('expanded');
 }
+
+// Potiahnutie prstom pre vysunutie menu
+const dragArea = document.getElementById('navDragArea');
+let startY = 0; let isSwiping = false;
+
+dragArea.addEventListener('touchstart', e => { 
+  startY = e.touches[0].clientY; 
+  isSwiping = false; 
+}, {passive: true});
+
+dragArea.addEventListener('touchmove', e => { 
+  isSwiping = true; 
+}, {passive: true});
+
+dragArea.addEventListener('touchend', e => {
+   let endY = e.changedTouches[0].clientY;
+   let diff = startY - endY;
+   
+   if (isSwiping && diff > 30) {
+     document.getElementById('bottom-nav').classList.add('expanded'); // Potiahnutie hore
+   } else if (isSwiping && diff < -30) {
+     document.getElementById('bottom-nav').classList.remove('expanded'); // Potiahnutie dole
+   } else {
+     toggleNav(); // Klasické kliknutie (ak nedošlo k swipu)
+   }
+});
 
 // Štart aplikácie
 loadAll();
