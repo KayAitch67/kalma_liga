@@ -36,6 +36,17 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* ════ ZBAVENIE SA SCROLL BAROV ════ */
+    ::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+    * {
+      -ms-overflow-style: none;  /* IE a Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    /* ══════════════════════════════════ */
+
     html, body { height: 100%; }
     
     body {
@@ -54,9 +65,9 @@
     header {
       display: flex; justify-content: space-between; align-items: center;
       padding: 20px 16px 10px;
-      background: var(--bg); /* Vrátené na pôvodné tmavé pozadie */
+      background: var(--bg);
       position: sticky; top: 0; z-index: 100;
-      border-bottom: 1px solid #333; /* Plná (solid) čiara */
+      border-bottom: 1px solid #333; 
     }
     .header-left { display: flex; align-items: center; gap: 10px; }
     .header-logo { width: 45px; height: auto; }
@@ -92,7 +103,7 @@
     }
     .donut::before {
       content: ""; width: 26px; height: 26px;
-      background: var(--bg); /* Vrátené na pôvodné pozadie */
+      background: var(--bg);
       border-radius: 50%;
     }
 
@@ -276,6 +287,17 @@
     
     .s-rank { display: inline-block; width: 14px; text-align: center; font-size: 11px; color: var(--muted); margin-right: 4px; }
 
+    /* Personalizácia tabuľky - jemná biela žiara pre vlastný tím */
+    .my-team-row {
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
+      position: relative;
+      z-index: 10;
+    }
+    .my-team-row td {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: #fff;
+    }
+
     /* PLAYOFF */
     .page.active#page-playoff {
       display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -374,6 +396,19 @@
     .scorer-val { font-size: 18px; font-weight: 900; color: var(--accent); }
     .scorer-card.gold .scorer-val { color: var(--group-a); }
     .scorer-label { font-size: 9px; font-weight: 700; color: var(--muted); display: block; margin-top: 2px; }
+
+    /* Personalizácia strelca - jemná biela žiara pre vlastné meno */
+    .scorer-card.my-player {
+      border-left: 6px solid #fff;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, var(--surface) 100%);
+      box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
+    .scorer-card.my-player .scorer-rank,
+    .scorer-card.my-player .scorer-name,
+    .scorer-card.my-player .scorer-val {
+      color: #fff;
+      text-shadow: 0 0 8px rgba(255,255,255,0.4);
+    }
 
     /* NASTAVENIA */
     .settings-title {
@@ -475,26 +510,21 @@
         gap: 20px;
       }
       
-      /* Úprava panelov: Priesvitné pozadie s 3D skleneným efektom */
       .page {
         display: flex !important;
         flex-direction: column;
-        
-        background: rgba(18, 18, 18, 0.4); /* Priesvitné tmavé pozadie */
-        backdrop-filter: blur(12px); /* Glassmorphism blur */
-        border: 1px solid rgba(255, 255, 255, 0.12); /* Jemný takmer biely outline */
-        
+        background: rgba(18, 18, 18, 0.4); 
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.12); 
         border-radius: 16px;
         padding: 20px;
         overflow-y: auto; 
         animation: none;
-        
-        /* 3D efekt a žiara (Shadows) */
         box-shadow: 
-            0 20px 40px rgba(0,0,0,0.8), /* Hlboký tieň pre 3D hĺbku */
-            0 0 20px rgba(255,255,255,0.05), /* Jemná vonkajšia žiara */
-            inset 0 1px 1px rgba(255,255,255,0.15), /* 3D vrchná hrana (odlesk) */
-            inset 0 -1px 1px rgba(0,0,0,0.6); /* 3D spodná hrana (tieň) */
+            0 20px 40px rgba(0,0,0,0.8), 
+            0 0 20px rgba(255,255,255,0.05), 
+            inset 0 1px 1px rgba(255,255,255,0.15), 
+            inset 0 -1px 1px rgba(0,0,0,0.6); 
       }
       
       #page-zapasy  { grid-column: 1 / 2; grid-row: 1 / 2; display: block !important; }
@@ -516,8 +546,6 @@
         transform: translate(-50%, -50%);
         width: 400px; max-width: 90%;
         height: auto; min-height: 300px;
-        
-        /* Modal rovnako v 3D skle */
         background: rgba(18, 18, 18, 0.8);
         backdrop-filter: blur(15px);
         border: 1px solid var(--accent);
@@ -526,11 +554,6 @@
       }
       .close-modal { display: block; position: absolute; top: 15px; right: 15px; color: var(--muted); cursor: pointer; font-size: 18px; }
       .close-modal:hover { color: var(--text); }
-      
-      .page::-webkit-scrollbar { width: 6px; }
-      .page::-webkit-scrollbar-track { background: transparent; }
-      .page::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
-      .page::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
       #bottom-nav { display: none !important; }
     }
@@ -614,7 +637,15 @@
     <div class="page" id="page-nastavenia">
       <i class="fa-solid fa-xmark close-modal" onclick="toggleSettingsModal()"></i>
       <div class="settings-title">NASTAVENIA</div>
-      <div class="empty">Tu neskôr pribudnú nastavenia aplikácie.</div>
+      
+      <!-- Osobny profil a prepinac mena -->
+      <div class="section-title" style="font-size: 12px; margin-bottom: 8px;">MÔJ PROFIL (HRÁČ)</div>
+      <select class="dropdown" id="userSelect" onchange="saveUser()">
+        <option value="">-- VYBER SVOJE MENO --</option>
+      </select>
+      <div class="po-text" style="font-size: 10px; margin-top: -10px; text-align: left;">
+        Aplikácia sa automaticky prispôsobí a zvýrazní tvoje tímy a štatistiky.
+      </div>
     </div>
 
   </main>
@@ -704,10 +735,12 @@ async function loadAll() {
     ]);
     DATA = {tymy, zapasy, hraci};
     updateProgress();
+    buildPlayerSelect(); 
     buildTimFilter();
-    buildPlayerSelect();
+    applyPersonalization();
     renderZapasy();
     renderTabulka();
+    renderVykony();
     renderStrelci(); 
   } catch(err) {
     document.querySelectorAll('.loader').forEach(l => l.innerHTML = '❌ Chyba pri načítaní dát.');
@@ -724,6 +757,44 @@ function updateProgress() {
   
   document.getElementById('prog-text').textContent = `${played}/${total}`;
   document.getElementById('prog-donut').style.setProperty('--pct', pct);
+}
+
+// ═══════════════════════════════════════
+// PERSONALIZÁCIA HRÁČA
+// ═══════════════════════════════════════
+function saveUser() {
+  const u = document.getElementById('userSelect').value;
+  localStorage.setItem('kalma_user', u);
+  applyPersonalization();
+  renderZapasy();
+  renderTabulka();
+  renderVykony();
+  renderStrelci();
+}
+
+function applyPersonalization() {
+  const u = localStorage.getItem('kalma_user');
+  if(!u) return;
+  
+  const selUser = document.getElementById('userSelect');
+  if(selUser) selUser.value = u;
+  
+  const selPlayer = document.getElementById('playerSelect');
+  if(selPlayer) selPlayer.value = u;
+  
+  const myTeams = DATA.tymy.filter(t => t.hrac === u);
+  const teamA = myTeams.find(t => t.skupina === 'A');
+  
+  if(teamA) {
+      activeSkupina = 'A';
+      document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active', 'all', 'ga', 'gb'));
+      const btnA = document.querySelector('.f-btn.ga');
+      if(btnA) btnA.classList.add('active', 'ga');
+      
+      buildTimFilter();
+      const selTeam = document.getElementById('timFilter');
+      if(selTeam) selTeam.value = teamA.nazov;
+  }
 }
 
 // ═══════════════════════════════════════
@@ -875,6 +946,8 @@ function calcStandings(skupina) {
 
 function renderTabulka() {
   const skupiny = [...new Set(DATA.tymy.map(t=>t.skupina))].sort();
+  const savedUser = localStorage.getItem('kalma_user');
+  
   let html = skupiny.map(s => {
     const rows = calcStandings(s);
     const gClass = s === 'A' ? 'ga' : 'gb';
@@ -885,6 +958,9 @@ function renderTabulka() {
       
       if(isPlayoff) rowClass = 'row-playoff';
       else if(isDanger) rowClass = 'row-danger';
+      
+      const isMyTeam = (getPlayerForTeam(r.t) === savedUser);
+      if (isMyTeam) rowClass += ' my-team-row';
       
       return `<tr class="${rowClass}">
         <td>
@@ -909,11 +985,19 @@ function renderTabulka() {
 // LOGIKA - VÝKONY A TOP STRELEC
 // ═══════════════════════════════════════
 function buildPlayerSelect() {
-  const sel = document.getElementById('playerSelect');
+  const sel1 = document.getElementById('playerSelect');
+  const sel2 = document.getElementById('userSelect');
+  
+  sel1.innerHTML = '<option value="">VYBER HRÁČA</option>';
+  sel2.innerHTML = '<option value="">-- VYBER SVOJE MENO --</option>';
+
   DATA.hraci.forEach(h=>{
     if(!h.hrac) return;
-    const o=document.createElement('option'); o.value=h.hrac; o.textContent=h.hrac.toUpperCase();
-    sel.appendChild(o);
+    const o1 = document.createElement('option'); o1.value = h.hrac; o1.textContent = h.hrac.toUpperCase();
+    sel1.appendChild(o1);
+    
+    const o2 = document.createElement('option'); o2.value = h.hrac; o2.textContent = h.hrac.toUpperCase();
+    sel2.appendChild(o2);
   });
 }
 
@@ -993,12 +1077,10 @@ function renderVykony() {
       </div>`;
   }).join('');
 
-  // Globálne výpočty
   const avgPPG = totalP > 0 ? (totalPts / totalP).toFixed(2) : '0.00';
   const avgGPG = totalP > 0 ? (totalGF / totalP).toFixed(2) : '0.00';
   const avgRank = ranks.length > 0 ? (ranks.reduce((a,b)=>a+b,0)/ranks.length).toFixed(1) : '0.0';
   
-  // Nový sofistikovaný výpočet koeficientu (WCPM)
   let coeff = '0.0';
   if (totalP > 0) {
       const BPI = (3 * totalW + totalD) / (3 * totalP);
@@ -1008,20 +1090,17 @@ function renderVykony() {
       coeff = K.toFixed(1);
   }
 
-  // Farba pre PPG (Body na zápas)
   const ppgNum = parseFloat(avgPPG);
   let ppgColor = 'var(--text)';
   if (ppgNum >= 2) ppgColor = 'var(--win)';
   else if (ppgNum >= 1) ppgColor = 'var(--group-a)';
   else ppgColor = 'var(--loss)';
 
-  // Zlaté zvýraznenie GPG (Góly na zápas), ak je top strelec
   const topScorer = getTopScorer();
   const isTopScorer = (player === topScorer);
   const goldGpgStyle = isTopScorer ? 'background: linear-gradient(145deg, rgba(255,204,0,0.15), var(--surface)); border-color: var(--group-a); box-shadow: 0 0 15px rgba(255,204,0,0.2);' : '';
   const goldGpgValStyle = isTopScorer ? 'color: var(--group-a); text-shadow: 0 0 10px rgba(255,204,0,0.5);' : '';
 
-  // Farba pre Koeficient
   const coeffNum = parseFloat(coeff);
   let cStyle = { c: '#FFFFFF', s: 'none' };
   if (coeffNum >= 8) cStyle = { c: 'var(--accent)', s: '0 0 25px rgba(255,115,0,0.9)' };
@@ -1057,6 +1136,7 @@ function renderVykony() {
 function renderStrelci() {
   const players = DATA.hraci.map(h => h.hrac).filter(Boolean);
   const stats = [];
+  const savedUser = localStorage.getItem('kalma_user');
 
   players.forEach(player => {
     const myTeams = DATA.tymy.filter(t => t.hrac === player);
@@ -1095,10 +1175,14 @@ function renderStrelci() {
   } else {
     html = stats.map((s, i) => {
       const isGold = i === 0;
-      const goldClass = isGold ? 'gold' : '';
+      const isMe = (s.name === savedUser);
+      let cardClass = isGold ? 'gold' : '';
+      
+      if (isMe && !isGold) cardClass += ' my-player';
+      
       const gpgStr = s.gpg.toFixed(2);
       return `
-        <div class="scorer-card ${goldClass}">
+        <div class="scorer-card ${cardClass}">
           <div class="scorer-left">
             <span class="scorer-rank">${i + 1}.</span>
             <span class="scorer-name">${s.name}</span>
