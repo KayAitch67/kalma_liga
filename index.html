@@ -63,7 +63,7 @@
     header {
       display: flex; justify-content: space-between; align-items: center;
       padding: 20px 16px 10px;
-      background: var(--bg);
+      background: #1d0d00;
       position: sticky; top: 0; z-index: 100;
       border-bottom: 1px solid #333; 
     }
@@ -97,11 +97,10 @@
       background: conic-gradient(var(--accent) calc(var(--pct) * 1%), #333 0);
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.2);
-      transition: background 0.5s ease-out;
     }
     .donut::before {
       content: ""; width: 26px; height: 26px;
-      background: var(--bg);
+      background: #1d0d00;
       border-radius: 50%;
     }
 
@@ -285,7 +284,7 @@
     
     .s-rank { display: inline-block; width: 14px; text-align: center; font-size: 11px; color: var(--muted); margin-right: 4px; }
 
-    /* Personalizácia tabuľky - jemná biela žiara pre vlastný tím */
+    /* Personalizácia tabuľky */
     .my-team-row {
       filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
       position: relative;
@@ -342,9 +341,9 @@
     .global-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; }
     .g-stat {
       background: var(--surface); border: 1px solid #333; border-radius: 12px;
-      padding: 16px 10px; text-align: center; transition: 0.3s;
+      padding: 16px 10px; text-align: center;
     }
-    .g-val { font-size: 22px; font-weight: 800; margin-bottom: 4px; transition: 0.3s; }
+    .g-val { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
     .g-label { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; line-height: 1.3;}
 
     .team-stat-card {
@@ -395,7 +394,6 @@
     .scorer-card.gold .scorer-val { color: var(--group-a); }
     .scorer-label { font-size: 9px; font-weight: 700; color: var(--muted); display: block; margin-top: 2px; }
 
-    /* Personalizácia strelca - jemná biela žiara pre vlastné meno */
     .scorer-card.my-player {
       border-left: 6px solid #fff;
       background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, var(--surface) 100%);
@@ -644,7 +642,6 @@
         Aplikácia sa automaticky prispôsobí a zvýrazní tvoje tímy a štatistiky.
       </div>
       
-      <!-- Nový výber farby aplikácie -->
       <div class="section-title" style="font-size: 12px; margin-bottom: 8px;">FARBA APLIKÁCIE</div>
       <select class="dropdown" id="themeSelect" onchange="saveTheme()">
         <option value="orange">Oranžová (Predvolená)</option>
@@ -733,10 +730,9 @@ function saveTheme() {
   const t = document.getElementById('themeSelect').value;
   localStorage.setItem('kalma_theme', t);
   applyThemeVariables(t);
-  renderVykony(); // Osvieži farby koeficientu
+  renderVykony(); 
 }
 
-// Inštalácia témy hneď po načítaní scriptu pre elimináciu farebného blikania
 loadTheme();
 
 function saveUser() {
@@ -1123,12 +1119,10 @@ function renderVykony() {
       </div>`;
   }).join('');
 
-  // Globálne výpočty
   const avgPPG = totalP > 0 ? (totalPts / totalP).toFixed(2) : '0.00';
   const avgGPG = totalP > 0 ? (totalGF / totalP).toFixed(2) : '0.00';
   const avgRank = ranks.length > 0 ? (ranks.reduce((a,b)=>a+b,0)/ranks.length).toFixed(1) : '0.0';
   
-  // Nový sofistikovaný výpočet koeficientu (WCPM)
   let coeff = '0.0';
   if (totalP > 0) {
       const BPI = (3 * totalW + totalD) / (3 * totalP);
@@ -1138,20 +1132,17 @@ function renderVykony() {
       coeff = K.toFixed(1);
   }
 
-  // Farba pre PPG (Body na zápas)
   const ppgNum = parseFloat(avgPPG);
   let ppgColor = 'var(--text)';
   if (ppgNum >= 2) ppgColor = 'var(--win)';
   else if (ppgNum >= 1) ppgColor = 'var(--group-a)';
   else ppgColor = 'var(--loss)';
 
-  // Zlaté zvýraznenie GPG (Góly na zápas), ak je top strelec
   const topScorer = getTopScorer();
   const isTopScorer = (player === topScorer);
   const goldGpgStyle = isTopScorer ? 'background: linear-gradient(145deg, rgba(255,204,0,0.15), var(--surface)); border-color: var(--group-a); box-shadow: 0 0 15px rgba(255,204,0,0.2);' : '';
   const goldGpgValStyle = isTopScorer ? 'color: var(--group-a); text-shadow: 0 0 10px rgba(255,204,0,0.5);' : '';
 
-  // Farba pre Koeficient podľa vybratej akcentovej farby a urovne
   const coeffNum = parseFloat(coeff);
   const themeObj = THEMES[localStorage.getItem('kalma_theme') || 'orange'];
   let cStyle = { c: '#FFFFFF', s: 'none' };
@@ -1168,7 +1159,7 @@ function renderVykony() {
         <i class="fa-solid fa-circle-info info-icon" onclick="toggleCoeffInfo()"></i>
       </div>
       <div class="coeff-val">
-        <span style="color:${cStyle.c}; text-shadow:${cStyle.s}; transition: 0.3s;">${coeff}</span><span class="coeff-max">/10</span>
+        <span style="color:${cStyle.c}; text-shadow:${cStyle.s};">${coeff}</span><span class="coeff-max">/10</span>
       </div>
       <div id="coeff-info" class="coeff-info">
         Tento koeficient využíva pokročilý matematický model a hodnotí tvoju hru v 3 zložkách: <b>60%</b> tvorí bodová efektivita (pomer získaných bodov voči maximu), <b>30%</b> Pytagorovská gólová dominancia (matematický pomer strelených a inkasovaných gólov, ktorý prísne trestá debakle a odmeňuje pevnú obranu) a <b>10%</b> index ofenzívnej atraktivity (bonus za vysoký priemer gólov na zápas).
