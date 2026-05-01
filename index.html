@@ -285,7 +285,7 @@
     
     .s-rank { display: inline-block; width: 14px; text-align: center; font-size: 11px; color: var(--muted); margin-right: 4px; }
 
-    /* Personalizácia tabuľky - jemná biela žiara pre vlastný tím */
+    /* Personalizácia tabuľky */
     .my-team-row {
       filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
       position: relative;
@@ -296,13 +296,90 @@
       color: #fff;
     }
 
-    /* PLAYOFF */
+    /* ════════════════════════════════════════════════════════════════
+       PLAY-OFF PAVÚK
+    ═════════════════════════════════════════════════════════════════ */
     .page.active#page-playoff {
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      min-height: 65vh; position: relative; text-align: center; overflow: hidden;
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      min-height: 65vh; position: relative; overflow-y: auto; overflow-x: hidden; padding-bottom: 20px;
     }
-    .po-title { font-size: 24px; font-weight: 800; color: var(--accent); margin-bottom: 12px; z-index: 1;}
-    .po-text { color: var(--muted); font-size: 14px; line-height: 1.5; font-weight: 500; z-index: 1;}
+
+    .po-title-main { font-size: 20px; font-weight: 900; color: var(--accent); letter-spacing: 1px; }
+    .po-header-row { display: none; width: 100%; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 5px;}
+    .po-mobile-toggle { display: flex; background: #111; border: 1px solid #333; border-radius: 8px; padding: 4px; gap: 4px;}
+    .po-btn { background: transparent; border: none; color: var(--muted); font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s;}
+    .po-btn.active { background: var(--surface-light); color: var(--text); }
+
+    .bracket-wrapper { display: flex; flex-direction: column; gap: 60px; width: 100%; padding-top: 10px;}
+    .bracket-group { width: 100%; display: flex; flex-direction: column; }
+    .bracket-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px;}
+    .bracket-title.ga { color: var(--group-a); }
+    .bracket-title.gb { color: var(--group-b); }
+
+    .bracket-container { display: flex; justify-content: center; align-items: stretch; gap: 40px; position: relative; }
+    .bracket-col { display: flex; flex-direction: column; justify-content: space-around; flex: 1; max-width: 260px; position: relative; z-index: 2;}
+
+    .bracket-round-title { text-align: center; font-size: 11px; font-weight: 800; color: var(--muted); letter-spacing: 1.5px; margin-bottom: 15px; text-transform: uppercase; }
+
+    .semi-wrapper { display: flex; flex-direction: column; justify-content: space-around; gap: 40px; position: relative; flex: 1;}
+
+    .br-matchup { background: var(--surface); border: 1px solid #333; border-radius: 12px; padding: 12px; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+
+    .br-seed-label { font-size: 9px; font-weight: 900; color: var(--accent); margin-bottom: 4px; margin-top: 8px; padding-left: 2px; }
+    .br-seed-label.ga { color: var(--group-a); }
+    .br-seed-label.gb { color: var(--group-b); }
+    .br-seed-label:first-child { margin-top: 0; }
+
+    .br-team-row { display: flex; align-items: center; background: #111; border: 1px solid #222; border-radius: 8px; padding: 8px; gap: 8px;}
+    .br-name { font-size: 12px; font-weight: 800; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+
+    .br-scores { display: flex; gap: 4px; }
+    .br-score-box { width: 22px; height: 22px; background: var(--surface-light); border: 1px solid #444; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
+
+    .br-winner-box { background: var(--surface); border: 2px solid var(--accent); border-radius: 16px; padding: 25px 15px; text-align: center; box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;}
+    .br-winner-box.ga { border-color: var(--group-a); box-shadow: 0 0 30px rgba(255, 204, 0, 0.2); }
+    .br-winner-box.gb { border-color: var(--group-b); box-shadow: 0 0 30px rgba(0, 168, 150, 0.2); }
+    .br-winner-name { font-size: 16px; font-weight: 900; color: #fff; margin-top: 12px; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.5);}
+
+    /* LOGIKA ČIAR (Skrytie základných) */
+    .br-matchup::before, .br-matchup::after, .semi-wrapper::before, .semi-wrapper::after, .br-winner-box::before, .br-winner-box::after { display: none; }
+
+    /* DESKTOP: Zľava doprava */
+    @media (min-width: 768px) {
+        .bracket-container { flex-direction: row; }
+        .po-header-row { display: none !important; }
+        
+        .bracket-col.semi .br-matchup::after { display: block; content: ""; position: absolute; right: -20px; top: 50%; width: 20px; border-bottom: 2px solid #444; z-index: 0;}
+        .semi-wrapper::after { display: block; content: ""; position: absolute; right: -20px; top: 25%; bottom: 25%; width: 0; border-right: 2px solid #444; z-index: 0;}
+        .bracket-col.final .br-matchup::before { display: block; content: ""; position: absolute; left: -20px; top: 50%; width: 20px; border-bottom: 2px solid #444; z-index: 0;}
+        .bracket-col.final .br-matchup::after { display: block; content: ""; position: absolute; right: -20px; top: 50%; width: 20px; border-bottom: 2px solid #444; z-index: 0;}
+        .bracket-col.winner .br-winner-box::before { display: block; content: ""; position: absolute; left: -20px; top: 50%; width: 20px; border-bottom: 2px solid #444; z-index: 0;}
+    }
+
+    /* MOBIL: Zospodu nahor */
+    @media (max-width: 767px) {
+        .bracket-wrapper { gap: 0; }
+        .po-header-row { display: flex; margin-bottom: 20px; }
+        .bracket-title { display: none; } 
+        .bracket-container { flex-direction: column-reverse; align-items: center; gap: 30px; }
+        .semi-wrapper { flex-direction: row; gap: 15px; width: 100%; }
+        .bracket-col { width: 100%; max-width: 100%; }
+        
+        .br-name { font-size: 10px; }
+        .br-score-box { width: 18px; height: 18px; font-size: 10px; }
+        .br-matchup { padding: 8px; width: 100%; }
+        .br-seed-label { font-size: 8px; }
+        
+        /* Čiary nahor */
+        .bracket-col.semi .br-matchup::after { display: block; content: ""; position: absolute; top: -15px; left: 50%; height: 15px; border-left: 2px solid #444; z-index: 0;}
+        .semi-wrapper::before { display: block; content: ""; position: absolute; top: -15px; left: 25%; right: 25%; border-top: 2px solid #444; z-index: 0;}
+        .bracket-col.final .br-matchup::after { display: block; content: ""; position: absolute; bottom: -15px; left: 50%; height: 15px; border-left: 2px solid #444; z-index: 0;}
+        .bracket-col.final .br-matchup::before { display: block; content: ""; position: absolute; top: -15px; left: 50%; height: 15px; border-left: 2px solid #444; z-index: 0;}
+        .bracket-col.winner .br-winner-box::after { display: block; content: ""; position: absolute; bottom: -15px; left: 50%; height: 15px; border-left: 2px solid #444; z-index: 0;}
+        
+        #bracket-B { display: none; }
+    }
+
 
     /* VÝKONY (STATS) */
     .coeff-card {
@@ -395,7 +472,7 @@
     .scorer-card.gold .scorer-val { color: var(--group-a); }
     .scorer-label { font-size: 9px; font-weight: 700; color: var(--muted); display: block; margin-top: 2px; }
 
-    /* Personalizácia strelca - jemná biela žiara pre vlastné meno */
+    /* Personalizácia strelca */
     .scorer-card.my-player {
       border-left: 6px solid #fff;
       background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, var(--surface) 100%);
@@ -529,9 +606,10 @@
       #page-poradie { grid-column: 2 / 3; grid-row: 1 / 2; display: block !important; }
       #page-vykony  { grid-column: 3 / 4; grid-row: 1 / 2; display: block !important; }
       #page-strelci { grid-column: 1 / 2; grid-row: 2 / 3; display: block !important; }
+      
       #page-playoff { 
         grid-column: 2 / 4; grid-row: 2 / 3; 
-        justify-content: center; align-items: center; 
+        justify-content: flex-start; align-items: center; 
       }
       
       #page-nastavenia {
@@ -612,8 +690,16 @@
     </div>
 
     <div class="page" id="page-playoff">
-      <div class="po-title">Play-off zatiaľ nie<br>je k dispozícii.</div>
-      <div class="po-text">Táto sekcia sa aktivuje po<br>skončení skupinovej fázy.</div>
+      <div class="po-header-row">
+        <div class="po-title-main">PLAY-OFF</div>
+        <div class="po-mobile-toggle">
+          <button class="po-btn active" id="po-btn-a" onclick="switchPlayoffGroup('A')">SKUPINA A</button>
+          <button class="po-btn" id="po-btn-b" onclick="switchPlayoffGroup('B')">SKUPINA B</button>
+        </div>
+      </div>
+      <div id="playoff-content">
+        <div class="loader"><div class="spinner"></div>Načítavam play-off...</div>
+      </div>
     </div>
 
     <div class="page" id="page-vykony">
@@ -644,7 +730,6 @@
         Aplikácia sa automaticky prispôsobí a zvýrazní tvoje tímy a štatistiky.
       </div>
       
-      <!-- Nový výber farby aplikácie -->
       <div class="section-title" style="font-size: 12px; margin-bottom: 8px;">FARBA APLIKÁCIE</div>
       <select class="dropdown" id="themeSelect" onchange="saveTheme()">
         <option value="orange">Oranžová (Predvolená)</option>
@@ -826,6 +911,7 @@ async function loadAll() {
     renderTabulka();
     renderVykony();
     renderStrelci(); 
+    renderPlayoff();
   } catch(err) {
     document.querySelectorAll('.loader').forEach(l => l.innerHTML = '❌ Chyba pri načítaní dát.');
   }
@@ -1026,6 +1112,96 @@ function renderTabulka() {
   }).join('');
   document.getElementById('tabulka-content').innerHTML = html;
 }
+
+// ═══════════════════════════════════════
+// LOGIKA - PLAY-OFF
+// ═══════════════════════════════════════
+function renderPlayoff() {
+    const rowsA = calcStandings('A');
+    const rowsB = calcStandings('B');
+
+    // Bezpečnostná funkcia pre názov tímu (ak ešte nie sú dohrané skupiny)
+    const getT = (rows, idx) => rows[idx] ? rows[idx].t.toUpperCase() : 'TBD';
+
+    const pA = { t1: getT(rowsA,0), t2: getT(rowsA,1), t3: getT(rowsA,2), t4: getT(rowsA,3) };
+    const pB = { t1: getT(rowsB,0), t2: getT(rowsB,1), t3: getT(rowsB,2), t4: getT(rowsB,3) };
+
+    const buildMatchup = (grp, s_a, t_a, s_b, t_b) => {
+        const cColor = grp === 'A' ? 'ga' : 'gb';
+        return `
+        <div class="br-matchup">
+            <div class="br-seed-label ${cColor}">${s_a}</div>
+            <div class="br-team-row">
+                <span class="br-name">${t_a}</span>
+                <div class="br-scores"><div class="br-score-box"></div><div class="br-score-box"></div></div>
+            </div>
+            <div class="br-seed-label ${cColor}">${s_b}</div>
+            <div class="br-team-row">
+                <span class="br-name">${t_b}</span>
+                <div class="br-scores"><div class="br-score-box"></div><div class="br-score-box"></div></div>
+            </div>
+        </div>`;
+    };
+
+    const buildBracket = (grp, p) => `
+        <div class="bracket-group" id="bracket-${grp}">
+            <div class="bracket-title ${grp === 'A' ? 'ga' : 'gb'}">SKUPINA ${grp}</div>
+            <div class="bracket-container">
+                <div class="bracket-col semi">
+                    <div class="bracket-round-title">SEMIFINÁLE</div>
+                    <div class="semi-wrapper">
+                        ${buildMatchup(grp, `${grp}1`, p.t1, `${grp}4`, p.t4)}
+                        ${buildMatchup(grp, `${grp}2`, p.t2, `${grp}3`, p.t3)}
+                    </div>
+                </div>
+                <div class="bracket-col final">
+                    <div class="bracket-round-title">FINÁLE</div>
+                    ${buildMatchup(grp, 'W', `VÍŤAZ S1`, 'W', `VÍŤAZ S2`)}
+                </div>
+                <div class="bracket-col winner">
+                    <div class="bracket-round-title">VÍŤAZ</div>
+                    <div class="br-winner-box ${grp === 'A' ? 'ga' : 'gb'}">
+                        <i class="fa-solid fa-trophy" style="font-size: 32px; color: var(--group-${grp.toLowerCase()}); margin-bottom: 8px;"></i>
+                        <div class="br-winner-name">ŠAMPIÓN ${grp}</div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+    document.getElementById('playoff-content').innerHTML = `
+        <div class="bracket-wrapper">
+            ${buildBracket('A', pA)}
+            ${buildBracket('B', pB)}
+        </div>
+    `;
+}
+
+function switchPlayoffGroup(g) {
+    document.getElementById('po-btn-a').classList.remove('active');
+    document.getElementById('po-btn-b').classList.remove('active');
+    document.getElementById('po-btn-' + g.toLowerCase()).classList.add('active');
+
+    if (window.innerWidth < 768) {
+        document.getElementById('bracket-A').style.display = g === 'A' ? 'flex' : 'none';
+        document.getElementById('bracket-B').style.display = g === 'B' ? 'flex' : 'none';
+    }
+}
+
+// Resetovanie zobrazenia na resize
+window.addEventListener('resize', () => {
+    const bA = document.getElementById('bracket-A');
+    const bB = document.getElementById('bracket-B');
+    if (!bA || !bB) return;
+    
+    if(window.innerWidth >= 768) {
+        bA.style.display = 'flex';
+        bB.style.display = 'flex';
+    } else {
+        const isA = document.getElementById('po-btn-a').classList.contains('active');
+        switchPlayoffGroup(isA ? 'A' : 'B');
+    }
+});
+
 
 // ═══════════════════════════════════════
 // LOGIKA - VÝKONY A TOP STRELEC
