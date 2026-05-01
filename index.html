@@ -15,7 +15,10 @@
       --bg: #121212;
       --surface: #1e1e1e;
       --surface-light: #2a2a2a;
+      
+      /* Dynamický Akcent */
       --accent: #FF7300;
+      --accent-rgb: 255, 115, 0;
       
       --group-a: #FFCC00;
       --group-a-bg: #332900; 
@@ -38,13 +41,8 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     /* ════ ZBAVENIE SA SCROLL BAROV ════ */
-    ::-webkit-scrollbar {
-      display: none; /* Chrome, Safari, Opera */
-    }
-    * {
-      -ms-overflow-style: none;  /* IE a Edge */
-      scrollbar-width: none;  /* Firefox */
-    }
+    ::-webkit-scrollbar { display: none; }
+    * { -ms-overflow-style: none; scrollbar-width: none; }
     /* ══════════════════════════════════ */
 
     html, body { height: 100%; }
@@ -76,7 +74,7 @@
       font-family: 'Audiowide', cursive;
       font-size: 24px; letter-spacing: 2px; text-transform: uppercase; 
       color: var(--accent); line-height: 1; margin-bottom: 2px;
-      text-shadow: 0 0 10px rgba(255, 115, 0, 0.5);
+      text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
     }
     .season-dropdown {
       background: transparent; border: none; color: #fff; font-size: 10px; font-weight: 700;
@@ -98,7 +96,7 @@
       width: 36px; height: 36px; border-radius: 50%;
       background: conic-gradient(var(--accent) calc(var(--pct) * 1%), #333 0);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 10px rgba(255,115,0,0.2);
+      box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.2);
       transition: background 0.5s ease-out;
     }
     .donut::before {
@@ -638,13 +636,26 @@
       <i class="fa-solid fa-xmark close-modal" onclick="toggleSettingsModal()"></i>
       <div class="settings-title">NASTAVENIA</div>
       
-      <!-- Osobny profil a prepinac mena -->
       <div class="section-title" style="font-size: 12px; margin-bottom: 8px;">MÔJ PROFIL (HRÁČ)</div>
       <select class="dropdown" id="userSelect" onchange="saveUser()">
         <option value="">-- VYBER SVOJE MENO --</option>
       </select>
-      <div class="po-text" style="font-size: 10px; margin-top: -10px; text-align: left;">
+      <div class="po-text" style="font-size: 10px; margin-top: -10px; text-align: left; margin-bottom: 24px;">
         Aplikácia sa automaticky prispôsobí a zvýrazní tvoje tímy a štatistiky.
+      </div>
+      
+      <!-- Nový výber farby aplikácie -->
+      <div class="section-title" style="font-size: 12px; margin-bottom: 8px;">FARBA APLIKÁCIE</div>
+      <select class="dropdown" id="themeSelect" onchange="saveTheme()">
+        <option value="orange">Oranžová (Predvolená)</option>
+        <option value="pink">Ružová</option>
+        <option value="purple">Fialová</option>
+        <option value="blue">Modrá</option>
+        <option value="green">Zelená</option>
+        <option value="red">Červená</option>
+      </select>
+      <div class="po-text" style="font-size: 10px; margin-top: -10px; text-align: left;">
+        Zmení hlavnú akcentnú farbu celej aplikácie na žiarivý neónový odtieň.
       </div>
     </div>
 
@@ -678,6 +689,18 @@
 
 <script>
 // ═══════════════════════════════════════
+// KONFIGURÁCIA TÉM A FARIEB
+// ═══════════════════════════════════════
+const THEMES = {
+  orange: { accent: '#FF7300', rgb: '255, 115, 0', c6: '#FF9933', c4: '#FFB870', c2: '#FFE0C2' },
+  pink:   { accent: '#FF007F', rgb: '255, 0, 127', c6: '#FF66B2', c4: '#FF99CC', c2: '#FFCCE5' },
+  purple: { accent: '#B200FF', rgb: '178, 0, 255', c6: '#CC66FF', c4: '#E099FF', c2: '#F0CCFF' },
+  blue:   { accent: '#00D4FF', rgb: '0, 212, 255', c6: '#66E5FF', c4: '#99EFFF', c2: '#CCF7FF' },
+  green:  { accent: '#00FF4D', rgb: '0, 255, 77',  c6: '#66FF8E', c4: '#99FFB4', c2: '#CCFFD9' },
+  red:    { accent: '#FF003C', rgb: '255, 0, 60',  c6: '#FF668A', c4: '#FF99B0', c2: '#FFCCD7' }
+};
+
+// ═══════════════════════════════════════
 // KONFIGURÁCIA CSV
 // ═══════════════════════════════════════
 const CSV_URLS = {
@@ -689,6 +712,67 @@ const CSV_URLS = {
 let DATA = { tymy:[], zapasy:[], hraci:[] };
 let activeSkupina = '';
 let isCompactMatches = false; 
+
+// ═══════════════════════════════════════
+// SYSTÉMOVÉ FUNKCIE PRE NASTAVENIA
+// ═══════════════════════════════════════
+function applyThemeVariables(t) {
+  const theme = THEMES[t] || THEMES['orange'];
+  document.documentElement.style.setProperty('--accent', theme.accent);
+  document.documentElement.style.setProperty('--accent-rgb', theme.rgb);
+}
+
+function loadTheme() {
+  const t = localStorage.getItem('kalma_theme') || 'orange';
+  const sel = document.getElementById('themeSelect');
+  if (sel) sel.value = t;
+  applyThemeVariables(t);
+}
+
+function saveTheme() {
+  const t = document.getElementById('themeSelect').value;
+  localStorage.setItem('kalma_theme', t);
+  applyThemeVariables(t);
+  renderVykony(); // Osvieži farby koeficientu
+}
+
+// Inštalácia témy hneď po načítaní scriptu pre elimináciu farebného blikania
+loadTheme();
+
+function saveUser() {
+  const u = document.getElementById('userSelect').value;
+  localStorage.setItem('kalma_user', u);
+  applyPersonalization();
+  renderZapasy();
+  renderTabulka();
+  renderVykony();
+  renderStrelci();
+}
+
+function applyPersonalization() {
+  const u = localStorage.getItem('kalma_user');
+  if(!u) return;
+  
+  const selUser = document.getElementById('userSelect');
+  if(selUser) selUser.value = u;
+  
+  const selPlayer = document.getElementById('playerSelect');
+  if(selPlayer) selPlayer.value = u;
+  
+  const myTeams = DATA.tymy.filter(t => t.hrac === u);
+  const teamA = myTeams.find(t => t.skupina === 'A');
+  
+  if(teamA) {
+      activeSkupina = 'A';
+      document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active', 'all', 'ga', 'gb'));
+      const btnA = document.querySelector('.f-btn.ga');
+      if(btnA) btnA.classList.add('active', 'ga');
+      
+      buildTimFilter();
+      const selTeam = document.getElementById('timFilter');
+      if(selTeam) selTeam.value = teamA.nazov;
+  }
+}
 
 // ═══════════════════════════════════════
 // PARSOVANIE A NAČÍTANIE
@@ -757,44 +841,6 @@ function updateProgress() {
   
   document.getElementById('prog-text').textContent = `${played}/${total}`;
   document.getElementById('prog-donut').style.setProperty('--pct', pct);
-}
-
-// ═══════════════════════════════════════
-// PERSONALIZÁCIA HRÁČA
-// ═══════════════════════════════════════
-function saveUser() {
-  const u = document.getElementById('userSelect').value;
-  localStorage.setItem('kalma_user', u);
-  applyPersonalization();
-  renderZapasy();
-  renderTabulka();
-  renderVykony();
-  renderStrelci();
-}
-
-function applyPersonalization() {
-  const u = localStorage.getItem('kalma_user');
-  if(!u) return;
-  
-  const selUser = document.getElementById('userSelect');
-  if(selUser) selUser.value = u;
-  
-  const selPlayer = document.getElementById('playerSelect');
-  if(selPlayer) selPlayer.value = u;
-  
-  const myTeams = DATA.tymy.filter(t => t.hrac === u);
-  const teamA = myTeams.find(t => t.skupina === 'A');
-  
-  if(teamA) {
-      activeSkupina = 'A';
-      document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active', 'all', 'ga', 'gb'));
-      const btnA = document.querySelector('.f-btn.ga');
-      if(btnA) btnA.classList.add('active', 'ga');
-      
-      buildTimFilter();
-      const selTeam = document.getElementById('timFilter');
-      if(selTeam) selTeam.value = teamA.nazov;
-  }
 }
 
 // ═══════════════════════════════════════
@@ -1077,10 +1123,12 @@ function renderVykony() {
       </div>`;
   }).join('');
 
+  // Globálne výpočty
   const avgPPG = totalP > 0 ? (totalPts / totalP).toFixed(2) : '0.00';
   const avgGPG = totalP > 0 ? (totalGF / totalP).toFixed(2) : '0.00';
   const avgRank = ranks.length > 0 ? (ranks.reduce((a,b)=>a+b,0)/ranks.length).toFixed(1) : '0.0';
   
+  // Nový sofistikovaný výpočet koeficientu (WCPM)
   let coeff = '0.0';
   if (totalP > 0) {
       const BPI = (3 * totalW + totalD) / (3 * totalP);
@@ -1090,23 +1138,28 @@ function renderVykony() {
       coeff = K.toFixed(1);
   }
 
+  // Farba pre PPG (Body na zápas)
   const ppgNum = parseFloat(avgPPG);
   let ppgColor = 'var(--text)';
   if (ppgNum >= 2) ppgColor = 'var(--win)';
   else if (ppgNum >= 1) ppgColor = 'var(--group-a)';
   else ppgColor = 'var(--loss)';
 
+  // Zlaté zvýraznenie GPG (Góly na zápas), ak je top strelec
   const topScorer = getTopScorer();
   const isTopScorer = (player === topScorer);
   const goldGpgStyle = isTopScorer ? 'background: linear-gradient(145deg, rgba(255,204,0,0.15), var(--surface)); border-color: var(--group-a); box-shadow: 0 0 15px rgba(255,204,0,0.2);' : '';
   const goldGpgValStyle = isTopScorer ? 'color: var(--group-a); text-shadow: 0 0 10px rgba(255,204,0,0.5);' : '';
 
+  // Farba pre Koeficient podľa vybratej akcentovej farby a urovne
   const coeffNum = parseFloat(coeff);
+  const themeObj = THEMES[localStorage.getItem('kalma_theme') || 'orange'];
   let cStyle = { c: '#FFFFFF', s: 'none' };
-  if (coeffNum >= 8) cStyle = { c: 'var(--accent)', s: '0 0 25px rgba(255,115,0,0.9)' };
-  else if (coeffNum >= 6) cStyle = { c: '#FF9933', s: '0 0 16px rgba(255,153,51,0.7)' };
-  else if (coeffNum >= 4) cStyle = { c: '#FFB870', s: '0 0 12px rgba(255,184,112,0.5)' };
-  else if (coeffNum >= 2) cStyle = { c: '#FFE0C2', s: '0 0 8px rgba(255,224,194,0.3)' };
+  
+  if (coeffNum >= 8) cStyle = { c: 'var(--accent)', s: '0 0 25px rgba(var(--accent-rgb),0.9)' };
+  else if (coeffNum >= 6) cStyle = { c: themeObj.c6, s: '0 0 16px rgba(var(--accent-rgb),0.7)' };
+  else if (coeffNum >= 4) cStyle = { c: themeObj.c4, s: '0 0 12px rgba(var(--accent-rgb),0.5)' };
+  else if (coeffNum >= 2) cStyle = { c: themeObj.c2, s: '0 0 8px rgba(var(--accent-rgb),0.3)' };
 
   el.innerHTML = `
     <div class="coeff-card">
