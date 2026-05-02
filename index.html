@@ -299,23 +299,28 @@
     }
 
     /* ════════════════════════════════════════════════════════════════
-       PLAY-OFF PAVÚK
+       PLAY-OFF PAVÚK (Univerzálny Horizontálny zľava doprava)
     ═════════════════════════════════════════════════════════════════ */
     .page.active#page-playoff {
-      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-      min-height: 65vh; position: relative; overflow-y: auto; overflow-x: hidden; padding-bottom: 20px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 65vh; position: relative; overflow-y: auto; overflow-x: auto; padding-bottom: 20px;
     }
 
-    .po-mobile-toggle-wrapper { display: none; width: 100%; margin-bottom: 20px; }
+    /* Prepínač */
+    .po-mobile-toggle-wrapper { display: none; z-index: 100; }
+    .po-mobile-toggle { display: flex; background: var(--surface); border: 1px solid #333; border-radius: 12px; padding: 4px; gap: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+    .po-btn { background: #333; border: none; color: var(--muted); font-size: 11px; font-weight: 800; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .po-btn.active#po-btn-a { background: var(--group-a-bg); color: var(--group-a); }
+    .po-btn.active#po-btn-b { background: var(--group-b-bg); color: var(--group-b); }
 
-    .bracket-wrapper { display: flex; flex-direction: column; gap: 60px; width: 100%; padding-top: 10px;}
+    .bracket-wrapper { display: flex; flex-direction: column; gap: 60px; width: max-content; padding-top: 10px; padding-left: 10px; padding-right: 10px; margin: auto;}
     .bracket-group { width: 100%; display: flex; flex-direction: column; }
     .bracket-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px;}
     .bracket-title.ga { color: var(--group-a); }
     .bracket-title.gb { color: var(--group-b); }
 
-    .bracket-container { display: flex; justify-content: center; align-items: stretch; gap: 40px; position: relative; }
-    .bracket-col { display: flex; flex-direction: column; justify-content: space-around; flex: 1; max-width: 260px; position: relative; z-index: 2;}
+    .bracket-container { display: flex; flex-direction: row; justify-content: center; align-items: stretch; gap: 40px; position: relative; }
+    .bracket-col { display: flex; flex-direction: column; justify-content: space-around; flex: 1; min-width: 220px; max-width: 260px; position: relative; z-index: 2;}
 
     .bracket-round-title { text-align: center; font-size: 11px; font-weight: 800; color: var(--muted); letter-spacing: 1.5px; margin-bottom: 15px; text-transform: uppercase; }
 
@@ -340,82 +345,54 @@
     .br-winner-box.gb { border-color: var(--group-b); box-shadow: 0 0 30px rgba(0, 168, 150, 0.2); }
     .br-winner-name { font-size: 11px; font-weight: 900; color: #fff; margin-top: 4px; margin-bottom: 8px; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.5);}
 
-    /* LOGIKA ČIAR (Skrytie základných) */
+    /* LOGIKA ČIAR - Aplikovaná na PC aj Mobil rovnako (pretože obe sú zľava doprava) */
     .br-matchup::before, .br-matchup::after, .semi-wrapper::before, .semi-wrapper::after, .br-winner-box::before, .br-winner-box::after { display: none; }
 
-    /* DESKTOP: Zľava doprava s presnými medzerami */
-    @media (min-width: 768px) {
-        .bracket-container { flex-direction: row; }
-        
-        .bracket-col.semi .br-matchup:nth-child(1)::after {
-            display: block; content: ""; position: absolute; right: -20px; top: 50%; width: 15px; height: calc(50% + 20px); border-top: 2px solid #444; border-right: 2px solid #444; border-top-right-radius: 6px; z-index: 0;
-        }
-        .bracket-col.semi .br-matchup:nth-child(2)::after {
-            display: block; content: ""; position: absolute; right: -20px; bottom: 50%; width: 15px; height: calc(50% + 20px); border-bottom: 2px solid #444; border-right: 2px solid #444; border-bottom-right-radius: 6px; z-index: 0;
-        }
-        .bracket-col.final .br-matchup::before {
-            display: block; content: ""; position: absolute; left: -20px; top: 50%; width: 15px; border-top: 2px solid #444; z-index: 0;
-        }
-        .bracket-col.final .br-matchup::after {
-            /* Finále -> Víťaz: Len jedna rovná čiara */
-            display: block; content: ""; position: absolute; right: -30px; top: 50%; width: 25px; border-top: 2px solid #444; z-index: 0;
-        }
+    .bracket-col.semi .br-matchup:nth-child(1)::after {
+        display: block; content: ""; position: absolute; right: -20px; top: 50%; width: 15px; height: calc(50% + 20px); border-top: 2px solid #444; border-right: 2px solid #444; border-top-right-radius: 6px; z-index: 0;
+    }
+    .bracket-col.semi .br-matchup:nth-child(2)::after {
+        display: block; content: ""; position: absolute; right: -20px; bottom: 50%; width: 15px; height: calc(50% + 20px); border-bottom: 2px solid #444; border-right: 2px solid #444; border-bottom-right-radius: 6px; z-index: 0;
+    }
+    .bracket-col.final .br-matchup::before {
+        display: block; content: ""; position: absolute; left: -20px; top: 50%; width: 15px; border-top: 2px solid #444; z-index: 0;
+    }
+    .bracket-col.final .br-matchup::after {
+        display: block; content: ""; position: absolute; right: -30px; top: 50%; width: 25px; border-top: 2px solid #444; z-index: 0;
     }
 
-    /* MOBIL: Zospodu nahor s presnými medzerami a vycentrovanými textami */
-    @media (max-width: 767px) {
-        .po-mobile-toggle-wrapper { display: flex; }
-        .bracket-wrapper { gap: 0; }
-        .bracket-title { display: none; } 
-        .bracket-container { flex-direction: column-reverse; align-items: center; gap: 50px; }
+    /* MOBILNÉ ÚPRAVY PRE PLAYOFF */
+    @media (max-width: 1023px) {
+        .po-mobile-toggle-wrapper { display: flex; position: fixed; z-index: 100;}
         
-        .semi-wrapper { flex-direction: row; gap: 15px; width: 100%; }
-        .col-content-center { flex-direction: row; width: 100%; justify-content: center; }
-        .bracket-col { width: 100%; max-width: 100%; position: relative; }
-        
-        /* Zúžené polia */
-        .bracket-col.final .br-matchup { width: 75%; margin: 0 auto; }
-        .bracket-col.winner .col-content-center { width: 65%; margin: 0 auto; }
-        
-        .br-name { font-size: 10px; }
-        .br-score-box { width: 18px; height: 18px; font-size: 10px; }
-        .br-matchup { padding: 8px; width: 100%; }
-        .br-winner-box { width: 100%; }
-        .br-seed-label { font-size: 8px; }
+        @media (orientation: portrait) {
+            .po-mobile-toggle-wrapper { bottom: 110px; right: 16px; top: auto; left: auto; }
+            .bracket-wrapper {
+                transform: rotate(90deg);
+                transform-origin: center center;
+                margin: auto;
+            }
+            .page.active#page-playoff {
+                justify-content: center;
+                align-items: center;
+                overflow-x: hidden; /* Zamedzenie neziaduceho nativneho scrollovania pre sirku nezrotovaneho bloku */
+            }
+        }
+        @media (orientation: landscape) {
+            .po-mobile-toggle-wrapper { top: 20px; right: 16px; bottom: auto; left: auto; }
+            .bracket-wrapper {
+                transform: none;
+                margin: 0 auto;
+                padding-top: 20px;
+            }
+            .page.active#page-playoff {
+                justify-content: flex-start;
+                align-items: flex-start;
+                padding-bottom: 100px;
+            }
+        }
 
-        /* Centrované tituly medzi čiarami */
-        .bracket-col.semi .bracket-round-title {
-            position: absolute; top: -25px; left: 50%; transform: translate(-50%, -50%);
-            background: var(--bg); padding: 0 10px; z-index: 5; margin: 0; white-space: nowrap;
-        }
-        .bracket-col.final .bracket-round-title {
-            position: absolute; top: -25px; left: 50%; transform: translate(-50%, -50%);
-            background: var(--bg); padding: 5px 0; z-index: 5; margin: 0;
-        }
-        .bracket-col.winner .bracket-round-title { display: none; }
-        
-        /* Spájacie čiary Semifinále -> Finále */
-        .bracket-col.semi .br-matchup:nth-child(1)::after {
-            display: block; content: ""; position: absolute; left: 50%; top: -25px;
-            width: calc(50% + 7.5px); height: 20px;
-            border-top: 2px solid #444; border-left: 2px solid #444; border-top-left-radius: 6px; z-index: 0;
-        }
-        .bracket-col.semi .br-matchup:nth-child(2)::after {
-            display: block; content: ""; position: absolute; right: 50%; top: -25px;
-            width: calc(50% + 7.5px); height: 20px;
-            border-top: 2px solid #444; border-right: 2px solid #444; border-top-right-radius: 6px; z-index: 0;
-        }
-        .bracket-col.final .br-matchup::before {
-            display: block; content: ""; position: absolute; left: 50%; bottom: -25px;
-            height: 20px; border-left: 2px solid #444; z-index: 0;
-        }
-        
-        /* Spájacie čiary Finále -> Víťaz */
-        .bracket-col.final .br-matchup::after {
-            display: block; content: ""; position: absolute; left: 50%; top: -45px;
-            height: 40px; border-left: 2px solid #444; z-index: 0;
-        }
-        
+        .bracket-title { display: none; }
         #bracket-B { display: none; }
     }
 
@@ -430,7 +407,7 @@
     }
     .coeff-card::after {
       content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' fill-opacity='0.075' d='M12 6l1.2 3.7h3.8l-3 2.3 1.1 3.7-3.1-2.4-3.1 2.4 1.1-3.7-3-2.3h3.8z'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' fill-opacity='0.075' d='M12 6l1.2 3.7h3.8l-3 2.3 1.1 3.7-3-2.3h3.8z'/%3E%3C/svg%3E");
       background-size: 30px 30px;
       z-index: 0;
       pointer-events: none;
@@ -656,7 +633,9 @@
         grid-column: 2 / 4; grid-row: 2 / 3; 
         justify-content: flex-start; align-items: center; 
         border: 1px solid var(--accent) !important;
+        overflow-x: hidden;
       }
+      .bracket-wrapper { width: 100%; margin: 0 auto; }
       
       #page-nastavenia {
         display: none !important; 
@@ -740,9 +719,9 @@
     <div class="page" id="page-playoff">
       <div class="desktop-page-title">PLAY-OFF</div>
       <div class="po-mobile-toggle-wrapper">
-        <div class="filter-buttons" style="width: 100%; margin-bottom: 0;">
-          <button class="f-btn ga active" id="po-btn-a" onclick="switchPlayoffGroup('A')">SKUPINA A</button>
-          <button class="f-btn gb" id="po-btn-b" onclick="switchPlayoffGroup('B')">SKUPINA B</button>
+        <div class="po-mobile-toggle">
+          <button class="po-btn active" id="po-btn-a" onclick="switchPlayoffGroup('A')">SKUPINA A</button>
+          <button class="po-btn" id="po-btn-b" onclick="switchPlayoffGroup('B')">SKUPINA B</button>
         </div>
       </div>
       <div id="playoff-content">
@@ -1194,7 +1173,6 @@ function renderPlayoff() {
         if (s_b) {
             html += `<div class="br-seed-label ${cColor}">${s_b}</div>`;
         } else {
-            // Pre finále, vymazaný text 'W', iba minimalistická medzera
             html += `<div style="height: 6px;"></div>`;
         }
         
@@ -1252,7 +1230,7 @@ function switchPlayoffGroup(g) {
     document.getElementById('po-btn-b').classList.remove('active');
     document.getElementById('po-btn-' + g.toLowerCase()).classList.add('active');
 
-    if (window.innerWidth < 768) {
+    if (window.innerWidth < 1024) {
         document.getElementById('bracket-A').style.display = g === 'A' ? 'flex' : 'none';
         document.getElementById('bracket-B').style.display = g === 'B' ? 'flex' : 'none';
     }
@@ -1263,7 +1241,7 @@ window.addEventListener('resize', () => {
     const bB = document.getElementById('bracket-B');
     if (!bA || !bB) return;
     
-    if(window.innerWidth >= 768) {
+    if(window.innerWidth >= 1024) {
         bA.style.display = 'flex';
         bB.style.display = 'flex';
         const playoffPage = document.getElementById('page-playoff');
