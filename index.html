@@ -366,7 +366,13 @@
         .po-mobile-toggle-wrapper { display: flex; position: fixed; z-index: 100;}
         
         @media (orientation: portrait) {
-            .po-mobile-toggle-wrapper { bottom: 110px; right: 16px; top: auto; left: auto; }
+            .po-mobile-toggle-wrapper { 
+                bottom: 120px; 
+                left: -30px; 
+                top: auto; 
+                right: auto;
+                transform: rotate(90deg);
+            }
             .bracket-wrapper {
                 transform: rotate(90deg);
                 transform-origin: center center;
@@ -375,15 +381,18 @@
             .page.active#page-playoff {
                 justify-content: center;
                 align-items: center;
-                overflow-x: hidden; /* Zamedzenie neziaduceho nativneho scrollovania pre sirku nezrotovaneho bloku */
+                overflow-x: hidden; 
+                padding-top: 60px; /* Priestor na dychanie zhora */
+                padding-bottom: 150px; /* Priestor na dychanie zospodu nad nav barom */
             }
         }
         @media (orientation: landscape) {
-            .po-mobile-toggle-wrapper { top: 20px; right: 16px; bottom: auto; left: auto; }
+            .po-mobile-toggle-wrapper { top: 20px; right: 16px; bottom: auto; left: auto; transform: none;}
             .bracket-wrapper {
                 transform: none;
                 margin: 0 auto;
-                padding-top: 20px;
+                padding-top: 40px;
+                padding-bottom: 40px;
             }
             .page.active#page-playoff {
                 justify-content: flex-start;
@@ -631,11 +640,10 @@
       
       #page-playoff { 
         grid-column: 2 / 4; grid-row: 2 / 3; 
-        justify-content: flex-start; align-items: center; 
+        justify-content: center; align-items: center; 
         border: 1px solid var(--accent) !important;
         overflow-x: hidden;
       }
-      .bracket-wrapper { width: 100%; margin: 0 auto; }
       
       #page-nastavenia {
         display: none !important; 
