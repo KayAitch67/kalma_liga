@@ -33,17 +33,15 @@
       --text: #ffffff;
       --muted: #a0a0a0;
       --win: #2ecc71;
-      --draw: #f39c12;
+      --draw: #ffffff;
       --loss: #e74c3c;
       --font: 'Montserrat', sans-serif;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
-    /* ════ ZBAVENIE SA SCROLL BAROV ════ */
     ::-webkit-scrollbar { display: none; }
     * { -ms-overflow-style: none; scrollbar-width: none; }
-    /* ══════════════════════════════════ */
 
     html, body { height: 100%; }
     
@@ -59,7 +57,6 @@
       position: relative;
     }
 
-    /* HEADER */
     header {
       display: flex; justify-content: space-between; align-items: center;
       padding: 20px 16px 10px;
@@ -91,7 +88,6 @@
     .progress-label { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 1px; }
     .progress-val { font-size: 11px; font-weight: 800; color: var(--text); }
     
-    /* DONUT CHART */
     .donut {
       width: 36px; height: 36px; border-radius: 50%;
       background: conic-gradient(var(--accent) calc(var(--pct) * 1%), #333 0);
@@ -105,7 +101,6 @@
       border-radius: 50%;
     }
 
-    /* MAIN AREA */
     main { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 110px; display: flex; flex-direction: column; }
     .page { display: none; animation: fadeIn 0.3s; flex: 1; }
     .page.active { display: block; }
@@ -113,19 +108,19 @@
 
     .desktop-page-title { display: none; }
 
-    /* FILTERS (ZÁPASY) */
-    .filter-buttons { display: flex; gap: 8px; margin-bottom: 12px; }
-    .f-btn {
-      flex: 1; padding: 8px 0; border-radius: 12px;
-      font-family: var(--font); font-size: 11px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 1px;
-      background: transparent; border: 1px solid var(--muted); color: var(--muted);
-      cursor: pointer; transition: 0.2s;
+    /* ZJEDNOTENÝ FILTER (ZÁPASY A PLAY-OFF) */
+    .global-switcher {
+      display: flex; background: #1e1e1e; padding: 4px; border-radius: 12px; gap: 4px; border: 1px solid #333; margin-bottom: 12px; width: 100%;
     }
-    .f-btn.active.all { background: var(--accent); border-color: var(--accent); color: #000; }
-    
-    .f-btn.active.ga { background: var(--group-a-bg); border-color: var(--group-a-bg); color: var(--group-a); }
-    .f-btn.active.gb { background: var(--group-b-bg); border-color: var(--group-b-bg); color: var(--group-b); }
+    .gs-btn {
+      flex: 1;
+      background: #2a2a2a; border: 1px solid #444; border-radius: 8px;
+      color: var(--muted); font-family: var(--font); font-size: 11px; font-weight: 700;
+      padding: 8px 0; cursor: pointer; transition: 0.2s; text-transform: uppercase; text-align: center;
+    }
+    .gs-btn.active.all { background: var(--accent); border-color: var(--accent); color: #000; }
+    .gs-btn.active.ga { background: var(--group-a-bg); border-color: var(--group-a-bg); color: var(--group-a); }
+    .gs-btn.active.gb { background: var(--group-b-bg); border-color: var(--group-b-bg); color: var(--group-b); }
 
     .dropdown {
       width: 100%; padding: 12px 16px; border-radius: 12px;
@@ -156,59 +151,33 @@
     }
     
     .mc-bg-logo {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 220px;
-      height: 220px;
-      object-fit: contain;
-      opacity: 0.15;
-      z-index: 0;
-      pointer-events: none;
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 220px; height: 220px; object-fit: contain;
+      opacity: 0.15; z-index: 0; pointer-events: none;
     }
     .mc-bg-logo.left { left: -90px; }
     .mc-bg-logo.right { right: -90px; }
 
     .st-bg-logo {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      left: -30px;
-      width: 100px;
-      height: 100px;
-      object-fit: contain;
-      opacity: 0.15;
-      z-index: 0;
-      pointer-events: none;
+      position: absolute; top: 50%; transform: translateY(-50%); left: -30px;
+      width: 100px; height: 100px; object-fit: contain; opacity: 0.15; z-index: 0; pointer-events: none;
     }
 
     .ts-bg-logo {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      right: -35px;
-      width: 120px;
-      height: 120px;
-      object-fit: contain;
-      opacity: 0.15;
-      z-index: 0;
-      pointer-events: none;
+      position: absolute; top: 50%; transform: translateY(-50%); right: -35px;
+      width: 120px; height: 120px; object-fit: contain; opacity: 0.15; z-index: 0; pointer-events: none;
     }
 
     .match-card::before, .match-card::after {
       content: ""; position: absolute; top: 0; bottom: 0; width: 6px;
-      background: var(--accent);
-      z-index: 2;
+      background: var(--accent); z-index: 2;
     }
     .match-card::before { left: 0; }
     .match-card::after { right: 0; }
     
     .match-card.compact .mc-header { display: none; }
 
-    .mc-header, .mc-teams {
-      position: relative;
-      z-index: 1; 
-    }
+    .mc-header, .mc-teams { position: relative; z-index: 1; }
 
     .mc-header {
       display: flex; justify-content: space-between; align-items: center;
@@ -217,8 +186,7 @@
     .mc-match-num { background: #ffffff; color: #555; font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; }
     .mc-score-label { 
       font-size: 9px; font-weight: 700; color: var(--muted); 
-      position: absolute; left: 50%; transform: translateX(-50%);
-      white-space: nowrap;
+      position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap;
     }
     
     .mc-group { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; }
@@ -272,11 +240,7 @@
     .standings-table td:first-child { border-radius: 8px 0 0 8px; padding-left: 8px; }
     
     .standings-table td:nth-child(1) { 
-      text-align: left; 
-      white-space: nowrap; 
-      overflow: hidden; 
-      text-overflow: ellipsis; 
-      position: relative; 
+      text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; 
     }
 
     .standings-table td:last-child { border-radius: 0 8px 8px 0; color: var(--accent); font-weight: 800; }
@@ -288,15 +252,33 @@
     .s-rank { display: inline-block; width: 14px; text-align: center; font-size: 11px; color: var(--muted); margin-right: 4px; }
 
     /* Personalizácia tabuľky */
-    .my-team-row {
-      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
-      position: relative;
-      z-index: 10;
+    .my-team-row { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35)); position: relative; z-index: 10; }
+    .my-team-row td { background: rgba(255, 255, 255, 0.1) !important; color: #fff; }
+
+    /* Riadok s detailmi tímu (Rolldown) */
+    .team-details-row td {
+        padding: 0 !important;
+        background: #151515 !important;
+        border-radius: 8px;
     }
-    .my-team-row td {
-      background: rgba(255, 255, 255, 0.1) !important;
-      color: #fff;
+    .team-details-container {
+        padding: 10px 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        box-shadow: inset 0 6px 12px rgba(0,0,0,0.5);
     }
+    .td-match {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        padding: 6px 0;
+        border-bottom: 1px dashed #333;
+    }
+    .td-match:last-child { border-bottom: none; }
+    .td-opp { color: var(--muted); text-align: left; }
+    .td-score { font-weight: 800; text-align: right; }
 
     /* ════════════════════════════════════════════════════════════════
        PLAY-OFF PAVÚK
@@ -337,7 +319,6 @@
     .br-winner-box.gb { border-color: var(--group-b); box-shadow: 0 0 30px rgba(0, 168, 150, 0.2); }
     .br-winner-name { font-size: 11px; font-weight: 900; color: #fff; margin-top: 4px; margin-bottom: 8px; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.5);}
 
-    /* LOGIKA ČIAR A ROZLOŽENIE (Aplikované globálne, pre desktop aj mobil) */
     .br-matchup::before, .br-matchup::after, .semi-wrapper::before, .semi-wrapper::after, .br-winner-box::before, .br-winner-box::after { display: none; }
     
     .bracket-container { flex-direction: row; }
@@ -356,10 +337,7 @@
     }
 
     .playoff-scroll-area {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        -ms-overflow-style: none; scrollbar-width: none;
+        width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; -ms-overflow-style: none; scrollbar-width: none;
     }
     .playoff-scroll-area::-webkit-scrollbar { display: none; }
 
@@ -372,16 +350,8 @@
 
     @media (max-width: 767px) {
         .po-top-right-switcher {
-            display: flex;
-            position: absolute;
-            top: 0px; 
-            right: 0px; 
-            background: #1e1e1e;
-            padding: 4px;
-            border-radius: 12px;
-            gap: 4px;
-            border: 1px solid #333;
-            z-index: 50;
+            display: flex; position: absolute; top: 0px; right: 0px; 
+            background: #1e1e1e; padding: 4px; border-radius: 12px; gap: 4px; border: 1px solid #333; z-index: 50;
         }
         .po-sw-btn {
             background: #2a2a2a; border: 1px solid #444; border-radius: 8px;
@@ -393,35 +363,23 @@
         
         #bracket-B { display: none; }
         
-        .playoff-scroll-area {
-            width: calc(100% + 32px);
-            margin-left: -16px;
-            margin-right: -16px;
-        }
-        .bracket-wrapper {
-            padding: 50px 50px 20px 50px; /* 50px rezervy pre plynuly horizontalny posun */
-        }
+        .playoff-scroll-area { width: calc(100% + 32px); margin-left: -16px; margin-right: -16px; }
+        .bracket-wrapper { padding: 50px 50px 20px 50px; }
     }
 
 
     /* VÝKONY (STATS) */
     .coeff-card {
-      position: relative;
-      background: linear-gradient(145deg, #252525, #151515);
+      position: relative; background: linear-gradient(145deg, #252525, #151515);
       border: 1px solid #444; border-radius: 16px; padding: 20px;
-      text-align: center; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-      overflow: hidden; 
+      text-align: center; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); overflow: hidden; 
     }
     .coeff-card::after {
       content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' fill-opacity='0.075' d='M12 6l1.2 3.7h3.8l-3 2.3 1.1 3.7-3.1-2.4-3.1 2.4 1.1-3.7-3-2.3h3.8z'/%3E%3C/svg%3E");
-      background-size: 30px 30px;
-      z-index: 0;
-      pointer-events: none;
+      background-size: 30px 30px; z-index: 0; pointer-events: none;
     }
-    .coeff-title, .coeff-val {
-      position: relative; z-index: 1; 
-    }
+    .coeff-title, .coeff-val { position: relative; z-index: 1; }
 
     .coeff-title { font-size: 13px; font-weight: 800; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
     .coeff-val { font-size: 48px; font-weight: 900; line-height: 1; }
@@ -451,22 +409,13 @@
       background: var(--surface); border-radius: 16px; overflow: hidden;
       margin-bottom: 16px; border: 1px solid #333; position: relative;
     }
-    .team-stat-card::before {
-      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
-      background: var(--accent);
-    }
+    .team-stat-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--accent); }
     
     .ts-header {
       background: var(--surface-light); padding: 12px 16px 12px 20px;
-      font-size: 12px; font-weight: 700; color: var(--muted);
-      border-bottom: 1px solid #333;
-      position: relative; 
-      overflow: hidden;
+      font-size: 12px; font-weight: 700; color: var(--muted); border-bottom: 1px solid #333; position: relative; overflow: hidden;
     }
-    .ts-header-content {
-      position: relative;
-      z-index: 1;
-    }
+    .ts-header-content { position: relative; z-index: 1; }
     .ts-name { color: #fff; font-size: 14px; font-weight: 800; }
     .ts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: #333; }
     .ts-item { background: var(--surface); padding: 16px 10px; text-align: center; }
@@ -504,37 +453,23 @@
     .scorer-card.my-player .scorer-rank,
     .scorer-card.my-player .scorer-name,
     .scorer-card.my-player .scorer-val {
-      color: #fff;
-      text-shadow: 0 0 8px rgba(255,255,255,0.4);
+      color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4);
     }
 
     /* NASTAVENIA */
-    .settings-title {
-      font-size: 16px; font-weight: 800; color: var(--accent); margin-bottom: 20px;
-    }
-    
+    .settings-title { font-size: 16px; font-weight: 800; color: var(--accent); margin-bottom: 20px; }
     .close-modal { display: none; }
 
     /* BOTTOM NAV */
     nav {
       position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto;
-      background: var(--bg); border-top: 1px solid #333;
-      border-radius: 20px 20px 0 0;
-      display: flex; flex-direction: column; z-index: 100;
-      height: 90px;
-      transition: height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
-      overflow: hidden; 
+      background: var(--bg); border-top: 1px solid #333; border-radius: 20px 20px 0 0;
+      display: flex; flex-direction: column; z-index: 100; height: 90px;
+      transition: height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 -4px 20px rgba(0,0,0,0.6); overflow: hidden; 
     }
-    nav.expanded {
-      height: 30vh;
-    }
-    .nav-drag-area {
-      width: 100%; height: 24px; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0;
-    }
-    .nav-handle {
-      width: 40px; height: 4px; background: #555; border-radius: 2px; transition: background 0.2s;
-    }
+    nav.expanded { height: 30vh; }
+    .nav-drag-area { width: 100%; height: 24px; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; }
+    .nav-handle { width: 40px; height: 4px; background: #555; border-radius: 2px; transition: background 0.2s; }
     .nav-drag-area:hover .nav-handle { background: var(--accent); }
     
     .nav-items-container {
@@ -542,22 +477,12 @@
       width: 100%; padding-top: 5px; height: calc(100% - 24px);
     }
     .nav-item {
-      position: relative;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-      color: var(--muted); cursor: pointer; transition: 0.2s;
-      width: 25%; height: 60px; 
+      position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+      color: var(--muted); cursor: pointer; transition: 0.2s; width: 25%; height: 60px; 
     }
     
-    .nav-item:nth-child(1),
-    .nav-item:nth-child(2),
-    .nav-item:nth-child(3),
-    .nav-item:nth-child(4) {
-      transform: translateY(-5px);
-    }
-
-    .nav-item:not(:nth-child(4n))::after {
-      content: ""; position: absolute; right: 0; top: 25%; bottom: 25%; width: 2px; background: #333;
-    }
+    .nav-item:nth-child(1), .nav-item:nth-child(2), .nav-item:nth-child(3), .nav-item:nth-child(4) { transform: translateY(-5px); }
+    .nav-item:not(:nth-child(4n))::after { content: ""; position: absolute; right: 0; top: 25%; bottom: 25%; width: 2px; background: #333; }
     .nav-item i { font-size: 20px; }
     .nav-item span { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;}
     .nav-item.active { color: var(--accent); }
@@ -574,55 +499,25 @@
        DESKTOP OPTIMALIZÁCIA (GRID DASHBOARD)
     ═════════════════════════════════════════════════════════════════ */
     @media (min-width: 1024px) {
-      body {
-        max-width: 100%;
-        min-height: 100vh;
-      }
+      body { max-width: 100%; min-height: 100vh; }
+      header { padding: 15px 40px; }
       
-      header {
-        padding: 15px 40px;
-      }
-      
-      .desktop-settings-wrap {
-        display: flex;
-        align-items: center;
-        border-left: 1px solid #444;
-        padding-left: 15px;
-        margin-left: 15px;
-        height: 36px;
-      }
-      .desktop-settings-btn {
-        color: var(--muted);
-        font-size: 20px;
-        cursor: pointer;
-        transition: 0.2s;
-      }
+      .desktop-settings-wrap { display: flex; align-items: center; border-left: 1px solid #444; padding-left: 15px; margin-left: 15px; height: 36px; }
+      .desktop-settings-btn { color: var(--muted); font-size: 20px; cursor: pointer; transition: 0.2s; }
       .desktop-settings-btn:hover { color: var(--text); }
       
       main {
-        padding: 20px 40px;
-        padding-bottom: 40px;
-        display: grid !important;
-        grid-template-columns: 1fr 1fr 1fr;
-        grid-template-rows: calc(100vh - 120px) calc(100vh - 120px); 
-        gap: 20px;
+        padding: 20px 40px; padding-bottom: 40px;
+        display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 20px;
+        align-items: start;
       }
       
       .page {
-        display: flex !important;
-        flex-direction: column;
-        background: rgba(18, 18, 18, 0.4); 
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.12); 
-        border-radius: 16px;
-        padding: 20px;
-        overflow-y: auto; 
-        animation: none;
-        box-shadow: 
-            0 20px 40px rgba(0,0,0,0.8), 
-            0 0 20px rgba(255,255,255,0.05), 
-            inset 0 1px 1px rgba(255,255,255,0.15), 
-            inset 0 -1px 1px rgba(0,0,0,0.6); 
+        display: flex !important; flex-direction: column;
+        background: rgba(18, 18, 18, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.12); 
+        border-radius: 16px; padding: 20px; overflow-y: auto; animation: none;
+        height: 70vh; /* Výška kontajnerov na 70% */
+        box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.05), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 -1px 1px rgba(0,0,0,0.6); 
       }
 
       .desktop-page-title {
@@ -630,6 +525,7 @@
           letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;
           border-bottom: 1px solid #333; padding-bottom: 10px; width: 100%; flex-shrink: 0;
       }
+      .desktop-page-title i { margin-left: 10px; opacity: 0.8; }
       
       #page-zapasy  { grid-column: 1 / 2; grid-row: 1 / 2; display: block !important; }
       #page-poradie { grid-column: 2 / 3; grid-row: 1 / 2; display: block !important; }
@@ -642,21 +538,11 @@
         border: 1px solid var(--accent) !important;
       }
       
-      #page-nastavenia {
-        display: none !important; 
-      }
+      #page-nastavenia { display: none !important; }
       #page-nastavenia.desktop-modal {
-        display: block !important;
-        position: fixed;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        width: 400px; max-width: 90%;
-        height: auto; min-height: 300px;
-        background: rgba(18, 18, 18, 0.8);
-        backdrop-filter: blur(15px);
-        border: 1px solid var(--accent);
-        box-shadow: 0 20px 60px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.2);
-        z-index: 1000;
+        display: block !important; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        width: 400px; max-width: 90%; height: auto; min-height: 300px; background: rgba(18, 18, 18, 0.8); backdrop-filter: blur(15px);
+        border: 1px solid var(--accent); box-shadow: 0 20px 60px rgba(0,0,0,0.9), inset 0 1px 1px rgba(255,255,255,0.2); z-index: 1000;
       }
       .close-modal { display: block; position: absolute; top: 15px; right: 15px; color: var(--muted); cursor: pointer; font-size: 18px; }
       .close-modal:hover { color: var(--text); }
@@ -696,12 +582,15 @@
   <main>
     
     <div class="page active" id="page-zapasy">
-      <div class="desktop-page-title">ZÁPASY</div>
-      <div class="filter-buttons">
-        <button class="f-btn active all" onclick="setSkupina('', this)">VŠETKY</button>
-        <button class="f-btn ga" onclick="setSkupina('A', this)">SKUPINA A</button>
-        <button class="f-btn gb" onclick="setSkupina('B', this)">SKUPINA B</button>
+      <div class="desktop-page-title">ZÁPASY <i class="fa-solid fa-futbol"></i></div>
+      
+      <!-- Zjednotený filter skupín pre zápasy -->
+      <div class="global-switcher">
+        <button class="gs-btn active all" onclick="setSkupina('', this)">VŠETKY</button>
+        <button class="gs-btn ga" onclick="setSkupina('A', this)">SKUPINA A</button>
+        <button class="gs-btn gb" onclick="setSkupina('B', this)">SKUPINA B</button>
       </div>
+      
       <select class="dropdown" id="timFilter" onchange="renderZapasy()">
         <option value="">VŠETKY TÍMY</option>
       </select>
@@ -711,7 +600,7 @@
     </div>
 
     <div class="page" id="page-poradie">
-      <div class="desktop-page-title">PORADIE</div>
+      <div class="desktop-page-title">PORADIE <i class="fa-solid fa-list-ol"></i></div>
       <div class="legend">
         <div class="legend-item"><div class="dot safe"></div> postup do play-off</div>
         <div class="legend-item"><div class="dot danger"></div> vypadnutie z turnaja</div>
@@ -722,15 +611,13 @@
     </div>
 
     <div class="page" id="page-playoff">
-      <div class="desktop-page-title">PLAY-OFF</div>
+      <div class="desktop-page-title">PLAY-OFF <i class="fa-solid fa-trophy"></i></div>
       
-      <!-- Prepínač skupín pre mobil -->
       <div class="po-top-right-switcher">
         <button class="po-sw-btn ga active" id="po-btn-a" onclick="switchPlayoffGroup('A')">A</button>
         <button class="po-sw-btn gb" id="po-btn-b" onclick="switchPlayoffGroup('B')">B</button>
       </div>
       
-      <!-- Obalovací kontajner pre horizontálne scrollovanie -->
       <div class="playoff-scroll-area">
         <div id="playoff-content">
           <div class="loader"><div class="spinner"></div>Načítavam play-off...</div>
@@ -739,7 +626,7 @@
     </div>
 
     <div class="page" id="page-vykony">
-      <div class="desktop-page-title">VÝKONY</div>
+      <div class="desktop-page-title">VÝKONY <i class="fa-solid fa-chart-simple"></i></div>
       <select class="dropdown" id="playerSelect" onchange="renderVykony()">
         <option value="">VYBER HRÁČA</option>
       </select>
@@ -749,7 +636,7 @@
     </div>
 
     <div class="page" id="page-strelci">
-      <div class="desktop-page-title">STRELCI</div>
+      <div class="desktop-page-title">STRELCI <i class="fa-solid fa-bullseye"></i></div>
       <div class="section-title" style="margin-bottom: 24px; line-height: 1.4; flex-wrap: wrap;">BOJ O ZLATÚ KOPAČKU (NAJLEPŠÍ STRELEC TURNAJA)</div>
       <div id="strelci-content">
         <div class="loader"><div class="spinner"></div>Načítavam strelcov...</div>
@@ -891,8 +778,8 @@ function applyPersonalization() {
   
   if(teamA) {
       activeSkupina = 'A';
-      document.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active', 'all', 'ga', 'gb'));
-      const btnA = document.querySelector('.f-btn.ga');
+      document.querySelectorAll('#page-zapasy .gs-btn').forEach(b => b.classList.remove('active', 'all', 'ga', 'gb'));
+      const btnA = document.querySelector('#page-zapasy .gs-btn.ga');
       if(btnA) btnA.classList.add('active', 'ga');
       
       buildTimFilter();
@@ -976,15 +863,16 @@ function updateProgress() {
 // ═══════════════════════════════════════
 function setSkupina(s, el) {
   activeSkupina = s;
-  document.querySelectorAll('.f-btn').forEach(b => {
+  const wrapper = el.closest('.global-switcher');
+  wrapper.querySelectorAll('.gs-btn').forEach(b => {
     b.classList.remove('active', 'all', 'ga', 'gb');
-    if(b === el) {
-      b.classList.add('active');
-      if(s==='') b.classList.add('all');
-      if(s==='A') b.classList.add('ga');
-      if(s==='B') b.classList.add('gb');
-    }
   });
+  
+  el.classList.add('active');
+  if(s==='') el.classList.add('all');
+  if(s==='A') el.classList.add('ga');
+  if(s==='B') el.classList.add('gb');
+  
   buildTimFilter();
   renderZapasy();
 }
@@ -1100,8 +988,15 @@ function renderZapasy() {
 }
 
 // ═══════════════════════════════════════
-// LOGIKA - PORADIE
+// LOGIKA - PORADIE A ROLLDOWN
 // ═══════════════════════════════════════
+function toggleTeamDetails(id) {
+    const el = document.getElementById('details-' + id);
+    if(el) {
+        el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
+    }
+}
+
 function calcStandings(skupina) {
   const teams = DATA.tymy.filter(t=>t.skupina===skupina).map(t=>t.nazov);
   const st = {};
@@ -1136,13 +1031,39 @@ function renderTabulka() {
       const isMyTeam = (getPlayerForTeam(r.t) === savedUser);
       if (isMyTeam) rowClass += ' my-team-row';
       
-      return `<tr class="${rowClass}">
+      const safeId = r.t.replace(/[^a-zA-Z0-9]/g, '-');
+      
+      const teamMatches = DATA.zapasy.filter(z => (z.domaci === r.t || z.host === r.t) && z.goly_domaci !== '' && z.goly_host !== '');
+      const detailsHtml = teamMatches.map(z => {
+          const isHome = z.domaci === r.t;
+          const opp = isHome ? z.host : z.domaci;
+          const gf = parseInt(isHome ? z.goly_domaci : z.goly_host);
+          const ga = parseInt(isHome ? z.goly_host : z.goly_domaci);
+          
+          let color = 'var(--draw)';
+          if (gf > ga) color = 'var(--win)';
+          else if (gf < ga) color = 'var(--loss)';
+
+          return `<div class="td-match">
+                      <span class="td-opp">vs ${opp}</span>
+                      <span class="td-score" style="color: ${color};">${gf} : ${ga}</span>
+                  </div>`;
+      }).join('');
+      
+      return `<tr class="${rowClass}" onclick="toggleTeamDetails('${safeId}')" style="cursor: pointer;">
         <td>
           <img src="loga_timov/${r.t}.png" class="st-bg-logo" onerror="this.style.display='none'" alt="">
           <span style="position: relative; z-index: 2;"><span class="s-rank">${i+1}</span> ${r.t}</span>
         </td>
         <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
         <td>${r.gf}:${r.ga}</td><td>${(r.gf-r.ga)>0?'+':''}${r.gf-r.ga}</td><td>${r.pts}</td>
+      </tr>
+      <tr class="team-details-row" id="details-${safeId}" style="display: none;">
+        <td colspan="8">
+            <div class="team-details-container">
+                ${detailsHtml || '<div class="td-match" style="justify-content:center; color:var(--muted); border-bottom: none;">Zatiaľ žiadne odohraté zápasy</div>'}
+            </div>
+        </td>
       </tr>`;
     }).join('');
     return `
@@ -1171,27 +1092,20 @@ function renderPlayoff() {
         const cColor = grp === 'A' ? 'ga' : 'gb';
         
         let html = `<div class="br-matchup">`;
-        
         if (s_a) html += `<div class="br-seed-label ${cColor}">${s_a}</div>`;
-        
         html += `<div class="br-team-row">
             <span class="br-name">${t_a}</span>
             <div class="br-scores"><div class="br-score-box"></div><div class="br-score-box"></div></div>
         </div>`;
         
-        if (s_b) {
-            html += `<div class="br-seed-label ${cColor}">${s_b}</div>`;
-        } else {
-            // Pre finále, vymazaný text 'W', iba minimalistická medzera
-            html += `<div style="height: 6px;"></div>`;
-        }
+        if (s_b) html += `<div class="br-seed-label ${cColor}">${s_b}</div>`;
+        else html += `<div style="height: 6px;"></div>`;
         
         html += `<div class="br-team-row">
             <span class="br-name">${t_b}</span>
             <div class="br-scores"><div class="br-score-box"></div><div class="br-score-box"></div></div>
         </div>
         </div>`;
-        
         return html;
     };
 
@@ -1235,7 +1149,6 @@ function renderPlayoff() {
     `;
 }
 
-// Funkcia pre centrovanie pavúka na mobilnom zobrazení
 function centerPlayoffScroll() {
     const area = document.querySelector('.playoff-scroll-area');
     if(area && window.innerWidth < 768) {
@@ -1454,11 +1367,7 @@ function renderStrelci() {
     });
 
     if (totalP > 0) {
-      stats.push({
-        name: player,
-        gpg: totalGF / totalP,
-        totalGF: totalGF
-      });
+      stats.push({ name: player, gpg: totalGF / totalP, totalGF: totalGF });
     }
   });
 
@@ -1472,9 +1381,7 @@ function renderStrelci() {
       const isGold = i === 0;
       const isMe = (s.name === savedUser);
       let cardClass = isGold ? 'gold' : '';
-      
       if (isMe && !isGold) cardClass += ' my-player';
-      
       const gpgStr = s.gpg.toFixed(2);
       return `
         <div class="scorer-card ${cardClass}">
@@ -1518,8 +1425,7 @@ const dragArea = document.getElementById('navDragArea');
 let startY = 0; let isSwiping = false;
 
 dragArea.addEventListener('touchstart', e => { 
-  startY = e.touches[0].clientY; 
-  isSwiping = false; 
+  startY = e.touches[0].clientY; isSwiping = false; 
 }, {passive: true});
 
 dragArea.addEventListener('touchmove', e => { 
@@ -1539,7 +1445,6 @@ dragArea.addEventListener('touchend', e => {
    }
 });
 
-// Štart aplikácie
 loadAll();
 </script>
 </body>
