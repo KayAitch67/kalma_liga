@@ -62,7 +62,7 @@
       padding: 20px 16px 10px;
       background: var(--bg);
       position: sticky; top: 0; z-index: 100;
-      border-bottom: 1px solid #333; 
+      border-bottom: 1px solid var(--accent); /* Zmena na akcentnu farbu */
     }
     .header-left { display: flex; align-items: center; gap: 10px; }
     .header-logo { width: 45px; height: auto; }
@@ -427,6 +427,7 @@
       display: flex; justify-content: space-between; align-items: center;
       background: var(--surface); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px;
       border-left: 6px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: opacity 0.3s ease;
     }
     .scorer-card.gold {
       border-left: 6px solid var(--group-a);
@@ -520,12 +521,14 @@
         box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.05), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 -1px 1px rgba(0,0,0,0.6); 
       }
 
+      /* Upravená pozícia ikon vedľa nadpisov */
       .desktop-page-title {
-          display: block; font-size: 20px; font-weight: 900; color: var(--accent);
+          display: flex !important; align-items: center; gap: 12px;
+          font-size: 20px; font-weight: 900; color: var(--accent);
           letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;
           border-bottom: 1px solid #333; padding-bottom: 10px; width: 100%; flex-shrink: 0;
       }
-      .desktop-page-title i { margin-left: 10px; opacity: 0.8; }
+      .desktop-page-title i { opacity: 0.8; }
       
       #page-zapasy  { grid-column: 1 / 2; grid-row: 1 / 2; display: block !important; }
       #page-poradie { grid-column: 2 / 3; grid-row: 1 / 2; display: block !important; }
@@ -582,7 +585,7 @@
   <main>
     
     <div class="page active" id="page-zapasy">
-      <div class="desktop-page-title">ZÁPASY <i class="fa-solid fa-futbol"></i></div>
+      <div class="desktop-page-title">ZÁPASY<i class="fa-solid fa-futbol"></i></div>
       
       <!-- Zjednotený filter skupín pre zápasy -->
       <div class="global-switcher">
@@ -600,7 +603,7 @@
     </div>
 
     <div class="page" id="page-poradie">
-      <div class="desktop-page-title">PORADIE <i class="fa-solid fa-list-ol"></i></div>
+      <div class="desktop-page-title">PORADIE<i class="fa-solid fa-list-ol"></i></div>
       <div class="legend">
         <div class="legend-item"><div class="dot safe"></div> postup do play-off</div>
         <div class="legend-item"><div class="dot danger"></div> vypadnutie z turnaja</div>
@@ -611,7 +614,7 @@
     </div>
 
     <div class="page" id="page-playoff">
-      <div class="desktop-page-title">PLAY-OFF <i class="fa-solid fa-trophy"></i></div>
+      <div class="desktop-page-title">PLAY-OFF<i class="fa-solid fa-trophy"></i></div>
       
       <div class="po-top-right-switcher">
         <button class="po-sw-btn ga active" id="po-btn-a" onclick="switchPlayoffGroup('A')">A</button>
@@ -626,7 +629,7 @@
     </div>
 
     <div class="page" id="page-vykony">
-      <div class="desktop-page-title">VÝKONY <i class="fa-solid fa-chart-simple"></i></div>
+      <div class="desktop-page-title">VÝKONY<i class="fa-solid fa-chart-simple"></i></div>
       <select class="dropdown" id="playerSelect" onchange="renderVykony()">
         <option value="">VYBER HRÁČA</option>
       </select>
@@ -636,7 +639,7 @@
     </div>
 
     <div class="page" id="page-strelci">
-      <div class="desktop-page-title">STRELCI <i class="fa-solid fa-bullseye"></i></div>
+      <div class="desktop-page-title">STRELCI<i class="fa-solid fa-bullseye"></i></div>
       <div class="section-title" style="margin-bottom: 24px; line-height: 1.4; flex-wrap: wrap;">BOJ O ZLATÚ KOPAČKU (NAJLEPŠÍ STRELEC TURNAJA)</div>
       <div id="strelci-content">
         <div class="loader"><div class="spinner"></div>Načítavam strelcov...</div>
@@ -1383,8 +1386,12 @@ function renderStrelci() {
       let cardClass = isGold ? 'gold' : '';
       if (isMe && !isGold) cardClass += ' my-player';
       const gpgStr = s.gpg.toFixed(2);
+      
+      // Postupné stmavovanie pre ďalšie priečky
+      const opacity = Math.max(0.35, 1 - (i * 0.08)); 
+
       return `
-        <div class="scorer-card ${cardClass}">
+        <div class="scorer-card ${cardClass}" style="opacity: ${opacity};">
           <div class="scorer-left">
             <span class="scorer-rank">${i + 1}.</span>
             <span class="scorer-name">${s.name}</span>
