@@ -302,13 +302,10 @@
        PLAY-OFF PAVÚK
     ═════════════════════════════════════════════════════════════════ */
     .page.active#page-playoff {
-      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start;
       min-height: 65vh; position: relative; overflow-y: auto; overflow-x: hidden; padding-bottom: 20px;
     }
 
-    .po-mobile-toggle-wrapper { display: none; width: 100%; margin-bottom: 20px; }
-
-    .bracket-wrapper { display: flex; flex-direction: column; gap: 60px; width: 100%; padding-top: 10px;}
     .bracket-group { width: 100%; display: flex; flex-direction: column; }
     .bracket-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px;}
     .bracket-title.ga { color: var(--group-a); }
@@ -340,83 +337,70 @@
     .br-winner-box.gb { border-color: var(--group-b); box-shadow: 0 0 30px rgba(0, 168, 150, 0.2); }
     .br-winner-name { font-size: 11px; font-weight: 900; color: #fff; margin-top: 4px; margin-bottom: 8px; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.5);}
 
-    /* LOGIKA ČIAR (Skrytie základných) */
+    /* LOGIKA ČIAR A ROZLOŽENIE (Aplikované globálne, pre desktop aj mobil) */
     .br-matchup::before, .br-matchup::after, .semi-wrapper::before, .semi-wrapper::after, .br-winner-box::before, .br-winner-box::after { display: none; }
-
-    /* DESKTOP: Zľava doprava s presnými medzerami */
-    @media (min-width: 768px) {
-        .bracket-container { flex-direction: row; }
-        
-        .bracket-col.semi .br-matchup:nth-child(1)::after {
-            display: block; content: ""; position: absolute; right: -20px; top: 50%; width: 15px; height: calc(50% + 20px); border-top: 2px solid #444; border-right: 2px solid #444; border-top-right-radius: 6px; z-index: 0;
-        }
-        .bracket-col.semi .br-matchup:nth-child(2)::after {
-            display: block; content: ""; position: absolute; right: -20px; bottom: 50%; width: 15px; height: calc(50% + 20px); border-bottom: 2px solid #444; border-right: 2px solid #444; border-bottom-right-radius: 6px; z-index: 0;
-        }
-        .bracket-col.final .br-matchup::before {
-            display: block; content: ""; position: absolute; left: -20px; top: 50%; width: 15px; border-top: 2px solid #444; z-index: 0;
-        }
-        .bracket-col.final .br-matchup::after {
-            /* Finále -> Víťaz: Len jedna rovná čiara */
-            display: block; content: ""; position: absolute; right: -30px; top: 50%; width: 25px; border-top: 2px solid #444; z-index: 0;
-        }
+    
+    .bracket-container { flex-direction: row; }
+    
+    .bracket-col.semi .br-matchup:nth-child(1)::after {
+        display: block; content: ""; position: absolute; right: -20px; top: 50%; width: 15px; height: calc(50% + 20px); border-top: 2px solid #444; border-right: 2px solid #444; border-top-right-radius: 6px; z-index: 0;
+    }
+    .bracket-col.semi .br-matchup:nth-child(2)::after {
+        display: block; content: ""; position: absolute; right: -20px; bottom: 50%; width: 15px; height: calc(50% + 20px); border-bottom: 2px solid #444; border-right: 2px solid #444; border-bottom-right-radius: 6px; z-index: 0;
+    }
+    .bracket-col.final .br-matchup::before {
+        display: block; content: ""; position: absolute; left: -20px; top: 50%; width: 15px; border-top: 2px solid #444; z-index: 0;
+    }
+    .bracket-col.final .br-matchup::after {
+        display: block; content: ""; position: absolute; right: -30px; top: 50%; width: 25px; border-top: 2px solid #444; z-index: 0;
     }
 
-    /* MOBIL: Zospodu nahor s presnými medzerami a vycentrovanými textami */
-    @media (max-width: 767px) {
-        .po-mobile-toggle-wrapper { display: flex; }
-        .bracket-wrapper { gap: 0; }
-        .bracket-title { display: none; } 
-        .bracket-container { flex-direction: column-reverse; align-items: center; gap: 50px; }
-        
-        .semi-wrapper { flex-direction: row; gap: 15px; width: 100%; }
-        .col-content-center { flex-direction: row; width: 100%; justify-content: center; }
-        .bracket-col { width: 100%; max-width: 100%; position: relative; }
-        
-        /* Zúžené polia */
-        .bracket-col.final .br-matchup { width: 75%; margin: 0 auto; }
-        .bracket-col.winner .col-content-center { width: 65%; margin: 0 auto; }
-        
-        .br-name { font-size: 10px; }
-        .br-score-box { width: 18px; height: 18px; font-size: 10px; }
-        .br-matchup { padding: 8px; width: 100%; }
-        .br-winner-box { width: 100%; }
-        .br-seed-label { font-size: 8px; }
+    .playoff-scroll-area {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        -ms-overflow-style: none; scrollbar-width: none;
+    }
+    .playoff-scroll-area::-webkit-scrollbar { display: none; }
 
-        /* Centrované tituly medzi čiarami */
-        .bracket-col.semi .bracket-round-title {
-            position: absolute; top: -25px; left: 50%; transform: translate(-50%, -50%);
-            background: var(--bg); padding: 0 10px; z-index: 5; margin: 0; white-space: nowrap;
+    .bracket-wrapper {
+        display: flex; flex-direction: column; gap: 60px;
+        width: max-content; margin: 0 auto; padding-top: 10px;
+    }
+
+    .po-top-right-switcher { display: none; }
+
+    @media (max-width: 767px) {
+        .po-top-right-switcher {
+            display: flex;
+            position: absolute;
+            top: 0px; 
+            right: 0px; 
+            background: #1e1e1e;
+            padding: 4px;
+            border-radius: 12px;
+            gap: 4px;
+            border: 1px solid #333;
+            z-index: 50;
         }
-        .bracket-col.final .bracket-round-title {
-            position: absolute; top: -25px; left: 50%; transform: translate(-50%, -50%);
-            background: var(--bg); padding: 5px 0; z-index: 5; margin: 0;
+        .po-sw-btn {
+            background: #2a2a2a; border: 1px solid #444; border-radius: 8px;
+            color: var(--muted); font-family: var(--font); font-size: 11px; font-weight: 700;
+            padding: 6px 14px; cursor: pointer; transition: 0.2s; text-transform: uppercase;
         }
-        .bracket-col.winner .bracket-round-title { display: none; }
-        
-        /* Spájacie čiary Semifinále -> Finále */
-        .bracket-col.semi .br-matchup:nth-child(1)::after {
-            display: block; content: ""; position: absolute; left: 50%; top: -25px;
-            width: calc(50% + 7.5px); height: 20px;
-            border-top: 2px solid #444; border-left: 2px solid #444; border-top-left-radius: 6px; z-index: 0;
-        }
-        .bracket-col.semi .br-matchup:nth-child(2)::after {
-            display: block; content: ""; position: absolute; right: 50%; top: -25px;
-            width: calc(50% + 7.5px); height: 20px;
-            border-top: 2px solid #444; border-right: 2px solid #444; border-top-right-radius: 6px; z-index: 0;
-        }
-        .bracket-col.final .br-matchup::before {
-            display: block; content: ""; position: absolute; left: 50%; bottom: -25px;
-            height: 20px; border-left: 2px solid #444; z-index: 0;
-        }
-        
-        /* Spájacie čiary Finále -> Víťaz */
-        .bracket-col.final .br-matchup::after {
-            display: block; content: ""; position: absolute; left: 50%; top: -45px;
-            height: 40px; border-left: 2px solid #444; z-index: 0;
-        }
+        .po-sw-btn.active.ga { background: var(--group-a-bg); border-color: var(--group-a-bg); color: var(--group-a); }
+        .po-sw-btn.active.gb { background: var(--group-b-bg); border-color: var(--group-b-bg); color: var(--group-b); }
         
         #bracket-B { display: none; }
+        
+        .playoff-scroll-area {
+            width: calc(100% + 32px);
+            margin-left: -16px;
+            margin-right: -16px;
+        }
+        .bracket-wrapper {
+            padding: 50px 50px 20px 50px; /* 50px rezervy pre plynuly horizontalny posun */
+        }
     }
 
 
@@ -739,14 +723,18 @@
 
     <div class="page" id="page-playoff">
       <div class="desktop-page-title">PLAY-OFF</div>
-      <div class="po-mobile-toggle-wrapper">
-        <div class="filter-buttons" style="width: 100%; margin-bottom: 0;">
-          <button class="f-btn ga active" id="po-btn-a" onclick="switchPlayoffGroup('A')">SKUPINA A</button>
-          <button class="f-btn gb" id="po-btn-b" onclick="switchPlayoffGroup('B')">SKUPINA B</button>
-        </div>
+      
+      <!-- Prepínač skupín pre mobil -->
+      <div class="po-top-right-switcher">
+        <button class="po-sw-btn ga active" id="po-btn-a" onclick="switchPlayoffGroup('A')">A</button>
+        <button class="po-sw-btn gb" id="po-btn-b" onclick="switchPlayoffGroup('B')">B</button>
       </div>
-      <div id="playoff-content">
-        <div class="loader"><div class="spinner"></div>Načítavam play-off...</div>
+      
+      <!-- Obalovací kontajner pre horizontálne scrollovanie -->
+      <div class="playoff-scroll-area">
+        <div id="playoff-content">
+          <div class="loader"><div class="spinner"></div>Načítavam play-off...</div>
+        </div>
       </div>
     </div>
 
@@ -1247,6 +1235,14 @@ function renderPlayoff() {
     `;
 }
 
+// Funkcia pre centrovanie pavúka na mobilnom zobrazení
+function centerPlayoffScroll() {
+    const area = document.querySelector('.playoff-scroll-area');
+    if(area && window.innerWidth < 768) {
+        area.scrollLeft = (area.scrollWidth - area.clientWidth) / 2;
+    }
+}
+
 function switchPlayoffGroup(g) {
     document.getElementById('po-btn-a').classList.remove('active');
     document.getElementById('po-btn-b').classList.remove('active');
@@ -1255,6 +1251,7 @@ function switchPlayoffGroup(g) {
     if (window.innerWidth < 768) {
         document.getElementById('bracket-A').style.display = g === 'A' ? 'flex' : 'none';
         document.getElementById('bracket-B').style.display = g === 'B' ? 'flex' : 'none';
+        setTimeout(centerPlayoffScroll, 10);
     }
 }
 
@@ -1507,6 +1504,10 @@ function navTo(id, el) {
   if(el) el.classList.add('active');
   
   document.getElementById('bottom-nav').classList.remove('expanded');
+  
+  if(id === 'playoff') {
+      setTimeout(centerPlayoffScroll, 10);
+  }
 }
 
 function toggleNav() {
