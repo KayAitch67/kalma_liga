@@ -16,10 +16,10 @@
       --surface: #1e1e1e;
       --surface-light: #2a2a2a;
       
-      /* Dynamický Akcent */
-      --accent: #FF7300;
-      --accent-rgb: 255, 115, 0;
-      --accent-contrast: #000000;
+      /* Predvolený Akcent: Ružová */
+      --accent: #FF007F;
+      --accent-rgb: 255, 0, 127;
+      --accent-contrast: #ffffff;
       
       --group-a: #FFCC00;
       --group-a-bg: #332900; 
@@ -287,6 +287,16 @@
       min-height: 65vh; position: relative; overflow-y: auto; overflow-x: hidden; padding-bottom: 20px;
     }
 
+    .playoff-mask-bg {
+        position: absolute; top: 0; left: 0;
+        width: 153.84%; height: 100%;
+        object-fit: fill; opacity: 0.1; z-index: 0; pointer-events: none;
+    }
+    
+    .po-content-layer {
+        position: relative; z-index: 1; display: flex; flex-direction: column; width: 100%; height: 100%;
+    }
+
     .bracket-group { width: 100%; display: flex; flex-direction: column; }
     .bracket-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px;}
     .bracket-title.ga { color: var(--group-a); }
@@ -374,7 +384,8 @@
     }
     .coeff-card::after {
       content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' fill-opacity='0.075' d='M12 6l1.2 3.7h3.8l-3 2.3 1.1 3.7-3-2.3h3.8z'/%3E%3C/svg%3E");
+      /* Ikonka hviezdy */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' fill-opacity='0.15' d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'/%3E%3C/svg%3E");
       background-size: 30px 30px; z-index: 0; pointer-events: none;
     }
     .coeff-title, .coeff-val { position: relative; z-index: 1; }
@@ -521,7 +532,7 @@
        DESKTOP OPTIMALIZÁCIA (GRID DASHBOARD)
     ═════════════════════════════════════════════════════════════════ */
     @media (min-width: 1024px) {
-      body { max-width: 100%; min-height: 100vh; }
+      body { max-width: 100%; min-height: 100vh; overflow: hidden; }
       header { padding: 15px 40px; }
       
       .desktop-settings-wrap { display: flex; align-items: center; border-left: 1px solid #444; padding-left: 15px; margin-left: 15px; height: 36px; }
@@ -530,15 +541,18 @@
       
       main {
         padding: 20px 40px; padding-bottom: 40px;
-        display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 20px;
-        align-items: start;
+        display: grid !important; grid-template-columns: 1fr 1fr 1fr; 
+        grid-template-rows: 1fr 1fr 1fr 1fr;
+        gap: 20px;
+        height: calc(100vh - 85px);
+        align-items: stretch;
       }
       
       .page {
         display: flex !important; flex-direction: column;
         background: rgba(18, 18, 18, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.12); 
         border-radius: 16px; padding: 20px; overflow-y: auto; animation: none;
-        height: 70vh;
+        height: 100%; max-height: 100%;
         box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.05), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 -1px 1px rgba(0,0,0,0.6); 
       }
 
@@ -550,16 +564,11 @@
       }
       .desktop-page-title i { opacity: 0.8; }
       
-      #page-zapasy  { grid-column: 1 / 2; grid-row: 1 / 2; display: block !important; }
-      #page-poradie { grid-column: 2 / 3; grid-row: 1 / 2; display: block !important; }
-      #page-vykony  { grid-column: 3 / 4; grid-row: 1 / 2; display: block !important; }
-      #page-strelci { grid-column: 1 / 2; grid-row: 2 / 3; display: block !important; }
-      
-      #page-playoff { 
-        grid-column: 2 / 4; grid-row: 2 / 3; 
-        justify-content: flex-start; align-items: center; 
-        border: 1px solid var(--accent) !important;
-      }
+      #page-zapasy  { grid-column: 1 / 2; grid-row: 1 / 4; }
+      #page-strelci { grid-column: 1 / 2; grid-row: 4 / 5; }
+      #page-poradie { grid-column: 2 / 3; grid-row: 1 / 3; }
+      #page-vykony  { grid-column: 3 / 4; grid-row: 1 / 3; }
+      #page-playoff { grid-column: 2 / 4; grid-row: 3 / 5; }
       
       #bottom-nav { display: none !important; }
     }
@@ -630,20 +639,23 @@
     </div>
 
     <div class="page" id="page-playoff">
-      <div class="desktop-page-title">
-        <span>PLAY-OFF</span>
-        <i class="fa-solid fa-trophy"></i>
-      </div>
-      
-      <div class="po-top-right-switcher">
-        <button class="po-sw-btn ga active" id="po-btn-a" onclick="switchPlayoffGroup('A')">A</button>
-        <button class="po-sw-btn gb" id="po-btn-b" onclick="switchPlayoffGroup('B')">B</button>
-      </div>
-      
-      <div class="playoff-scroll-area">
-        <div id="playoff-content">
-          <div class="loader"><div class="spinner"></div>Načítavam play-off...</div>
-        </div>
+      <img src="logo transparent.png" class="playoff-mask-bg" onerror="this.style.display='none'" alt="">
+      <div class="po-content-layer">
+          <div class="desktop-page-title">
+            <span>PLAY-OFF</span>
+            <i class="fa-solid fa-trophy"></i>
+          </div>
+          
+          <div class="po-top-right-switcher">
+            <button class="po-sw-btn ga active" id="po-btn-a" onclick="switchPlayoffGroup('A')">A</button>
+            <button class="po-sw-btn gb" id="po-btn-b" onclick="switchPlayoffGroup('B')">B</button>
+          </div>
+          
+          <div class="playoff-scroll-area">
+            <div id="playoff-content">
+              <div class="loader"><div class="spinner"></div>Načítavam play-off...</div>
+            </div>
+          </div>
       </div>
     </div>
 
@@ -689,15 +701,15 @@
       
       <div class="section-title" style="font-size: 12px; margin-bottom: 8px;">FARBA APLIKÁCIE</div>
       <select class="dropdown" id="themeSelect" onchange="saveTheme()">
-        <option value="orange">Oranžová (Predvolená)</option>
-        <option value="pink">Ružová</option>
+        <option value="orange">Oranžová</option>
+        <option value="pink">Ružová (Predvolená)</option>
         <option value="purple">Fialová</option>
         <option value="blue">Modrá</option>
         <option value="green">Zelená</option>
         <option value="red">Červená</option>
       </select>
       <div class="po-text" style="font-size: 10px; margin-top: -10px; text-align: left;">
-        Zmení hlavnú akcentnú farbu celej aplikácie na žiarivý neónový odtieň.
+        Zmení hlavnú akcentnú farbu celej aplikácie.
       </div>
     </div>
   </div>
@@ -766,7 +778,8 @@ let isCompactMatches = false;
 // SYSTÉMOVÉ FUNKCIE PRE NASTAVENIA
 // ═══════════════════════════════════════
 function applyThemeVariables(t) {
-  const theme = THEMES[t] || THEMES['orange'];
+  // Predvolený fallback pre tému v kóde
+  const theme = THEMES[t] || THEMES['pink'];
   document.documentElement.style.setProperty('--accent', theme.accent);
   document.documentElement.style.setProperty('--accent-rgb', theme.rgb);
   document.documentElement.style.setProperty('--accent-contrast', theme.text);
@@ -778,7 +791,7 @@ function applyThemeVariables(t) {
 }
 
 function loadTheme() {
-  const t = localStorage.getItem('kalma_theme') || 'orange';
+  const t = localStorage.getItem('kalma_theme') || 'pink';
   const sel = document.getElementById('themeSelect');
   if (sel) sel.value = t;
   applyThemeVariables(t);
@@ -984,16 +997,16 @@ function openMatchModal(id) {
         <div style="display:inline-block; font-size:10px; font-weight:800; background:${bColor}; color:${tColor}; padding: 3px 10px; border-radius: 12px;">SKUPINA ${z.skupina}</div>
       </div>
       
-      <div class="mc-teams" style="margin-bottom: 20px; padding:0; display:flex; align-items:center;">
-        <div class="mc-team" style="flex:1;">
+      <div class="mc-teams" style="margin-bottom: 20px; padding:0; display:flex; align-items:flex-start;">
+        <div class="mc-team" style="flex:1; width:calc(50% - 35px);">
           <img src="loga_timov/${z.domaci}.png" style="width:60px; height:60px; object-fit:contain; margin-bottom:5px;" onerror="this.style.display='none'">
           <div class="mc-team-name">${z.domaci}</div>
           <div style="font-size:8px; color:var(--muted); margin-top:2px; font-weight:700;">DOMÁCI</div>
         </div>
-        <div class="mc-score-wrap" style="width:90px;">
+        <div class="mc-score-wrap" style="width:70px; padding-top:10px;">
           <div class="mc-score" style="font-size: 24px; padding:10px 0;">${z.goly_domaci !== '' ? z.goly_domaci + ' : ' + z.goly_host : '- : -'}</div>
         </div>
-        <div class="mc-team" style="flex:1;">
+        <div class="mc-team" style="flex:1; width:calc(50% - 35px);">
           <img src="loga_timov/${z.host}.png" style="width:60px; height:60px; object-fit:contain; margin-bottom:5px;" onerror="this.style.display='none'">
           <div class="mc-team-name">${z.host}</div>
           <div style="font-size:8px; color:var(--muted); margin-top:2px; font-weight:700;">HOSŤ</div>
@@ -1016,7 +1029,7 @@ function openMatchModal(id) {
            <div style="width:70px; flex-shrink:0; text-align:center; font-size:12px; color:var(--muted); font-weight:700;">${h2hD} REMÍZ</div>
            <div style="flex:1; text-align:center; font-size:12px; font-weight:800; color:var(--win);">${h2hB} VÝHRY</div>
         </div>
-        <div style="display:flex; flex-direction:column; gap:6px; align-items:center; width:100%;">
+        <div style="display:flex; flex-direction:column; gap:6px; align-items:center;">
             ${h2hMatchesHtml}
         </div>
       </div>
@@ -1507,7 +1520,7 @@ function renderVykony() {
   const goldGpgValStyle = isTopScorer ? 'color: var(--group-a); text-shadow: 0 0 10px rgba(255,204,0,0.5);' : '';
 
   const coeffNum = parseFloat(coeff);
-  const themeObj = THEMES[localStorage.getItem('kalma_theme') || 'orange'];
+  const themeObj = THEMES[localStorage.getItem('kalma_theme') || 'pink'];
   let cStyle = { c: '#FFFFFF', s: 'none' };
   
   if (coeffNum >= 8) cStyle = { c: 'var(--accent)', s: '0 0 25px rgba(var(--accent-rgb),0.9)' };
