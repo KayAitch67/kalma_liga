@@ -307,8 +307,13 @@
     .br-seed-label.gb { color: var(--group-b); }
     .br-seed-label:first-child { margin-top: 0; }
 
-    .br-team-row { display: flex; align-items: center; background: #111; border: 1px solid #222; border-radius: 8px; padding: 8px; gap: 8px;}
-    .br-name { font-size: 12px; font-weight: 800; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+    .br-team-row { display: flex; align-items: center; background: #111; border: 1px solid #222; border-radius: 8px; padding: 8px; gap: 8px; position: relative; overflow: hidden;}
+    .br-name { font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+    .br-player-sub { font-size: 9px; font-weight: 600; color: var(--muted); display: block; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .br-bg-logo {
+      position: absolute; top: 50%; transform: translateY(-50%); left: -6px;
+      width: 48px; height: 48px; object-fit: contain; opacity: 0.12; z-index: 0; pointer-events: none;
+    }
 
     .br-scores { display: flex; gap: 4px; }
     .br-score-box { width: 22px; height: 22px; background: var(--surface-light); border: 1px solid #444; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
@@ -369,13 +374,9 @@
     /* VÝKONY (STATS) */
     .coeff-card {
       position: relative; background: linear-gradient(145deg, #252525, #151515);
-      border: 1px solid #444; border-radius: 16px; padding: 20px;
-      text-align: center; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); overflow: hidden; 
-    }
-    .coeff-card::after {
-      content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23ffffff' fill-opacity='0.075' d='M12 6l1.2 3.7h3.8l-3 2.3 1.1 3.7-3-2.3h3.8z'/%3E%3C/svg%3E");
-      background-size: 30px 30px; z-index: 0; pointer-events: none;
+      border: 2px solid #444; border-radius: 16px; padding: 20px;
+      text-align: center; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
     .coeff-title, .coeff-val { position: relative; z-index: 1; }
 
@@ -944,9 +945,21 @@ function openMatchModal(id) {
         h2hMatchesHtml = `<div style="text-align:center; font-size:10px; color:var(--muted);">Zatiaľ žiadne vzájomné zápasy</div>`;
     }
 
-    // Očakávané skóre
-    const expA = (stA.p > 0 && stB.p > 0) ? ((stA.gf/stA.p) + (stB.ga/stB.p)) / 2 : 0;
-    const expB = (stB.p > 0 && stA.p > 0) ? ((stB.gf/stB.p) + (stA.ga/stA.p)) / 2 : 0;
+    // Očakávané skóre – model útok/obrana normalizovaný priemerom ligy (Dixon-Coles)
+    const groupMatches = DATA.zapasy.filter(m => m.skupina === z.skupina && m.goly_domaci !== '' && m.goly_host !== '');
+    const lgTotalGoals = groupMatches.reduce((s, m) => s + parseInt(m.goly_domaci) + parseInt(m.goly_host), 0);
+    const lgGames = groupMatches.length;
+    const leagueAvg = lgGames > 0 ? lgTotalGoals / lgGames / 2 : 2.5;
+
+    let expA = 0, expB = 0;
+    if (stA.p > 0 && stB.p > 0 && leagueAvg > 0) {
+        const attA = (stA.gf / stA.p) / leagueAvg;
+        const defA = (stA.ga / stA.p) / leagueAvg;
+        const attB = (stB.gf / stB.p) / leagueAvg;
+        const defB = (stB.ga / stB.p) / leagueAvg;
+        expA = attA * defB * leagueAvg;
+        expB = attB * defA * leagueAvg;
+    }
     const expScore = `${Math.round(expA)} : ${Math.round(expB)}`;
 
     // Simulácia
@@ -1288,26 +1301,43 @@ function renderPlayoff() {
     const rowsA = calcStandings('A');
     const rowsB = calcStandings('B');
 
-    const getT = (rows, idx) => rows[idx] ? rows[idx].t.toUpperCase() : 'TBD';
+    const getT = (rows, idx) => rows[idx] ? rows[idx].t : 'TBD';
 
     const pA = { t1: getT(rowsA,0), t2: getT(rowsA,1), t3: getT(rowsA,2), t4: getT(rowsA,3) };
     const pB = { t1: getT(rowsB,0), t2: getT(rowsB,1), t3: getT(rowsB,2), t4: getT(rowsB,3) };
 
     const buildMatchup = (grp, s_a, t_a, s_b, t_b) => {
         const cColor = grp === 'A' ? 'ga' : 'gb';
-        
+        const isReal = (name) => name !== 'TBD' && !name.startsWith('VÍŤAZ');
+
+        const p_a = isReal(t_a) ? getPlayerForTeam(t_a) : '';
+        const p_b = isReal(t_b) ? getPlayerForTeam(t_b) : '';
+        const logoA = isReal(t_a) ? `<img src="loga_timov/${t_a}.png" class="br-bg-logo" onerror="this.style.display='none'" alt="">` : '';
+        const logoB = isReal(t_b) ? `<img src="loga_timov/${t_b}.png" class="br-bg-logo" onerror="this.style.display='none'" alt="">` : '';
+
+        const nameBlockA = `<div style="flex:1; min-width:0; position:relative; z-index:1;">
+            <div class="br-name">${t_a.toUpperCase()}</div>
+            ${p_a ? `<span class="br-player-sub">${p_a}</span>` : ''}
+        </div>`;
+        const nameBlockB = `<div style="flex:1; min-width:0; position:relative; z-index:1;">
+            <div class="br-name">${t_b.toUpperCase()}</div>
+            ${p_b ? `<span class="br-player-sub">${p_b}</span>` : ''}
+        </div>`;
+
         let html = `<div class="br-matchup">`;
         if (s_a) html += `<div class="br-seed-label ${cColor}">${s_a}</div>`;
         html += `<div class="br-team-row">
-            <span class="br-name">${t_a}</span>
+            ${logoA}
+            ${nameBlockA}
             <div class="br-scores"><div class="br-score-box"></div><div class="br-score-box"></div></div>
         </div>`;
-        
+
         if (s_b) html += `<div class="br-seed-label ${cColor}">${s_b}</div>`;
         else html += `<div style="height: 6px;"></div>`;
-        
+
         html += `<div class="br-team-row">
-            <span class="br-name">${t_b}</span>
+            ${logoB}
+            ${nameBlockB}
             <div class="br-scores"><div class="br-score-box"></div><div class="br-score-box"></div></div>
         </div>
         </div>`;
@@ -1484,7 +1514,24 @@ function renderVykony() {
 
   const avgPPG = totalP > 0 ? (totalPts / totalP).toFixed(2) : '0.00';
   const avgGPG = totalP > 0 ? (totalGF / totalP).toFixed(2) : '0.00';
-  const avgRank = ranks.length > 0 ? (ranks.reduce((a,b)=>a+b,0)/ranks.length).toFixed(1) : '0.0';
+
+  // Najvyššia výhra (najväčší gólový rozdiel, pri rovnakom prechádza viac strelených gólov)
+  let bestWin = null, bestWinDiff = -1, bestWinGoals = -1;
+  myTeams.forEach(t => {
+    DATA.zapasy.filter(z => (z.domaci === t.nazov || z.host === t.nazov) && z.goly_domaci !== '' && z.goly_host !== '').forEach(z => {
+      const gd = parseInt(z.goly_domaci), gh = parseInt(z.goly_host);
+      if (isNaN(gd) || isNaN(gh)) return;
+      const isH = z.domaci === t.nazov;
+      const mg = isH ? gd : gh, og = isH ? gh : gd;
+      if (mg > og) {
+        const diff = mg - og;
+        if (diff > bestWinDiff || (diff === bestWinDiff && mg > bestWinGoals)) {
+          bestWinDiff = diff; bestWinGoals = mg; bestWin = `${mg}:${og}`;
+        }
+      }
+    });
+  });
+  const topWin = bestWin || '-';
   
   let coeff = '0.0';
   if (totalP > 0) {
@@ -1515,8 +1562,11 @@ function renderVykony() {
   else if (coeffNum >= 4) cStyle = { c: themeObj.c4, s: '0 0 12px rgba(var(--accent-rgb),0.5)' };
   else if (coeffNum >= 2) cStyle = { c: themeObj.c2, s: '0 0 8px rgba(var(--accent-rgb),0.3)' };
 
+  const coeffBorderColor = cStyle.c === '#FFFFFF' ? '#444' : cStyle.c;
+  const coeffBoxShadow = cStyle.s !== 'none' ? `, 0 0 18px rgba(var(--accent-rgb),0.25)` : '';
+
   el.innerHTML = `
-    <div class="coeff-card">
+    <div class="coeff-card" style="border-color: ${coeffBorderColor}; box-shadow: 0 8px 20px rgba(0,0,0,0.5)${coeffBoxShadow};">
       <div class="coeff-title">
         VÝKONNOSTNÝ KOEFICIENT HRÁČA
         <i class="fa-solid fa-circle-info info-icon" onclick="toggleCoeffInfo()"></i>
@@ -1531,7 +1581,7 @@ function renderVykony() {
     <div class="global-stats">
       <div class="g-stat"><div class="g-val" style="color:${ppgColor}">${avgPPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>BODOV NA ZÁPAS</div></div>
       <div class="g-stat" style="${goldGpgStyle}"><div class="g-val" style="${goldGpgValStyle}">${avgGPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>GÓLOV NA ZÁPAS</div></div>
-      <div class="g-stat"><div class="g-val">${avgRank}</div><div class="g-label">CELKOVÝ PRIEMER<br>PORADIA</div></div>
+      <div class="g-stat"><div class="g-val" style="font-size: 18px;">${topWin}</div><div class="g-label">NAJVYŠŠIA<br>VÝHRA</div></div>
     </div>
     ${teamCards}
   `;
