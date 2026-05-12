@@ -311,8 +311,8 @@
     .br-name { font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
     .br-player-sub { font-size: 9px; font-weight: 600; color: var(--muted); display: block; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .br-bg-logo {
-      position: absolute; top: 50%; transform: translateY(-50%); left: -6px;
-      width: 48px; height: 48px; object-fit: contain; opacity: 0.12; z-index: 0; pointer-events: none;
+      position: absolute; top: 50%; transform: translateY(-50%); left: -18px;
+      width: 62px; height: 62px; object-fit: contain; opacity: 0.12; z-index: 0; pointer-events: none;
     }
 
     .br-scores { display: flex; gap: 4px; }
@@ -1251,19 +1251,34 @@ function renderTabulka() {
       
       const safeId = r.t.replace(/[^a-zA-Z0-9]/g, '-');
       
-      const teamMatches = DATA.zapasy.filter(z => (z.domaci === r.t || z.host === r.t) && z.goly_domaci !== '' && z.goly_host !== '');
+      const teamMatches = DATA.zapasy
+          .filter(z => z.domaci === r.t || z.host === r.t)
+          .sort((a, b) => parseInt(a.id) - parseInt(b.id));
       const detailsHtml = teamMatches.map(z => {
           const isHome = z.domaci === r.t;
           const opp = isHome ? z.host : z.domaci;
+          const isPlayed = z.goly_domaci !== '' && z.goly_host !== '';
+
+          const isKon = isPlayed && z.kontumacia &&
+              (z.kontumacia.toLowerCase() === 'ano' || z.kontumacia === '1' || z.kontumacia.toLowerCase() === 'x');
+          const konTag = isKon ? `<span style="color:var(--loss);font-size:9px;font-weight:800;margin-left:4px;">KON</span>` : '';
+
+          if (!isPlayed) {
+              return `<div class="td-match">
+                          <span class="td-opp">vs ${opp}</span>
+                          <span class="td-score" style="color:#555;">?:?</span>
+                      </div>`;
+          }
+
           const gf = parseInt(isHome ? z.goly_domaci : z.goly_host);
           const ga = parseInt(isHome ? z.goly_host : z.goly_domaci);
-          
+
           let color = 'var(--draw)';
           if (gf > ga) color = 'var(--win)';
           else if (gf < ga) color = 'var(--loss)';
 
           return `<div class="td-match">
-                      <span class="td-opp">vs ${opp}</span>
+                      <span class="td-opp">vs ${opp}${konTag}</span>
                       <span class="td-score" style="color: ${color};">${gf} : ${ga}</span>
                   </div>`;
       }).join('');
@@ -1279,7 +1294,7 @@ function renderTabulka() {
       <tr class="team-details-row" id="details-${safeId}" style="display: none;">
         <td colspan="8">
             <div class="team-details-container">
-                ${detailsHtml || '<div class="td-match" style="justify-content:center; color:var(--muted); border-bottom: none;">Zatiaľ žiadne odohraté zápasy</div>'}
+                ${detailsHtml || '<div class="td-match" style="justify-content:center; color:var(--muted); border-bottom: none;">Žiadne zápasy nenájdené</div>'}
             </div>
         </td>
       </tr>`;
@@ -1580,8 +1595,8 @@ function renderVykony() {
     </div>
     <div class="global-stats">
       <div class="g-stat"><div class="g-val" style="color:${ppgColor}">${avgPPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>BODOV NA ZÁPAS</div></div>
+      <div class="g-stat"><div class="g-val">${topWin}</div><div class="g-label">NAJVYŠŠIA<br>VÝHRA</div></div>
       <div class="g-stat" style="${goldGpgStyle}"><div class="g-val" style="${goldGpgValStyle}">${avgGPG}</div><div class="g-label">CELKOVÝ PRIEMER<br>GÓLOV NA ZÁPAS</div></div>
-      <div class="g-stat"><div class="g-val" style="font-size: 18px;">${topWin}</div><div class="g-label">NAJVYŠŠIA<br>VÝHRA</div></div>
     </div>
     ${teamCards}
   `;
