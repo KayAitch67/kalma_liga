@@ -1154,21 +1154,23 @@ function fetchFantasyData(name, pin) {
       });
 }
 
-// Opravená funkcia pre správne formátovanie dátumu
 function formatDateTime(d, t) {
     if(!d) return "ČAS NEURČENÝ";
-    try {
-        let dateStr = d.split('T')[0];
-        let dateParts;
-        if (dateStr.includes('-')) {
-            dateParts = dateStr.split('-');
-            if (dateParts[0].length === 4) return `${parseInt(dateParts[2])}. ${parseInt(dateParts[1])}. ${dateParts[0]} | ${t || ''}`;
-        } else if (dateStr.includes('/')) {
-            dateParts = dateStr.split('/');
-            return `${parseInt(dateParts[1])}. ${parseInt(dateParts[0])}. ${dateParts[2]} | ${t || ''}`;
-        }
-    } catch(e) {}
-    return `${d} | ${t || ''}`;
+    
+    // Zoberieme presný text dátumu z tabuľky
+    let displayDate = d;
+    
+    // Poistka: ak by náhodou predsa len prišiel starý formát s "T", orežeme ho
+    if (typeof d === 'string' && d.includes('T')) {
+        displayDate = d.split('T')[0];
+    }
+    
+    // Zobrazíme dátum a ak je zadaný aj čas, pridáme ho za oddelovač
+    if (t && t.toString().trim() !== '') {
+        return `${displayDate} | ${t}`;
+    }
+    
+    return displayDate;
 }
 
 function renderFantasyMatches() {
