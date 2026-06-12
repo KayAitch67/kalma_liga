@@ -1336,30 +1336,90 @@ function submitPrediction(isLock) {
     
     if (currentPredMode === 1 || currentPredMode === 2) {
         if (!currentPredValue || currentPredValue === "exact") {
-            alert("Vyber jednu z možností!");
-            return;
+            alert("Vyber jednu z možností!"); return;
         }
         payloadValue = currentPredValue;
     } else if (currentPredMode === 3) {
         const h = document.getElementById('pred-score-home').value;
         const a = document.getElementById('pred-score-away').value;
         if (h === '' || a === '') {
-            alert("Zadaj presné skóre pre oba tímy!");
-            return;
+            alert("Zadaj presné skóre pre oba tímy!"); return;
         }
         payloadValue = `${h}:${a}`;
     }
     
-    localPreds[currentPredMatchId] = { val: payloadValue, locked: isLock, mode: currentPredMode };
-    renderFantasyMatches();
-    closePredictorModal();
+    const btnDraft = document.querySelector('.btn-draft');
+    const btnLock = document.querySelector('.btn-lock');
+    const originalDraft = btnDraft.innerHTML;
+    const originalLock = btnLock.innerHTML;
+    
+    // Optická odozva točiaceho sa kolieska
+    if (isLock) btnLock.innerHTML = '<div class="spinner" style="width: 12px; height: 12px; border-width: 2px;"></div>';
+    else btnDraft.innerHTML = '<div class="spinner" style="width: 12px; height: 12px; border-width: 2px;"></div>';
+    
+    const payload = {
+        player_name: localStorage.getItem('fantasy_name'),
+        pin_code: localStorage.getItem('fantasy_pin'),
+        match_id: currentPredMatchId,
+        pred_mode: currentPredMode,
+        pred_value: payloadValue,
+        is_locked: isLock
+    };
+    
+    fetch(WEB_APP_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            fetchFantasyData(localStorage.getItem('fantasy_name'), localStorage.getItem('fantasy_pin'));
+            closePredictorModal();
+        } else {
+            alert("Chyba: " + data.error);
+        }
+    })
+    .catch(err => {
+        alert("Chyba pripojenia. Skontroluj internet.");
+    })
+    .finally(() => {
+        btnDraft.innerHTML = originalDraft;
+        btnLock.innerHTML = originalLock;
+    });
 }
 
 function quickLockPrediction(mId) {
-    if(localPreds[mId]) {
-        localPreds[mId].locked = true;
-        renderFantasyMatches();
-    }
+    const match = FANTASY_MATCHES.find(m => m.match_id === mId || m.id === mId);
+    if (!match || !match.my_prediction) return;
+    
+    const payload = {
+        player_name: localStorage.getItem('fantasy_name'),
+        pin_code: localStorage.getItem('fantasy_pin'),
+        match_id: mId,
+        pred_mode: match.my_prediction.pred_mode,
+        pred_value: match.my_prediction.val,
+        is_locked: true
+    };
+    
+    document.getElementById('fantasy-content').innerHTML = '<div class="loader"><div class="spinner"></div>Uzamykám tip...</div>';
+    
+    fetch(WEB_APP_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.success) {
+            fetchFantasyData(localStorage.getItem('fantasy_name'), localStorage.getItem('fantasy_pin'));
+        } else {
+            alert("Chyba: " + data.error);
+            fetchFantasyData(localStorage.getItem('fantasy_name'), localStorage.getItem('fantasy_pin'));
+        }
+    })
+    .catch(err => {
+        alert("Chyba pripojenia.");
+        fetchFantasyData(localStorage.getItem('fantasy_name'), localStorage.getItem('fantasy_pin'));
+    });
 }
 
 function switchFantasyTab(tab) {
