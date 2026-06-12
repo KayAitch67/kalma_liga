@@ -1484,31 +1484,50 @@ function renderFantasyLeaderboard() {
 
     if (FANTASY_MATCHES && FANTASY_MATCHES.length > 0) {
         FANTASY_MATCHES.forEach(m => {
+            // Zistíme reálne skóre z tabuľky
             const hScore = (m.real_score_home !== undefined && m.real_score_home !== '') ? m.real_score_home : '?';
             const aScore = (m.real_score_away !== undefined && m.real_score_away !== '') ? m.real_score_away : '?';
 
             FANTASY_PLAYERS.forEach(p => {
                 let pPred = null;
-                if (p === localStorage.getItem('fantasy_name')) {
+                const savedName = localStorage.getItem('fantasy_name');
+                
+                // Rozdielne hľadanie pre prihláseného hráča a pre ostatných
+                if (p === savedName) {
                     pPred = m.my_prediction;
-                } else if (m.other_predictions && m.other_predictions[p]) {
-                    pPred = m.other_predictions[p];
-                } else if (m.predictions && m.predictions[p]) {
-                    pPred = m.predictions[p];
+                } else if (m.predictions) {
+                    pPred = m.predictions.find(pred => 
+                        String(pred.player_name).trim().toLowerCase() === String(p).trim().toLowerCase()
+                    );
                 }
 
-                if (pPred && pPred.locked && hScore !== '?' && aScore !== '?') {
-                    playerPoints[p] += calculateFantasyPoints(pPred.pred_mode, pPred.val, hScore, aScore);
+                if (pPred) {
+                    // Pre teba sa zámok volá "locked", pre ostatných "is_locked"
+                    const isLocked = pPred.locked === true || 
+                                     String(pPred.is_locked).trim().toUpperCase() === "TRUE" || 
+                                     String(pPred.is_locked).trim().toUpperCase() === "PRAVDA" ||
+                                     String(pPred.is_locked) === "1" ||
+                                     pPred.is_locked === true;
+                                     
+                    // Pre teba sa tip volá "val", pre ostatných "pred_value"
+                    const tipValue = pPred.val !== undefined ? pPred.val : pPred.pred_value;
+
+                    // Body pripočítame len ak je tip uzamknutý, poznáme reálny výsledok a tip nie je skrytý (?)
+                    if (isLocked && hScore !== '?' && aScore !== '?' && tipValue && tipValue !== "?") {
+                        playerPoints[p] += calculateFantasyPoints(pPred.pred_mode, tipValue, hScore, aScore);
+                    }
                 }
             });
         });
     }
 
+    // Zotriedenie hráčov podľa bodov (od najlepšieho)
     const sortedPlayers = Object.keys(playerPoints).map(p => ({
         name: p,
         pts: playerPoints[p]
     })).sort((a, b) => b.pts - a.pts);
 
+    // Vygenerovanie HTML tabuľky
     const html = sortedPlayers.map((p, i) => {
         return `
         <tr>
@@ -1518,6 +1537,7 @@ function renderFantasyLeaderboard() {
           <td style="color: var(--accent); font-weight: 800; text-align: right; padding-right: 12px;">${p.pts}</td>
         </tr>`;
     }).join('');
+    
     document.getElementById('fantasy-leaderboard-content').innerHTML = html;
 }
 
