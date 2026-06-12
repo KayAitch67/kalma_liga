@@ -809,8 +809,8 @@
       <div class="settings-title" style="text-align: center; margin-bottom: 20px;" id="pred-modal-title">ZÁPAS</div>
       
       <div class="global-switcher" style="margin-bottom: 20px;">
-          <button class="gs-btn pred-tab active" onclick="switchPredMode(1)" style="font-size: 80%;">DVOJITÁ ŠANCA</button>
-          <button class="gs-btn pred-tab" onclick="switchPredMode(2)" style="font-size: 80%;">VÝSLEDOK (1X2)</button>
+          <button class="gs-btn pred-tab active" onclick="switchPredMode(1)" style="font-size: 80%;">VÝSLEDOK (1X/X2)</button>
+          <button class="gs-btn pred-tab" onclick="switchPredMode(2)" style="font-size: 80%;">VÝSLEDOK (1/X/2)</button>
           <button class="gs-btn pred-tab" onclick="switchPredMode(3)" style="font-size: 80%;">PRESNÉ SKÓRE</button>
       </div>
       
@@ -823,7 +823,7 @@
       </div>
       
       <div id="pred-mode-2" class="pred-content">
-          <div class="pred-explainer">Uhádnutý presný výsledok zápasu = 10 bodov</div>
+          <div class="pred-explainer">Uhádnutý výsledok zápasu = 10 bodov</div>
           <div class="pred-options">
               <button class="pred-opt-btn" onclick="selectPrediction(2, '1', this)">1</button>
               <button class="pred-opt-btn" onclick="selectPrediction(2, 'X', this)">X</button>
@@ -832,7 +832,7 @@
       </div>
       
       <div id="pred-mode-3" class="pred-content">
-          <div class="pred-explainer">Uhádnutý presný výsledok zápasu = 25 bodov</div>
+          <div class="pred-explainer">Uhádnuté presné skóre zápasu = 25 bodov</div>
           <div class="pred-score-inputs">
               <input type="number" id="pred-score-home" class="pred-input" placeholder="0" min="0" oninput="selectPrediction(3)">
               <span style="font-size: 20px; font-weight: 900; color: #555;">:</span>
