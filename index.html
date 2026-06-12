@@ -119,7 +119,7 @@
       color: var(--muted); font-family: var(--font); font-size: 11px; font-weight: 700;
       padding: 8px 0; cursor: pointer; transition: 0.2s; text-transform: uppercase; text-align: center;
     }
-    .gs-btn.active.all { background: var(--accent); border-color: var(--accent); color: var(--accent-contrast); }
+    .gs-btn.active.all, .gs-btn.active { background: var(--accent); border-color: var(--accent); color: var(--accent-contrast); }
     .gs-btn.active.ga { background: var(--group-a-bg); border-color: var(--group-a-bg); color: var(--group-a); }
     .gs-btn.active.gb { background: var(--group-b-bg); border-color: var(--group-b-bg); color: var(--group-b); }
 
@@ -144,12 +144,13 @@
     .compact-toggle { color: var(--muted); cursor: pointer; font-size: 18px; transition: 0.2s; }
     .compact-toggle:hover { color: var(--text); }
 
-    /* MATCH CARDS (Pre E-SPORT) */
+    /* MATCH CARDS */
     .match-card {
       position: relative; background: var(--surface);
       border-radius: 16px; padding: 16px; margin-bottom: 12px;
       overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }
+    
     .mc-bg-logo {
       position: absolute; top: 50%; transform: translateY(-50%);
       width: 220px; height: 220px; object-fit: contain;
@@ -482,6 +483,69 @@
     .md-pred-table td { padding: 8px 0; border-bottom: 1px dashed #222; font-weight: 700;}
     .md-pred-table tr:last-child td { border-bottom: none; }
 
+    /* FANTASY TABS */
+    #fantasy-leaderboard-view { display: none; }
+
+    /* FANTASY MATCH CARDS */
+    .f-card {
+        display: flex; gap: 8px; margin-bottom: 12px; width: 100%; background: transparent; border: none; box-shadow: none;
+    }
+    .f-info {
+        flex: 0 0 calc(70% - 4px); background: var(--surface); border-radius: 12px;
+        padding: 14px 12px; display: flex; flex-direction: column; justify-content: center;
+        border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .f-datetime {
+        font-size: 9px; font-weight: 800; color: var(--muted); letter-spacing: 0.5px; margin-bottom: 0;
+    }
+    .f-pts {
+        font-size: 9px; font-weight: 800; color: var(--accent); text-align: right;
+    }
+    .f-matchup { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+    .f-teams { display: flex; flex-direction: column; gap: 8px; }
+    .f-team {
+        font-size: 14px; font-weight: 800; color: var(--text); text-align: left;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;
+    }
+    .f-score { display: flex; flex-direction: column; gap: 8px; text-align: right; }
+    .f-score-val { font-size: 14px; font-weight: 900; color: var(--accent); }
+    
+    .f-action-wrapper {
+        flex: 0 0 calc(30% - 4px); display: flex; flex-direction: column; gap: 4px; justify-content: stretch;
+    }
+    .f-btn {
+        flex: 1; border-radius: 12px; border: none; font-family: var(--font);
+        font-size: 9.5px; font-weight: 800; text-transform: uppercase; cursor: pointer;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); padding: 4px; text-align: center;
+    }
+    .f-btn:hover { filter: brightness(1.15); }
+    .f-btn i { font-size: 14px; margin-bottom: 3px; }
+    
+    /* Stavy tlačidiel FANTASY na karte */
+    .f-btn-predict { background: var(--surface-light); color: var(--accent); border: 1px solid #444; }
+    .f-btn-draft { background: var(--surface-light); color: var(--text); border: 1px dashed #555; }
+    .f-btn-lock-action { background: rgba(var(--accent-rgb), 0.1); color: var(--accent); border: 1px solid var(--accent); }
+    .f-btn-locked-val { background: var(--accent); color: var(--accent-contrast); border: 1px solid var(--accent); cursor: pointer; transition: 0.2s;}
+    .f-btn-locked-val:hover { filter: brightness(1.1); }
+    .f-btn-locked-state { background: #1a1a1a; color: #555; border: 1px solid #222; pointer-events: none; }
+
+    /* FANTASY PREDICTOR MODAL (Vo vnútri okna) */
+    .pred-content { display: none; text-align: center; }
+    .pred-content.active { display: block; animation: fadeIn 0.3s; }
+    .pred-explainer { font-size: 10px; color: var(--group-a); font-weight: 800; margin-bottom: 16px; background: var(--group-a-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--group-a); }
+    .pred-options { display: flex; justify-content: center; gap: 10px; margin-bottom: 24px; }
+    .pred-opt-btn { background: var(--surface); border: 2px solid #444; color: var(--text); border-radius: 8px; padding: 14px; font-size: 18px; font-weight: 900; cursor: pointer; transition: 0.2s; flex: 1; font-family: var(--font); }
+    .pred-opt-btn.selected { border-color: var(--accent); background: rgba(var(--accent-rgb), 0.1); color: var(--accent); box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3); }
+    .pred-score-inputs { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 24px; }
+    .pred-input { width: 65px; height: 65px; background: #111; border: 2px solid #444; border-radius: 12px; text-align: center; font-size: 26px; font-weight: 900; color: var(--text); font-family: var(--font); }
+    .pred-input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3); }
+    .btn-lock-wrap { display: flex; gap: 8px; margin-top: 10px; }
+    .btn-action { border: none; padding: 16px 0; font-size: 11px; font-family: var(--font); font-weight: 900; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; transition: 0.2s; }
+    .btn-draft { flex: 3; background: #2a2a2a; color: var(--text); border: 1px solid #444; line-height: 1.2; }
+    .btn-lock { flex: 7; background: var(--accent); color: var(--accent-contrast); }
+    .btn-action:hover { filter: brightness(1.1); }
+
     /* BOTTOM NAV */
     nav {
       position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto;
@@ -529,9 +593,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* ════════════════════════════════════════════════════════════════
-       DESKTOP OPTIMALIZÁCIA (GRID DASHBOARD)
-    ═════════════════════════════════════════════════════════════════ */
+    /* DESKTOP OPTIMALIZÁCIA (GRID DASHBOARD) */
     @media (min-width: 1024px) {
       body { max-width: 100%; min-height: 100vh; }
       header { padding: 15px 40px; }
@@ -580,43 +642,6 @@
     @media (max-width: 1023px) {
       .desktop-settings-wrap { display: none; }
     }
-
-    /* FANTASY ZALozKA A KARTY */
-    #fantasy-leaderboard-view { display: none; }
-    .f-card { display: flex; gap: 8px; margin-bottom: 12px; width: 100%; background: transparent; }
-    .f-info { flex: 0 0 calc(70% - 4px); background: var(--surface); border-radius: 12px; padding: 14px 12px; display: flex; flex-direction: column; justify-content: center; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-    .f-datetime { font-size: 9px; font-weight: 800; color: var(--muted); margin-bottom: 12px; letter-spacing: 0.5px; }
-    .f-matchup { display: flex; justify-content: space-between; align-items: center; }
-    .f-teams { display: flex; flex-direction: column; gap: 8px; }
-    .f-team { font-size: 14px; font-weight: 800; color: var(--text); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
-    .f-score { display: flex; flex-direction: column; gap: 8px; text-align: right; }
-    .f-score-val { font-size: 14px; font-weight: 900; color: var(--accent); }
-    .f-action-wrapper { flex: 0 0 calc(30% - 4px); display: flex; flex-direction: column; gap: 4px; justify-content: stretch; }
-    .f-btn { flex: 1; border-radius: 12px; border: none; font-family: var(--font); font-size: 9.5px; font-weight: 800; text-transform: uppercase; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); padding: 4px; text-align: center; }
-    .f-btn:hover { filter: brightness(1.15); }
-    .f-btn i { font-size: 14px; margin-bottom: 3px; }
-    .f-btn-predict { background: var(--surface-light); color: var(--accent); border: 1px solid #444; }
-    .f-btn-draft { background: var(--surface-light); color: var(--text); border: 1px dashed #555; }
-    .f-btn-lock-action { background: rgba(var(--accent-rgb), 0.1); color: var(--accent); border: 1px solid var(--accent); }
-    .f-btn-locked-val { background: var(--accent); color: var(--accent-contrast); border: 1px solid var(--accent); pointer-events: none; }
-    .f-btn-locked-state { background: #1a1a1a; color: #555; border: 1px solid #222; pointer-events: none; }
-    .pred-tabs { display: flex; background: #111; border-radius: 8px; padding: 4px; gap: 4px; margin-bottom: 16px; }
-    .pred-tab { flex: 1; background: transparent; border: none; color: var(--muted); font-family: var(--font); font-size: 9px; font-weight: 800; padding: 10px 0; border-radius: 6px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-    .pred-tab.active { background: var(--surface-light); color: var(--text); border: 1px solid #444; }
-    .pred-content { display: none; text-align: center; }
-    .pred-content.active { display: block; animation: fadeIn 0.3s; }
-    .pred-explainer { font-size: 10px; color: var(--group-a); font-weight: 800; margin-bottom: 16px; background: var(--group-a-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--group-a); }
-    .pred-options { display: flex; justify-content: center; gap: 10px; margin-bottom: 24px; }
-    .pred-opt-btn { background: var(--surface); border: 2px solid #444; color: var(--text); border-radius: 8px; padding: 14px; font-size: 18px; font-weight: 900; cursor: pointer; transition: 0.2s; flex: 1; font-family: var(--font); }
-    .pred-opt-btn.selected { border-color: var(--accent); background: rgba(var(--accent-rgb), 0.1); color: var(--accent); box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3); }
-    .pred-score-inputs { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 24px; }
-    .pred-input { width: 65px; height: 65px; background: #111; border: 2px solid #444; border-radius: 12px; text-align: center; font-size: 26px; font-weight: 900; color: var(--text); font-family: var(--font); }
-    .pred-input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3); }
-    .btn-lock-wrap { display: flex; gap: 8px; margin-top: 10px; }
-    .btn-action { border: none; padding: 16px 0; font-size: 11px; font-family: var(--font); font-weight: 900; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; transition: 0.2s; }
-    .btn-draft { flex: 4; background: #2a2a2a; color: var(--text); border: 1px solid #444; }
-    .btn-lock { flex: 6; background: var(--accent); color: var(--accent-contrast); }
-    .btn-action:hover { filter: brightness(1.1); }
   </style>
 </head>
 <body>
@@ -728,7 +753,7 @@
         <i class="fa-solid fa-star"></i>
       </div>
       
-      <div class="global-switcher">
+      <div class="global-switcher" style="margin-bottom: 20px;">
           <button class="gs-btn active" id="f-tab-btn-preds" onclick="switchFantasyTab('preds')">MOJE PREDIKCIE</button>
           <button class="gs-btn" id="f-tab-btn-leader" onclick="switchFantasyTab('leader')">PORADIE HRÁČOV</button>
       </div>
@@ -744,7 +769,7 @@
               <thead>
                   <tr>
                       <th><span class="s-rank">#</span> HRÁČ</th>
-                      <th style="width: 30%;">BODY</th>
+                      <th style="width: 30%; text-align: right; padding-right: 12px;">BODY</th>
                   </tr>
               </thead>
               <tbody id="fantasy-leaderboard-content">
@@ -787,10 +812,11 @@
       <i class="fa-solid fa-xmark md-close" onclick="closePredictorModal()"></i>
       <div class="settings-title" style="text-align: center; margin-bottom: 20px;" id="pred-modal-title">ZÁPAS</div>
       
-      <div class="pred-tabs">
-          <button class="pred-tab active" onclick="switchPredMode(1)">DVOJITÁ ŠANCA</button>
-          <button class="pred-tab" onclick="switchPredMode(2)">VÍŤAZ (1X2)</button>
-          <button class="pred-tab" onclick="switchPredMode(3)">PRESNÉ SKÓRE</button>
+      <!-- Nový switcher s globálnym dizajnom -->
+      <div class="global-switcher" style="margin-bottom: 20px;">
+          <button class="gs-btn pred-tab active" onclick="switchPredMode(1)">DVOJITÁ ŠANCA</button>
+          <button class="gs-btn pred-tab" onclick="switchPredMode(2)">VÝSLEDOK (1X2)</button>
+          <button class="gs-btn pred-tab" onclick="switchPredMode(3)">PRESNÉ SKÓRE</button>
       </div>
       
       <div id="pred-mode-1" class="pred-content active">
@@ -802,7 +828,7 @@
       </div>
       
       <div id="pred-mode-2" class="pred-content">
-          <div class="pred-explainer">Uhádnutý presný víťaz = 10 bodov</div>
+          <div class="pred-explainer">Uhádnutý presný výsledok zápasu = 10 bodov</div>
           <div class="pred-options">
               <button class="pred-opt-btn" onclick="selectPrediction(2, '1', this)">1</button>
               <button class="pred-opt-btn" onclick="selectPrediction(2, 'X', this)">X</button>
@@ -820,8 +846,19 @@
       </div>
       
       <div class="btn-lock-wrap">
-          <button class="btn-action btn-draft" onclick="submitPrediction(false)">PREDBEŽNE ULOŽIŤ</button>
+          <button class="btn-action btn-draft" onclick="submitPrediction(false)">PREDBEŽNE<br>ULOŽIŤ</button>
           <button class="btn-action btn-lock" onclick="submitPrediction(true)"><i class="fa-solid fa-lock"></i> UZAMKNÚŤ TIP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ZAMKNUTÉ TIPY OSTATNÝCH HRÁČOV -->
+  <div id="locked-tips-modal" class="md-modal-overlay">
+    <div class="md-modal-content">
+      <i class="fa-solid fa-xmark md-close" onclick="closeLockedTipsModal()"></i>
+      <div class="settings-title" style="text-align: center; margin-bottom: 20px;" id="locked-modal-title">ZÁPAS</div>
+      <div id="locked-tips-content">
+          <!-- JS vygeneruje obsah a tipy -->
       </div>
     </div>
   </div>
@@ -1015,7 +1052,7 @@ function handleFantasyNav(el) {
     
     if (savedName && savedPin) {
         navTo('fantasy', el);
-        fetchFantasyData(savedName, savedPin);
+        fetchFantasyData(savedName, savedPin); // Opätovné načítanie pre aktualizáciu dát
     } else {
         document.getElementById('auth-modal').style.display = 'flex';
         document.getElementById('bottom-nav').classList.remove('expanded');
@@ -1079,9 +1116,10 @@ function fetchFantasyData(name, pin) {
     content.innerHTML = '<div class="loader"><div class="spinner"></div>Aktualizujem dáta...</div>';
     
     if (WEB_APP_URL === "SEM_VLOZIS_SVOJ_LINK") {
+        // Fallback pre testovanie UI bez funkčného backendu, berie dáta z public tabuľky
         FANTASY_MATCHES = DATA.zapasy.map(m => ({
             match_id: m.id, home_team: m.domaci, away_team: m.host,
-            match_date: "12.06.2026", match_time: "18:00",
+            match_date: "2026-06-12", match_time: "18:00",
             real_score_home: m.goly_domaci, real_score_away: m.goly_host
         }));
         renderFantasyMatches();
@@ -1103,6 +1141,7 @@ function fetchFantasyData(name, pin) {
       });
 }
 
+// Opravená funkcia pre správne formátovanie dátumu
 function formatDateTime(d, t) {
     if(!d) return "ČAS NEURČENÝ";
     try {
@@ -1127,6 +1166,7 @@ function renderFantasyMatches() {
     
     let html = '';
     FANTASY_MATCHES.forEach(m => {
+        // Poistenie názvov premenných pre zhodu s front/back
         const hTeam = m.home_team || m.domaci || "Tím 1"; 
         const aTeam = m.away_team || m.host || "Tím 2";
         const hScore = (m.real_score_home !== undefined && m.real_score_home !== '') ? m.real_score_home : '?';
@@ -1142,6 +1182,9 @@ function renderFantasyMatches() {
             predState = myPred.locked ? 'locked' : 'draft'; 
             predDisplay = myPred.val; 
         }
+        
+        // Zobrazenie bodov ak je tip zamknutý (tu môžeme potiahnuť body z backendu neskôr)
+        let ptsText = (predState === 'locked') ? '+0 BODOV' : ''; 
 
         let actionHtml = '';
         if (predState === 'none') {
@@ -1155,7 +1198,7 @@ function renderFantasyMatches() {
             actionHtml = `
             <div class="f-action-wrapper">
                 <button class="f-btn f-btn-draft" onclick="openPredictorModal('${mId}', '${hTeam}', '${aTeam}')">
-                    <span style="font-size: 8px; font-weight: 600;">KONCEPT</span>
+                    <span style="font-size: 8px; font-weight: 600;">PREDBEŽNÝ TIP</span>
                     <span style="font-size: 14px; margin-top:2px; font-weight: 900;">${predDisplay}</span>
                 </button>
                 <button class="f-btn f-btn-lock-action" onclick="quickLockPrediction('${mId}')">
@@ -1165,8 +1208,8 @@ function renderFantasyMatches() {
         } else if (predState === 'locked') {
             actionHtml = `
             <div class="f-action-wrapper">
-                <button class="f-btn f-btn-locked-val">
-                    <span style="font-size: 8px; font-weight: 600;">TVOJ TIP</span>
+                <button class="f-btn f-btn-locked-val" onclick="openLockedTipsModal('${mId}', '${hTeam}', '${aTeam}', '${predDisplay}')">
+                    <span style="font-size: 8px; font-weight: 600;">MÔJ TIP</span>
                     <span style="font-size: 14px; margin-top:2px; font-weight: 900;">${predDisplay}</span>
                 </button>
                 <button class="f-btn f-btn-locked-state">
@@ -1178,7 +1221,10 @@ function renderFantasyMatches() {
         html += `
         <div class="f-card">
           <div class="f-info">
-             <div class="f-datetime">${datetime}</div>
+             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                 <div class="f-datetime" style="margin-bottom: 0;">${datetime}</div>
+                 <div class="f-pts">${ptsText}</div>
+             </div>
              <div class="f-matchup">
                  <div class="f-teams">
                      <div class="f-team">${hTeam}</div>
@@ -1199,7 +1245,7 @@ function renderFantasyMatches() {
 }
 
 // ═══════════════════════════════════════
-// LOGIKA - FANTASY PREDICTOR MODAL
+// LOGIKA - FANTASY PREDICTOR MODALS A TABS
 // ═══════════════════════════════════════
 function openPredictorModal(matchId, home, away) {
     currentPredMatchId = matchId;
@@ -1214,6 +1260,44 @@ function openPredictorModal(matchId, home, away) {
 
 function closePredictorModal() {
     document.getElementById('predictor-modal').style.display = 'none';
+}
+
+function openLockedTipsModal(mId, home, away, myTip) {
+    document.getElementById('locked-modal-title').innerText = `${home} vs ${away}`;
+    
+    let html = `
+    <div style="background: var(--surface-light); border-radius: 8px; padding: 12px; margin-bottom: 20px; text-align: center; border: 1px solid var(--accent);">
+        <div style="font-size: 9px; font-weight: 800; color: var(--muted); margin-bottom: 4px;">MÔJ ZAMKNUTÝ TIP</div>
+        <div style="font-size: 18px; font-weight: 900; color: var(--accent);">${myTip}</div>
+    </div>
+    <div style="font-size: 11px; font-weight: 800; color: var(--muted); margin-bottom: 10px; text-align: center; letter-spacing: 1px;">TIPY OSTATNÝCH HRÁČOV</div>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+    `;
+    
+    const savedName = localStorage.getItem('fantasy_name');
+    
+    FANTASY_PLAYERS.forEach(p => {
+        if(p === savedName) return; 
+        
+        // Random priradenie tipu pre ukážku, kým to napojíme na reálny backend
+        const randomTip = Math.random() > 0.5 ? (Math.random() > 0.5 ? "1" : "2:1") : null;
+        const tipDisplay = randomTip ? randomTip : "<span style='color: #666; font-size: 9px;'>ŽIADNA PREDIKCIA</span>";
+        
+        html += `
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #111; padding: 10px 15px; border-radius: 8px; border: 1px solid #333;">
+            <div style="font-size: 12px; font-weight: 800; color: var(--text);">${p}</div>
+            <div style="font-size: 14px; font-weight: 900; color: var(--accent); text-align: right;">${tipDisplay}</div>
+        </div>
+        `;
+    });
+    
+    html += `</div>`;
+    document.getElementById('locked-tips-content').innerHTML = html;
+    document.getElementById('locked-tips-modal').style.display = 'flex';
+}
+
+function closeLockedTipsModal() {
+    document.getElementById('locked-tips-modal').style.display = 'none';
 }
 
 function switchPredMode(mode) {
@@ -1301,7 +1385,7 @@ function renderFantasyLeaderboard() {
           <td style="text-align: left; padding-left: 12px;">
               <span class="s-rank">${i+1}.</span> ${p}
           </td>
-          <td style="color: var(--accent); font-weight: 800;">${pts} BODOV</td>
+          <td style="color: var(--accent); font-weight: 800; text-align: right; padding-right: 12px;">${pts}</td>
         </tr>`;
     }).join('');
     document.getElementById('fantasy-leaderboard-content').innerHTML = html;
