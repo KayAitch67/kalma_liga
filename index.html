@@ -1294,19 +1294,34 @@ function openLockedTipsModal(mId, home, away, myTip) {
     `;
     
     const savedName = localStorage.getItem('fantasy_name');
-    const match = FANTASY_MATCHES.find(m => m.match_id === mId || m.id === mId);
+    
+    // Extrémne odolné hľadanie zápasu (prevedieme obe strany na string pre istotu)
+    const match = FANTASY_MATCHES.find(m => String(m.match_id) === String(mId) || String(m.id) === String(mId));
     
     FANTASY_PLAYERS.forEach(p => {
-        if(p === savedName) return; 
+        if (p === savedName) return; 
         
         let tipDisplay = "<span style='color: #666; font-size: 9px;'>ŽIADNA PREDIKCIA</span>";
-        let playerPred = null;
 
-        if (match && match.predictions && match.predictions[p]) playerPred = match.predictions[p];
-        else if (match && match.other_predictions && match.other_predictions[p]) playerPred = match.other_predictions[p];
+        if (match && match.predictions) {
+            // Extrémne odolné hľadanie hráča (ignoruje veľké/malé písmená a medzery)
+            const playerPred = match.predictions.find(pred => 
+                String(pred.player_name).trim().toLowerCase() === String(p).trim().toLowerCase()
+            );
 
-        if (playerPred && playerPred.locked) {
-            tipDisplay = playerPred.val;
+            if (playerPred) {
+                // Bezpečná kontrola (Google Sheets môže poslať "TRUE", "PRAVDA" alebo bool)
+                const rawLock = String(playerPred.is_locked).trim().toUpperCase();
+                const isLocked = (rawLock === "TRUE" || rawLock === "PRAVDA" || rawLock === "1" || playerPred.is_locked === true);
+                
+                if (isLocked) {
+                    // Tip je uzamknutý, priamo ho vypíšeme
+                    tipDisplay = playerPred.pred_value;
+                } else {
+                    // Tip je len predbežne uložený (draft)
+                    tipDisplay = "<span style='color: #666; font-size: 9px;'>ZATIAĽ NEUZAMKNUTÉ</span>";
+                }
+            }
         }
         
         html += `
