@@ -150,6 +150,7 @@
       border-radius: 16px; padding: 16px; margin-bottom: 12px;
       overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }
+    
     .mc-bg-logo {
       position: absolute; top: 50%; transform: translateY(-50%);
       width: 220px; height: 220px; object-fit: contain;
@@ -157,22 +158,28 @@
     }
     .mc-bg-logo.left { left: -90px; }
     .mc-bg-logo.right { right: -90px; }
+
     .st-bg-logo {
       position: absolute; top: 50%; transform: translateY(-50%); left: -30px;
       width: 100px; height: 100px; object-fit: contain; opacity: 0.15; z-index: 0; pointer-events: none;
     }
+
     .ts-bg-logo {
       position: absolute; top: 50%; transform: translateY(-50%); right: -35px;
       width: 120px; height: 120px; object-fit: contain; opacity: 0.15; z-index: 0; pointer-events: none;
     }
+
     .match-card::before, .match-card::after {
       content: ""; position: absolute; top: 0; bottom: 0; width: 6px;
       background: var(--accent); z-index: 2;
     }
     .match-card::before { left: 0; }
     .match-card::after { right: 0; }
+    
     .match-card.compact .mc-header { display: none; }
+
     .mc-header, .mc-teams { position: relative; z-index: 1; }
+
     .mc-header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 12px; padding: 0 10px;
@@ -182,19 +189,23 @@
       font-size: 9px; font-weight: 700; color: var(--muted); 
       position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap;
     }
+    
     .mc-group { font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 10px; }
     .mc-group.ga { background: var(--group-a-bg); color: var(--group-a); }
     .mc-group.gb { background: var(--group-b-bg); color: var(--group-b); }
+
     .mc-teams { display: flex; align-items: center; justify-content: space-between; padding: 0 10px; gap: 10px; }
     .mc-team { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: calc(50% - 30px);}
     .mc-team-name { font-size: 14px; font-weight: 700; text-align: center; }
     .mc-team-name.loser { color: #666; } 
     .mc-player { font-size: 10px; font-weight: 600; color: var(--muted); margin-top: 2px; text-align: center; }
+    
     .mc-score-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 60px; flex-shrink: 0;}
     .mc-score {
       background: #111; border: 1px solid #333; border-radius: 12px;
       width: 100%; text-align: center; padding: 8px 0; font-size: 16px; font-weight: 900; color: var(--accent);
     }
+    
     .md-btn {
       background: transparent; border: 1px solid var(--accent); border-radius: 12px;
       color: var(--accent); font-size: 5.5px; font-weight: 800; text-transform: uppercase;
@@ -208,11 +219,13 @@
     .dot { width: 10px; height: 10px; border-radius: 50%; }
     .dot.safe { background-color: var(--playoff-bg); border: 1px solid var(--playoff-border); }
     .dot.danger { border: 2px solid var(--loss); background-color: transparent; }
+
     .standings-table { 
       width: 100%; border-collapse: separate; border-spacing: 0 4px; 
       font-size: 12px; margin-bottom: 24px;
       table-layout: fixed; 
     }
+    
     .s-title { 
       font-size: 11px; font-weight: 800; padding: 4px 10px; 
       display: inline-block; border-radius: 8px; margin-bottom: 8px;
@@ -220,6 +233,7 @@
     }
     .s-title.ga { background: var(--group-a-bg); color: var(--group-a); }
     .s-title.gb { background: var(--group-b-bg); color: var(--group-b); }
+    
     .standings-table th:nth-child(1) { width: 38%; }
     .standings-table th:nth-child(2) { width: 10%; }
     .standings-table th:nth-child(3) { width: 8%; }
@@ -228,70 +242,131 @@
     .standings-table th:nth-child(6) { width: 10%; }
     .standings-table th:nth-child(7) { width: 8%; }
     .standings-table th:nth-child(8) { width: 10%; }
+
     .standings-table th { color: var(--muted); font-weight: 600; padding: 8px 0; text-align: center; border-bottom: 1px solid #333;}
     .standings-table th:nth-child(1) { text-align: left; padding-left: 8px; }
     .standings-table td { background: var(--surface); padding: 12px 0; text-align: center; font-weight: 600; }
     .standings-table td:first-child { border-radius: 8px 0 0 8px; padding-left: 8px; }
-    .standings-table td:nth-child(1) { text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; }
+    
+    .standings-table td:nth-child(1) { 
+      text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; 
+    }
+
     .standings-table td:last-child { border-radius: 0 8px 8px 0; color: var(--accent); font-weight: 800; }
+    
     .row-playoff td { background-color: var(--playoff-bg); }
     .row-danger td { background: var(--relegation); color: #ff9999; }
     .row-danger td:last-child { color: #ff9999; }
+    
     .s-rank { display: inline-block; width: 14px; text-align: center; font-size: 11px; color: var(--muted); margin-right: 4px; }
+
+    /* Personalizácia tabuľky */
     .my-team-row { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35)); position: relative; z-index: 10; }
     .my-team-row td { background: rgba(255, 255, 255, 0.1) !important; color: #fff; }
-    .team-details-row td { padding: 0 !important; background: #151515 !important; border-radius: 8px; }
-    .team-details-container { padding: 10px 15px; display: flex; flex-direction: column; gap: 0; box-shadow: inset 0 6px 12px rgba(0,0,0,0.5); }
-    .td-match { display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding: 6px 0; border-bottom: 1px dashed #333; }
+
+    /* Riadok s detailmi tímu (Rolldown) */
+    .team-details-row td {
+        padding: 0 !important; background: #151515 !important; border-radius: 8px;
+    }
+    .team-details-container {
+        padding: 10px 15px; display: flex; flex-direction: column; gap: 0; box-shadow: inset 0 6px 12px rgba(0,0,0,0.5);
+    }
+    .td-match {
+        display: flex; justify-content: space-between; align-items: center;
+        font-size: 11px; padding: 6px 0; border-bottom: 1px dashed #333;
+    }
     .td-match:last-child { border-bottom: none; }
     .td-opp { color: var(--muted); text-align: left; }
     .td-score { font-weight: 800; text-align: right; }
 
-    /* PLAY-OFF PAVÚK */
+    /* ════════════════════════════════════════════════════════════════
+       PLAY-OFF PAVÚK
+    ═════════════════════════════════════════════════════════════════ */
     .page.active#page-playoff {
       display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start;
       min-height: 65vh; position: relative; overflow-y: auto; overflow-x: hidden; padding-bottom: 20px;
     }
+
     .bracket-group { width: 100%; display: flex; flex-direction: column; }
     .bracket-title { font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 2px;}
     .bracket-title.ga { color: var(--group-a); }
     .bracket-title.gb { color: var(--group-b); }
+
     .bracket-container { display: flex; justify-content: center; align-items: stretch; gap: 40px; position: relative; }
     .bracket-col { display: flex; flex-direction: column; justify-content: space-around; flex: 1; max-width: 260px; position: relative; z-index: 2;}
+
     .bracket-round-title { text-align: center; font-size: 11px; font-weight: 800; color: var(--muted); letter-spacing: 1.5px; margin-bottom: 15px; text-transform: uppercase; }
+
     .semi-wrapper { display: flex; flex-direction: column; justify-content: space-around; gap: 40px; position: relative; flex: 1;}
     .col-content-center { display: flex; flex-direction: column; flex: 1; justify-content: center; position: relative; width: 100%; }
+
     .br-matchup { background: var(--surface); border: 1px solid #333; border-radius: 12px; padding: 12px; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+
     .br-seed-label { font-size: 9px; font-weight: 900; color: var(--accent); margin-bottom: 4px; margin-top: 8px; padding-left: 2px; }
     .br-seed-label.ga { color: var(--group-a); }
     .br-seed-label.gb { color: var(--group-b); }
     .br-seed-label:first-child { margin-top: 0; }
+
     .br-team-row { display: flex; align-items: center; background: #111; border: 1px solid #222; border-radius: 8px; padding: 8px; gap: 8px; position: relative; overflow: hidden;}
     .br-name { font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
     .br-player-sub { font-size: 9px; font-weight: 600; color: var(--muted); display: block; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .br-bg-logo { position: absolute; top: 50%; transform: translateY(-50%); left: -18px; width: 62px; height: 62px; object-fit: contain; opacity: 0.12; z-index: 0; pointer-events: none; }
+    .br-bg-logo {
+      position: absolute; top: 50%; transform: translateY(-50%); left: -18px;
+      width: 62px; height: 62px; object-fit: contain; opacity: 0.12; z-index: 0; pointer-events: none;
+    }
+
     .br-scores { display: flex; gap: 4px; }
     .br-score-box { width: 22px; height: 22px; background: var(--surface-light); border: 1px solid #444; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; }
+
     .br-winner-box { background: var(--surface); border: 2px solid var(--accent); border-radius: 16px; padding: 12px; text-align: center; box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.3); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;}
     .br-winner-box.ga { border-color: var(--group-a); box-shadow: 0 0 30px rgba(255, 204, 0, 0.2); }
     .br-winner-box.gb { border-color: var(--group-b); box-shadow: 0 0 30px rgba(0, 168, 150, 0.2); }
     .br-winner-name { font-size: 11px; font-weight: 900; color: #fff; margin-top: 4px; margin-bottom: 8px; text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.5);}
+
     .br-matchup::before, .br-matchup::after, .semi-wrapper::before, .semi-wrapper::after, .br-winner-box::before, .br-winner-box::after { display: none; }
+    
     .bracket-container { flex-direction: row; }
-    .bracket-col.semi .br-matchup:nth-child(1)::after { display: block; content: ""; position: absolute; right: -20px; top: 50%; width: 15px; height: calc(50% + 20px); border-top: 2px solid #444; border-right: 2px solid #444; border-top-right-radius: 6px; z-index: 0; }
-    .bracket-col.semi .br-matchup:nth-child(2)::after { display: block; content: ""; position: absolute; right: -20px; bottom: 50%; width: 15px; height: calc(50% + 20px); border-bottom: 2px solid #444; border-right: 2px solid #444; border-bottom-right-radius: 6px; z-index: 0; }
-    .bracket-col.final .br-matchup::before { display: block; content: ""; position: absolute; left: -20px; top: 50%; width: 15px; border-top: 2px solid #444; z-index: 0; }
-    .bracket-col.final .br-matchup::after { display: block; content: ""; position: absolute; right: -30px; top: 50%; width: 25px; border-top: 2px solid #444; z-index: 0; }
-    .playoff-scroll-area { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; -ms-overflow-style: none; scrollbar-width: none; }
+    
+    .bracket-col.semi .br-matchup:nth-child(1)::after {
+        display: block; content: ""; position: absolute; right: -20px; top: 50%; width: 15px; height: calc(50% + 20px); border-top: 2px solid #444; border-right: 2px solid #444; border-top-right-radius: 6px; z-index: 0;
+    }
+    .bracket-col.semi .br-matchup:nth-child(2)::after {
+        display: block; content: ""; position: absolute; right: -20px; bottom: 50%; width: 15px; height: calc(50% + 20px); border-bottom: 2px solid #444; border-right: 2px solid #444; border-bottom-right-radius: 6px; z-index: 0;
+    }
+    .bracket-col.final .br-matchup::before {
+        display: block; content: ""; position: absolute; left: -20px; top: 50%; width: 15px; border-top: 2px solid #444; z-index: 0;
+    }
+    .bracket-col.final .br-matchup::after {
+        display: block; content: ""; position: absolute; right: -30px; top: 50%; width: 25px; border-top: 2px solid #444; z-index: 0;
+    }
+
+    .playoff-scroll-area {
+        width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; -ms-overflow-style: none; scrollbar-width: none;
+    }
     .playoff-scroll-area::-webkit-scrollbar { display: none; }
-    .bracket-wrapper { display: flex; flex-direction: column; gap: 60px; width: max-content; margin: 0 auto; padding-top: 10px; }
+
+    .bracket-wrapper {
+        display: flex; flex-direction: column; gap: 60px;
+        width: max-content; margin: 0 auto; padding-top: 10px;
+    }
+
     .po-top-right-switcher { display: none; }
+
     @media (max-width: 767px) {
-        .po-top-right-switcher { display: flex; position: absolute; top: 0px; right: 0px; background: #1e1e1e; padding: 4px; border-radius: 12px; gap: 4px; border: 1px solid #333; z-index: 50; }
-        .po-sw-btn { background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: var(--muted); font-family: var(--font); font-size: 11px; font-weight: 700; padding: 6px 14px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .po-top-right-switcher {
+            display: flex; position: absolute; top: 0px; right: 0px; 
+            background: #1e1e1e; padding: 4px; border-radius: 12px; gap: 4px; border: 1px solid #333; z-index: 50;
+        }
+        .po-sw-btn {
+            background: #2a2a2a; border: 1px solid #444; border-radius: 8px;
+            color: var(--muted); font-family: var(--font); font-size: 11px; font-weight: 700;
+            padding: 6px 14px; cursor: pointer; transition: 0.2s; text-transform: uppercase;
+        }
         .po-sw-btn.active.ga { background: var(--group-a-bg); border-color: var(--group-a-bg); color: var(--group-a); }
         .po-sw-btn.active.gb { background: var(--group-b-bg); border-color: var(--group-b-bg); color: var(--group-b); }
+        
         #bracket-B { display: none; }
+        
         .playoff-scroll-area { width: calc(100% + 32px); margin-left: -16px; margin-right: -16px; }
         .bracket-wrapper { padding: 50px 50px 20px 50px; }
     }
@@ -304,9 +379,11 @@
       transition: border-color 0.3s, box-shadow 0.3s;
     }
     .coeff-title, .coeff-val { position: relative; z-index: 1; }
+
     .coeff-title { font-size: 13px; font-weight: 800; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
     .coeff-val { font-size: 48px; font-weight: 900; line-height: 1; }
     .coeff-max { font-size: 20px; color: #555; text-shadow: none !important; }
+    
     .coeff-info {
       display: none; position: relative; z-index: 1;
       font-size: 10px; font-weight: 500; color: #ccc;
@@ -315,15 +392,28 @@
       border: 1px solid #333; line-height: 1.4;
     }
     .coeff-info.show { display: block; animation: fadeIn 0.3s; }
+    
     .info-icon { cursor: pointer; color: var(--muted); transition: 0.2s; margin-left: 6px; }
     .info-icon:hover { color: var(--text); }
+
     .global-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 24px; }
-    .g-stat { background: var(--surface); border: 1px solid #333; border-radius: 12px; padding: 16px 10px; text-align: center; transition: 0.3s; }
+    .g-stat {
+      background: var(--surface); border: 1px solid #333; border-radius: 12px;
+      padding: 16px 10px; text-align: center; transition: 0.3s;
+    }
     .g-val { font-size: 22px; font-weight: 800; margin-bottom: 4px; transition: 0.3s; }
     .g-label { font-size: 9px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; line-height: 1.3;}
-    .team-stat-card { background: var(--surface); border-radius: 16px; overflow: hidden; margin-bottom: 16px; border: 1px solid #333; position: relative; }
+
+    .team-stat-card {
+      background: var(--surface); border-radius: 16px; overflow: hidden;
+      margin-bottom: 16px; border: 1px solid #333; position: relative;
+    }
     .team-stat-card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: var(--accent); }
-    .ts-header { background: var(--surface-light); padding: 12px 16px 12px 20px; font-size: 12px; font-weight: 700; color: var(--muted); border-bottom: 1px solid #333; position: relative; overflow: hidden; }
+    
+    .ts-header {
+      background: var(--surface-light); padding: 12px 16px 12px 20px;
+      font-size: 12px; font-weight: 700; color: var(--muted); border-bottom: 1px solid #333; position: relative; overflow: hidden;
+    }
     .ts-header-content { position: relative; z-index: 1; }
     .ts-name { color: #fff; font-size: 14px; font-weight: 800; }
     .ts-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: #333; }
@@ -338,88 +428,118 @@
       border-left: 6px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       transition: opacity 0.3s ease;
     }
-    .scorer-card.gold { border-left: 6px solid var(--group-a); background: linear-gradient(90deg, rgba(255, 204, 0, 0.1) 0%, var(--surface) 100%); box-shadow: 0 0 15px rgba(255,204,0,0.15); }
+    .scorer-card.gold {
+      border-left: 6px solid var(--group-a);
+      background: linear-gradient(90deg, rgba(255, 204, 0, 0.1) 0%, var(--surface) 100%);
+      box-shadow: 0 0 15px rgba(255,204,0,0.15);
+    }
     .scorer-left { display: flex; align-items: center; gap: 12px; }
     .scorer-rank { font-size: 14px; font-weight: 800; color: var(--muted); width: 24px; text-align: center; }
     .scorer-card.gold .scorer-rank { color: var(--group-a); }
     .scorer-name { font-size: 14px; font-weight: 700; color: var(--text); text-transform: uppercase; }
     .scorer-card.gold .scorer-name { color: var(--group-a); font-weight: 800; }
+    
     .scorer-right-wrap { text-align: right; }
     .scorer-val { font-size: 18px; font-weight: 900; color: var(--accent); }
     .scorer-card.gold .scorer-val { color: var(--group-a); }
     .scorer-label { font-size: 9px; font-weight: 700; color: var(--muted); display: block; margin-top: 2px; }
-    .scorer-card.my-player { border-left: 6px solid #fff; background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, var(--surface) 100%); box-shadow: 0 0 15px rgba(255,255,255,0.2); }
-    .scorer-card.my-player .scorer-rank, .scorer-card.my-player .scorer-name, .scorer-card.my-player .scorer-val { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4); }
+
+    /* Personalizácia strelca */
+    .scorer-card.my-player {
+      border-left: 6px solid #fff;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 0%, var(--surface) 100%);
+      box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
+    .scorer-card.my-player .scorer-rank,
+    .scorer-card.my-player .scorer-name,
+    .scorer-card.my-player .scorer-val {
+      color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4);
+    }
 
     /* MODÁLNE OKNÁ (NASTAVENIA & DETAILY) */
     .settings-title { font-size: 16px; font-weight: 800; color: var(--accent); margin-bottom: 20px; }
-    .md-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 2000; display: none; align-items: center; justify-content: center; animation: fadeIn 0.3s; }
-    .md-modal-content { background: rgba(22, 22, 22, 0.85); backdrop-filter: blur(15px); border: 1px solid var(--accent); border-radius: 16px; width: 90%; max-width: 450px; padding: 20px; position: relative; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.1); }
+    
+    .md-modal-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.85); backdrop-filter: blur(6px);
+        z-index: 2000; display: none; align-items: center; justify-content: center;
+        animation: fadeIn 0.3s;
+    }
+    .md-modal-content {
+        background: rgba(22, 22, 22, 0.85); backdrop-filter: blur(15px);
+        border: 1px solid var(--accent); border-radius: 16px;
+        width: 90%; max-width: 450px; padding: 20px; position: relative; max-height: 85vh; overflow-y: auto;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.1);
+    }
     .md-close { position: absolute; top: 15px; right: 15px; color: var(--muted); font-size: 20px; cursor: pointer; transition: 0.2s;}
     .md-close:hover { color: var(--text); }
+    
     .md-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid #333; }
     .md-title { font-size: 11px; font-weight: 800; color: var(--accent); letter-spacing: 1px; margin-bottom: 8px; text-align: center;}
     .md-center { text-align: center; font-size: 16px; font-weight: 900; }
+    
     .md-pred-table { width: 100%; font-size: 11px; text-align: center; border-collapse: collapse; margin-top: 10px; }
     .md-pred-table th { padding-bottom: 6px; color: var(--muted); border-bottom: 1px solid #444; font-weight: 800; }
     .md-pred-table td { padding: 8px 0; border-bottom: 1px dashed #222; font-weight: 700;}
     .md-pred-table tr:last-child td { border-bottom: none; }
 
-    /* FANTASY MATCH CARDS (Nové rozdelenie 70/30) */
+    /* FANTASY TABS */
+    #fantasy-leaderboard-view { display: none; }
+
+    /* FANTASY MATCH CARDS (Dizajn s 8px medzerou) */
     .f-card {
-        display: flex; background: var(--surface); border-radius: 12px;
-        margin-bottom: 12px; overflow: hidden; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        display: flex; gap: 8px; margin-bottom: 12px; width: 100%; background: transparent; border: none; box-shadow: none;
     }
     .f-info {
-        flex: 0 0 70%; padding: 12px; display: flex; flex-direction: column;
-        border-right: 1px solid #333; justify-content: center;
+        flex: 0 0 calc(70% - 4px); background: var(--surface); border-radius: 12px;
+        padding: 14px 12px; display: flex; flex-direction: column; justify-content: center;
+        border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
     .f-datetime {
-        font-size: 9px; font-weight: 800; color: var(--muted); margin-bottom: 12px;
+        font-size: 9px; font-weight: 800; color: var(--muted); margin-bottom: 12px; letter-spacing: 0.5px;
     }
-    .f-matchup {
-        display: flex; justify-content: space-between; align-items: center;
-    }
-    .f-teams {
-        display: flex; flex-direction: column; gap: 8px;
-    }
+    .f-matchup { display: flex; justify-content: space-between; align-items: center; }
+    .f-teams { display: flex; flex-direction: column; gap: 8px; }
     .f-team {
         font-size: 14px; font-weight: 800; color: var(--text); text-align: left;
         white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;
     }
-    .f-score {
-        display: flex; flex-direction: column; gap: 8px; text-align: right;
+    .f-score { display: flex; flex-direction: column; gap: 8px; text-align: right; }
+    .f-score-val { font-size: 14px; font-weight: 900; color: var(--accent); }
+    
+    .f-action-wrapper {
+        flex: 0 0 calc(30% - 4px); display: flex; flex-direction: column; gap: 4px; justify-content: stretch;
     }
-    .f-score-val {
-        font-size: 14px; font-weight: 900; color: var(--accent);
+    .f-btn {
+        flex: 1; border-radius: 12px; border: none; font-family: var(--font);
+        font-size: 9.5px; font-weight: 800; text-transform: uppercase; cursor: pointer;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); padding: 4px; text-align: center;
     }
-    .f-action {
-        flex: 0 0 30%; background: var(--surface-light); border: none;
-        color: var(--accent); font-family: var(--font); font-size: 10px;
-        font-weight: 800; text-transform: uppercase; cursor: pointer;
-        display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s;
-    }
-    .f-action:hover { background: #333; }
+    .f-btn:hover { filter: brightness(1.15); }
+    .f-btn i { font-size: 14px; margin-bottom: 3px; }
+    
+    /* Stavy tlačidiel FANTASY na karte */
+    .f-btn-predict { background: var(--surface-light); color: var(--accent); border: 1px solid #444; }
+    .f-btn-draft { background: var(--surface-light); color: var(--text); border: 1px dashed #555; }
+    .f-btn-lock-action { background: rgba(var(--accent-rgb), 0.1); color: var(--accent); border: 1px solid var(--accent); }
+    .f-btn-locked-val { background: var(--accent); color: var(--accent-contrast); border: 1px solid var(--accent); pointer-events: none; }
+    .f-btn-locked-state { background: #1a1a1a; color: #555; border: 1px solid #222; pointer-events: none; }
 
-    /* FANTASY PREDICTOR MODAL */
+    /* FANTASY PREDICTOR MODAL (Vo vnútri okna) */
     .pred-tabs { display: flex; background: #111; border-radius: 8px; padding: 4px; gap: 4px; margin-bottom: 16px; }
     .pred-tab { flex: 1; background: transparent; border: none; color: var(--muted); font-family: var(--font); font-size: 9px; font-weight: 800; padding: 10px 0; border-radius: 6px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
     .pred-tab.active { background: var(--surface-light); color: var(--text); border: 1px solid #444; }
-    
     .pred-content { display: none; text-align: center; }
     .pred-content.active { display: block; animation: fadeIn 0.3s; }
-    
     .pred-explainer { font-size: 10px; color: var(--group-a); font-weight: 800; margin-bottom: 16px; background: var(--group-a-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--group-a); }
-    
     .pred-options { display: flex; justify-content: center; gap: 10px; margin-bottom: 24px; }
     .pred-opt-btn { background: var(--surface); border: 2px solid #444; color: var(--text); border-radius: 8px; padding: 14px; font-size: 18px; font-weight: 900; cursor: pointer; transition: 0.2s; flex: 1; font-family: var(--font); }
     .pred-opt-btn.selected { border-color: var(--accent); background: rgba(var(--accent-rgb), 0.1); color: var(--accent); box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3); }
-    
     .pred-score-inputs { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 24px; }
     .pred-input { width: 65px; height: 65px; background: #111; border: 2px solid #444; border-radius: 12px; text-align: center; font-size: 26px; font-weight: 900; color: var(--text); font-family: var(--font); }
     .pred-input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3); }
-    
-    .btn-lock { background: var(--accent); color: var(--accent-contrast); border: none; width: 100%; padding: 16px 0; font-size: 12px; font-family: var(--font); font-weight: 900; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; transition: 0.2s; }
+    .btn-lock { background: var(--accent); color: var(--accent-contrast); border: none; width: 100%; padding: 16px 0; font-size: 11px; font-family: var(--font); font-weight: 900; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; text-transform: uppercase; transition: 0.2s; }
     .btn-lock:hover { filter: brightness(1.1); }
 
     /* BOTTOM NAV */
@@ -438,16 +558,13 @@
       display: flex; flex-wrap: wrap; justify-content: flex-start; align-content: flex-start;
       width: 100%; padding-top: 5px; height: calc(100% - 24px);
     }
-    
     .nav-item {
       position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-      color: var(--muted); cursor: pointer; transition: 0.2s; height: 60px; 
+      color: var(--muted); cursor: pointer; transition: 0.2s; width: 25%; height: 60px; 
     }
-    .nav-item.top-row { width: 25%; transform: translateY(-5px); }
-    .nav-item.bottom-row { width: 33.33%; margin-top: 10px; }
-    .nav-item.top-row:not(:last-child)::after { content: ""; position: absolute; right: 0; top: 25%; bottom: 25%; width: 2px; background: #333; }
-    .nav-item.bottom-row:not(:last-child)::after { content: ""; position: absolute; right: 0; top: 25%; bottom: 25%; width: 2px; background: #333; }
     
+    .nav-item:nth-child(1), .nav-item:nth-child(2), .nav-item:nth-child(3), .nav-item:nth-child(4) { transform: translateY(-5px); }
+    .nav-item:not(:nth-child(4n))::after { content: ""; position: absolute; right: 0; top: 25%; bottom: 25%; width: 2px; background: #333; }
     .nav-item i { font-size: 20px; }
     .nav-item span { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;}
     .nav-item.active { color: var(--accent); }
@@ -463,10 +580,15 @@
 
     /* LOADER & EMPTY */
     .loader, .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-weight: 600; width: 100%; }
-    .spinner { width: 30px; height: 30px; border: 3px solid #333; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+    .spinner {
+      width: 30px; height: 30px; border: 3px solid #333; border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
     
-    /* DESKTOP OPTIMALIZÁCIA */
+    /* ════════════════════════════════════════════════════════════════
+       DESKTOP OPTIMALIZÁCIA (GRID DASHBOARD)
+    ═════════════════════════════════════════════════════════════════ */
     @media (min-width: 1024px) {
       body { max-width: 100%; min-height: 100vh; }
       header { padding: 15px 40px; }
@@ -475,13 +597,25 @@
       .desktop-settings-btn { color: var(--muted); font-size: 20px; cursor: pointer; transition: 0.2s; }
       .desktop-settings-btn:hover { color: var(--text); }
       
-      main { padding: 20px 40px; padding-bottom: 40px; display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: start; }
+      main {
+        padding: 20px 40px; padding-bottom: 40px;
+        display: grid !important; grid-template-columns: 1fr 1fr 1fr; gap: 20px;
+        align-items: start;
+      }
       
       .page {
-        display: flex !important; flex-direction: column; background: rgba(18, 18, 18, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 20px; overflow-y: auto; animation: none; height: 70vh; box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.05), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 -1px 1px rgba(0,0,0,0.6); 
+        display: flex !important; flex-direction: column;
+        background: rgba(18, 18, 18, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.12); 
+        border-radius: 16px; padding: 20px; overflow-y: auto; animation: none;
+        height: 70vh;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.05), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 -1px 1px rgba(0,0,0,0.6); 
       }
+
       .desktop-page-title {
-          display: flex !important; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 900; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; width: 100%; flex-shrink: 0;
+          display: flex !important; justify-content: space-between; align-items: center; 
+          font-size: 20px; font-weight: 900; color: var(--accent);
+          letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;
+          border-bottom: 1px solid #333; padding-bottom: 10px; width: 100%; flex-shrink: 0;
       }
       .desktop-page-title i { opacity: 0.8; }
       
@@ -489,12 +623,19 @@
       #page-poradie { grid-column: 2 / 3; grid-row: 1 / 2; display: block !important; }
       #page-vykony  { grid-column: 3 / 4; grid-row: 1 / 2; display: block !important; }
       #page-strelci { grid-column: 1 / 2; grid-row: 2 / 3; display: block !important; }
-      #page-fantasy { grid-column: 2 / 3; grid-row: 2 / 3; display: block !important; border: 1px solid var(--accent); }
-      #page-playoff { grid-column: 3 / 4; grid-row: 2 / 3; justify-content: flex-start; align-items: center; border: 1px solid var(--accent) !important; }
+      
+      #page-playoff { 
+        grid-column: 2 / 4; grid-row: 2 / 3; 
+        justify-content: flex-start; align-items: center; 
+        border: 1px solid var(--accent) !important;
+      }
       
       #bottom-nav { display: none !important; }
     }
-    @media (max-width: 1023px) { .desktop-settings-wrap { display: none; } }
+    
+    @media (max-width: 1023px) {
+      .desktop-settings-wrap { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -599,23 +740,74 @@
       </div>
     </div>
 
-    <!-- ZÁLOŽKA FANTASY PREDICTOR -->
     <div class="page" id="page-fantasy">
       <div class="desktop-page-title">
         <span>FANTASY</span>
         <i class="fa-solid fa-star"></i>
       </div>
-      <div id="fantasy-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-         <div class="section-title" style="margin-bottom: 0;">TVOJE PREDIKCIE</div>
+      
+      <div class="global-switcher">
+          <button class="gs-btn active" id="f-tab-btn-preds" onclick="switchFantasyTab('preds')">MOJE PREDIKCIE</button>
+          <button class="gs-btn" id="f-tab-btn-leader" onclick="switchFantasyTab('leader')">PORADIE HRÁČOV</button>
       </div>
-      <div id="fantasy-content">
-         <div class="loader"><div class="spinner"></div>Načítavam dáta predikcií...</div>
+      
+      <div id="fantasy-matches-view">
+          <div id="fantasy-content">
+             <div class="loader"><div class="spinner"></div>Načítavam dáta predikcií...</div>
+          </div>
+      </div>
+      
+      <div id="fantasy-leaderboard-view">
+           <table class="standings-table">
+              <thead>
+                  <tr>
+                      <th><span class="s-rank">#</span> HRÁČ</th>
+                      <th style="width: 30%;">BODY</th>
+                  </tr>
+              </thead>
+              <tbody id="fantasy-leaderboard-content">
+                  </tbody>
+           </table>
       </div>
     </div>
 
   </main>
 
-  <!-- MODAL: FANTASY PRIHLÁSENIE -->
+  <div id="settings-modal" class="md-modal-overlay">
+    <div class="md-modal-content">
+      <i class="fa-solid fa-xmark md-close" onclick="closeSettingsModal()"></i>
+      <div class="settings-title">NASTAVENIA</div>
+      
+      <div class="section-title" style="font-size: 12px; margin-bottom: 8px;">MÔJ PROFIL (HRÁČ)</div>
+      <select class="dropdown" id="userSelect" onchange="saveUser()">
+        <option value="">-- VYBER SVOJE MENO --</option>
+      </select>
+      <div class="po-text" style="font-size: 10px; margin-top: -10px; text-align: left; margin-bottom: 24px;">
+        Aplikácia sa automaticky prispôsobí a zvýrazní tvoje tímy a štatistiky.
+      </div>
+      
+      <div class="section-title" style="font-size: 12px; margin-bottom: 8px;">FARBA APLIKÁCIE</div>
+      <select class="dropdown" id="themeSelect" onchange="saveTheme()">
+        <option value="orange">Oranžová (Predvolená)</option>
+        <option value="pink">Ružová</option>
+        <option value="purple">Fialová</option>
+        <option value="blue">Modrá</option>
+        <option value="green">Zelená</option>
+        <option value="red">Červená</option>
+      </select>
+      <div class="po-text" style="font-size: 10px; margin-top: -10px; text-align: left;">
+        Zmení hlavnú akcentnú farbu celej aplikácie na žiarivý neónový odtieň.
+      </div>
+    </div>
+  </div>
+
+  <div id="match-modal" class="md-modal-overlay">
+    <div class="md-modal-content">
+       <i class="fa-solid fa-xmark md-close" onclick="closeMatchModal()"></i>
+       <div id="match-modal-body"></div>
+    </div>
+  </div>
+
   <div id="auth-modal" class="md-modal-overlay">
     <div class="md-modal-content" style="max-width: 350px;">
       <i class="fa-solid fa-xmark md-close" onclick="closeAuthModal()"></i>
@@ -640,7 +832,6 @@
     </div>
   </div>
 
-  <!-- MODAL: FANTASY TIPOVANIE -->
   <div id="predictor-modal" class="md-modal-overlay">
     <div class="md-modal-content">
       <i class="fa-solid fa-xmark md-close" onclick="closePredictorModal()"></i>
@@ -678,44 +869,10 @@
           </div>
       </div>
       
-      <button class="btn-lock" onclick="lockPrediction()"><i class="fa-solid fa-lock"></i> UZAMKNÚŤ TIP</button>
-    </div>
-  </div>
-
-  <!-- MODAL: NASTAVENIA -->
-  <div id="settings-modal" class="md-modal-overlay">
-    <div class="md-modal-content">
-      <i class="fa-solid fa-xmark md-close" onclick="closeSettingsModal()"></i>
-      <div class="settings-title">NASTAVENIA</div>
-      
-      <div class="section-title" style="font-size: 12px; margin-bottom: 8px;">MÔJ PROFIL (HRÁČ)</div>
-      <select class="dropdown" id="userSelect" onchange="saveUser()">
-        <option value="">-- VYBER SVOJE MENO --</option>
-      </select>
-      <div class="po-text" style="font-size: 10px; margin-top: -10px; text-align: left; margin-bottom: 24px;">
-        Aplikácia sa automaticky prispôsobí a zvýrazní tvoje tímy a štatistiky.
+      <div style="display: flex; gap: 8px; margin-top: 10px;">
+          <button class="btn-lock" style="flex: 4; background: #2a2a2a; color: var(--text); border: 1px solid #444;" onclick="submitPrediction(false)">PREDBEŽNE ULOŽIŤ</button>
+          <button class="btn-lock" style="flex: 6;" onclick="submitPrediction(true)"><i class="fa-solid fa-lock"></i> UZAMKNÚŤ TIP</button>
       </div>
-      
-      <div class="section-title" style="font-size: 12px; margin-bottom: 8px;">FARBA APLIKÁCIE</div>
-      <select class="dropdown" id="themeSelect" onchange="saveTheme()">
-        <option value="orange">Oranžová (Predvolená)</option>
-        <option value="pink">Ružová</option>
-        <option value="purple">Fialová</option>
-        <option value="blue">Modrá</option>
-        <option value="green">Zelená</option>
-        <option value="red">Červená</option>
-      </select>
-      <div class="po-text" style="font-size: 10px; margin-top: -10px; text-align: left;">
-        Zmení hlavnú akcentnú farbu celej aplikácie na žiarivý neónový odtieň.
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: DETAIL ZÁPASU -->
-  <div id="match-modal" class="md-modal-overlay">
-    <div class="md-modal-content">
-       <i class="fa-solid fa-xmark md-close" onclick="closeMatchModal()"></i>
-       <div id="match-modal-body"></div>
     </div>
   </div>
 
@@ -724,46 +881,28 @@
       <div class="nav-handle"></div>
     </div>
     <div class="nav-items-container">
-      <!-- 1. RIADOK -->
-      <div class="nav-item top-row active" onclick="navTo('zapasy', this)">
+      <div class="nav-item active" onclick="navTo('zapasy', this)">
         <i class="fa-solid fa-futbol"></i><span>Zápasy</span>
       </div>
-      <div class="nav-item top-row" onclick="navTo('poradie', this)">
+      <div class="nav-item" onclick="navTo('poradie', this)">
         <i class="fa-solid fa-list-ol"></i><span>Poradie</span>
       </div>
-      <div class="nav-item top-row" onclick="navTo('vykony', this)">
-        <i class="fa-solid fa-chart-simple"></i><span>Výkony</span>
-      </div>
-      <div class="nav-item top-row fantasy-tab" id="nav-fantasy" onclick="handleFantasyNav(this)">
-        <i class="fa-solid fa-star"></i><span>Fantasy</span>
-      </div>
-      
-      <!-- 2. RIADOK -->
-      <div class="nav-item bottom-row" onclick="navTo('strelci', this)">
-        <i class="fa-solid fa-bullseye"></i><span>Strelci</span>
-      </div>
-      <div class="nav-item bottom-row" onclick="navTo('playoff', this)">
+      <div class="nav-item" onclick="navTo('playoff', this)">
         <i class="fa-solid fa-trophy"></i><span>Play-off</span>
       </div>
-      <div class="nav-item bottom-row" onclick="navTo('nastavenia', this)">
+      <div class="nav-item" onclick="navTo('vykony', this)">
+        <i class="fa-solid fa-chart-simple"></i><span>Výkony</span>
+      </div>
+      <div class="nav-item" onclick="navTo('strelci', this)">
+        <i class="fa-solid fa-bullseye"></i><span>Strelci</span>
+      </div>
+      <div class="nav-item" onclick="navTo('nastavenia', this)">
         <i class="fa-solid fa-gear"></i><span>Nastavenia</span>
       </div>
     </div>
   </nav>
 
 <script>
-// ═══════════════════════════════════════
-// TVOJE API PREPOJENIE NA BACKEND (FANTASY)
-// ═══════════════════════════════════════
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxMExBdBDSmji5w_9IgYCKxHbrmmkBSu0K8FrhwySvgxNq4dvHNToi4FfQt7RVOP9Wo/exec"; // <-- TU VLOŽ SVOJ VYGENEROVANÝ ODKAZ Z APPS SCRIPTU
-const FANTASY_PLAYERS = ['Kristián', 'Dávid', 'Matej', 'Filip'];
-let FANTASY_MATCHES = []; // Tu sa uložia načítané dáta pre Fantasy
-
-// Globálne premenné pre rozpracovanú predikciu
-let currentPredMatchId = null;
-let currentPredMode = 1;
-let currentPredValue = null;
-
 // ═══════════════════════════════════════
 // KONFIGURÁCIA TÉM A FARIEB
 // ═══════════════════════════════════════
@@ -775,6 +914,19 @@ const THEMES = {
   green:  { accent: '#00FF4D', rgb: '0, 255, 77',  c6: '#66FF8E', c4: '#99FFB4', c2: '#CCFFD9', text: '#000000' },
   red:    { accent: '#FF003C', rgb: '255, 0, 60',  c6: '#FF668A', c4: '#FF99B0', c2: '#FFCCD7', text: '#ffffff' }
 };
+
+// ═══════════════════════════════════════
+// TVOJE API PREPOJENIE NA BACKEND (FANTASY)
+// ═══════════════════════════════════════
+const WEB_APP_URL = "SEM_VLOZIS_SVOJ_LINK"; // <-- TU VLOŽ SVOJ VYGENEROVANÝ ODKAZ Z APPS SCRIPTU
+const FANTASY_PLAYERS = ['Kristián', 'Dávid', 'Matej', 'Filip'];
+let FANTASY_MATCHES = []; 
+
+// Lokálna pamäť pre simuláciu UI predikcií
+let localPreds = {}; 
+let currentPredMatchId = null;
+let currentPredMode = 1;
+let currentPredValue = null;
 
 // ═══════════════════════════════════════
 // KONFIGURÁCIA CSV
@@ -865,224 +1017,6 @@ function closeSettingsModal() {
 }
 
 // ═══════════════════════════════════════
-// FANTASY AUTENTIFIKÁCIA A LOGIKA ZOBRAZENIA
-// ═══════════════════════════════════════
-function handleFantasyNav(el) {
-    const savedName = localStorage.getItem('fantasy_name');
-    const savedPin = localStorage.getItem('fantasy_pin');
-    
-    if (savedName && savedPin) {
-        navTo('fantasy', el);
-        fetchFantasyData(savedName, savedPin); // Opätovné načítanie pre aktualizáciu dát
-    } else {
-        document.getElementById('auth-modal').style.display = 'flex';
-        document.getElementById('bottom-nav').classList.remove('expanded');
-    }
-}
-
-function closeAuthModal() {
-    document.getElementById('auth-modal').style.display = 'none';
-}
-
-function authenticateFantasy() {
-    const name = document.getElementById('authNameSelect').value;
-    const pin = document.getElementById('authPinInput').value;
-    const errEl = document.getElementById('auth-error');
-    const btn = document.getElementById('authSubmitBtn');
-    
-    if (!name || !pin) {
-        errEl.textContent = "Vyplň všetky údaje!";
-        errEl.style.display = "block"; return;
-    }
-    
-    errEl.style.display = "none";
-    btn.innerHTML = '<div class="spinner" style="width: 15px; height: 15px; border-width: 2px; margin: 0; display: inline-block; vertical-align: middle;"></div> Overujem...';
-    btn.disabled = true;
-    
-    if (WEB_APP_URL === "SEM_VLOZIS_SVOJ_LINK") {
-        errEl.textContent = "Nezabudni nastaviť WEB_APP_URL v kóde!";
-        errEl.style.display = "block";
-        btn.innerHTML = 'OVERIŤ PRÍSTUP'; btn.disabled = false; return;
-    }
-    
-    const url = `${WEB_APP_URL}?action=getMatches&player_name=${encodeURIComponent(name)}&pin_code=${encodeURIComponent(pin)}`;
-    
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            btn.innerHTML = 'OVERIŤ PRÍSTUP'; btn.disabled = false;
-            
-            if(data.success && data.matches) {
-                localStorage.setItem('fantasy_name', name);
-                localStorage.setItem('fantasy_pin', pin);
-                FANTASY_MATCHES = data.matches;
-                closeAuthModal();
-                navTo('fantasy', document.getElementById('nav-fantasy'));
-                renderFantasyMatches();
-            } else {
-                errEl.textContent = "Neplatné meno alebo PIN kód!";
-                errEl.style.display = "block";
-            }
-        })
-        .catch(error => {
-            console.error("Chyba:", error);
-            btn.innerHTML = 'OVERIŤ PRÍSTUP'; btn.disabled = false;
-            errEl.textContent = "Chyba pripojenia. Skontroluj internet alebo odkaz.";
-            errEl.style.display = "block";
-        });
-}
-
-function fetchFantasyData(name, pin) {
-    const content = document.getElementById('fantasy-content');
-    content.innerHTML = '<div class="loader"><div class="spinner"></div>Aktualizujem dáta...</div>';
-    
-    if (WEB_APP_URL === "SEM_VLOZIS_SVOJ_LINK") {
-        // Fallback pre testovanie UI bez funkčného backendu, berie dáta z public tabuľky
-        FANTASY_MATCHES = DATA.zapasy.map(m => ({
-            match_id: m.id, home_team: m.domaci, away_team: m.host,
-            match_date: "12.06.2026", match_time: "18:00",
-            real_score_home: m.goly_domaci, real_score_away: m.goly_host
-        }));
-        renderFantasyMatches();
-        return;
-    }
-    
-    const url = `${WEB_APP_URL}?action=getMatches&player_name=${encodeURIComponent(name)}&pin_code=${encodeURIComponent(pin)}`;
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-          if(data.success) {
-              FANTASY_MATCHES = data.matches;
-              renderFantasyMatches();
-          } else {
-              content.innerHTML = '<div class="empty">Chyba: ' + data.error + '</div>';
-          }
-      }).catch(err => {
-          content.innerHTML = '<div class="empty">Chyba pripojenia.</div>';
-      });
-}
-
-function renderFantasyMatches() {
-    if(!FANTASY_MATCHES || FANTASY_MATCHES.length === 0) {
-        document.getElementById('fantasy-content').innerHTML = '<div class="empty">Žiadne zápasy na tipovanie.</div>';
-        return;
-    }
-    
-    let html = '';
-    FANTASY_MATCHES.forEach(m => {
-        // Poistenie názvov premenných pre zhodu s front/back
-        const hTeam = m.home_team || m.domaci || "Tím 1"; 
-        const aTeam = m.away_team || m.host || "Tím 2";
-        const hScore = (m.real_score_home !== undefined && m.real_score_home !== '') ? m.real_score_home : '?';
-        const aScore = (m.real_score_away !== undefined && m.real_score_away !== '') ? m.real_score_away : '?';
-        const datetime = (m.match_date && m.match_time) ? `${m.match_date} | ${m.match_time}` : 'ČAS NEURČENÝ';
-        
-        // Zostavenie 70/30 karty
-        html += `
-        <div class="f-card">
-          <div class="f-info">
-             <div class="f-datetime">${datetime}</div>
-             <div class="f-matchup">
-                 <div class="f-teams">
-                     <div class="f-team">${hTeam}</div>
-                     <div class="f-team">${aTeam}</div>
-                 </div>
-                 <div class="f-score">
-                     <div class="f-score-val">${hScore}</div>
-                     <div class="f-score-val">${aScore}</div>
-                 </div>
-             </div>
-          </div>
-          <button class="f-action" onclick="openPredictorModal('${m.match_id || m.id}', '${hTeam}', '${aTeam}')">
-             <i class="fa-solid fa-bolt" style="font-size: 16px; margin-bottom: 2px;"></i>
-             PREDIKCIE
-          </button>
-        </div>
-        `;
-    });
-    
-    document.getElementById('fantasy-content').innerHTML = html;
-}
-
-// ═══════════════════════════════════════
-// LOGIKA - FANTASY PREDICTOR MODAL
-// ═══════════════════════════════════════
-function openPredictorModal(matchId, home, away) {
-    currentPredMatchId = matchId;
-    document.getElementById('pred-modal-title').innerText = `${home} vs ${away}`;
-    
-    // Vyčistenie a reset do Módu 1
-    switchPredMode(1);
-    document.getElementById('pred-score-home').value = '';
-    document.getElementById('pred-score-away').value = '';
-    
-    document.getElementById('predictor-modal').style.display = 'flex';
-}
-
-function closePredictorModal() {
-    document.getElementById('predictor-modal').style.display = 'none';
-}
-
-function switchPredMode(mode) {
-    currentPredMode = mode;
-    currentPredValue = null; // Vyčistíme výber pri zmene tabu
-    
-    // Vyčistenie UI výberu
-    document.querySelectorAll('.pred-opt-btn').forEach(b => b.classList.remove('selected'));
-    
-    // Zmena Tabov
-    document.querySelectorAll('.pred-tab').forEach((tab, index) => {
-        if (index + 1 === mode) tab.classList.add('active');
-        else tab.classList.remove('active');
-    });
-    
-    // Zobrazenie príslušného obsahu
-    document.querySelectorAll('.pred-content').forEach((content, index) => {
-        if (index + 1 === mode) content.classList.add('active');
-        else content.classList.remove('active');
-    });
-}
-
-function selectPrediction(mode, val, btnEl) {
-    if (currentPredMode !== mode) return;
-    
-    if (mode === 1 || mode === 2) {
-        currentPredValue = val;
-        const container = document.getElementById(`pred-mode-${mode}`);
-        container.querySelectorAll('.pred-opt-btn').forEach(b => b.classList.remove('selected'));
-        if (btnEl) btnEl.classList.add('selected');
-    } 
-    else if (mode === 3) {
-        currentPredValue = "exact"; // len flag, že píšeme skóre
-    }
-}
-
-function lockPrediction() {
-    let payloadValue = null;
-    let finalMode = currentPredMode;
-    
-    if (currentPredMode === 1 || currentPredMode === 2) {
-        if (!currentPredValue || currentPredValue === "exact") {
-            alert("Vyber jednu z možností pred uzamknutím!");
-            return;
-        }
-        payloadValue = currentPredValue; // napr. "1X" alebo "2"
-    } else if (currentPredMode === 3) {
-        const h = document.getElementById('pred-score-home').value;
-        const a = document.getElementById('pred-score-away').value;
-        if (h === '' || a === '') {
-            alert("Zadaj presné skóre pre oba tímy!");
-            return;
-        }
-        payloadValue = `${h}:${a}`; // napr. "2:1"
-    }
-    
-    // ZÁSTUPNÝ ALERT (Kým nepridáme novú funkciu do Apps Scriptu)
-    alert(`Úspech! Vybral si si Mód ${finalMode} a tvoj tip je: [ ${payloadValue} ]\n\nV ďalšom kroku toto prepojíme priamo na zápis do Google Sheets databázy.`);
-    closePredictorModal();
-}
-
-// ═══════════════════════════════════════
 // PARSOVANIE A NAČÍTANIE
 // ═══════════════════════════════════════
 function parseLine(line) {
@@ -1150,6 +1084,222 @@ function updateProgress() {
   
   document.getElementById('prog-text').textContent = `${played}/${total}`;
   document.getElementById('prog-donut').style.setProperty('--pct', pct);
+}
+
+// ═══════════════════════════════════════
+// FANTASY AUTENTIFIKÁCIA A LOGIKA ZOBRAZENIA
+// ═══════════════════════════════════════
+function handleFantasyNav(el) {
+    const savedName = localStorage.getItem('fantasy_name');
+    const savedPin = localStorage.getItem('fantasy_pin');
+    
+    if (savedName && savedPin) {
+        navTo('fantasy', el);
+        fetchFantasyData(savedName, savedPin);
+    } else {
+        document.getElementById('auth-modal').style.display = 'flex';
+        document.getElementById('bottom-nav').classList.remove('expanded');
+    }
+}
+function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
+
+function authenticateFantasy() {
+    const name = document.getElementById('authNameSelect').value;
+    const pin = document.getElementById('authPinInput').value;
+    const errEl = document.getElementById('auth-error');
+    const btn = document.getElementById('authSubmitBtn');
+    
+    if (!name || !pin) { errEl.textContent = "Vyplň všetky údaje!"; errEl.style.display = "block"; return; }
+    errEl.style.display = "none";
+    btn.innerHTML = '<div class="spinner" style="width: 15px; height: 15px; border-width: 2px; margin: 0; display: inline-block; vertical-align: middle;"></div> Overujem...';
+    btn.disabled = true;
+    
+    if (WEB_APP_URL === "SEM_VLOZIS_SVOJ_LINK") {
+        errEl.textContent = "Nezabudni nastaviť WEB_APP_URL v kóde!";
+        errEl.style.display = "block"; btn.innerHTML = 'OVERIŤ PRÍSTUP'; btn.disabled = false; return;
+    }
+    
+    const url = `${WEB_APP_URL}?action=getMatches&player_name=${encodeURIComponent(name)}&pin_code=${encodeURIComponent(pin)}`;
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            btn.innerHTML = 'OVERIŤ PRÍSTUP'; btn.disabled = false;
+            if(data.success && data.matches) {
+                localStorage.setItem('fantasy_name', name); localStorage.setItem('fantasy_pin', pin);
+                FANTASY_MATCHES = data.matches; closeAuthModal(); navTo('fantasy', document.getElementById('nav-fantasy')); renderFantasyMatches();
+            } else { errEl.textContent = "Neplatné meno alebo PIN kód!"; errEl.style.display = "block"; }
+        })
+        .catch(error => { btn.innerHTML = 'OVERIŤ PRÍSTUP'; btn.disabled = false; errEl.textContent = "Chyba pripojenia. Skontroluj internet alebo odkaz."; errEl.style.display = "block"; });
+}
+
+function fetchFantasyData(name, pin) {
+    const content = document.getElementById('fantasy-content');
+    content.innerHTML = '<div class="loader"><div class="spinner"></div>Aktualizujem dáta...</div>';
+    
+    if (WEB_APP_URL === "SEM_VLOZIS_SVOJ_LINK") {
+        // Fallback pre testovanie UI
+        FANTASY_MATCHES = DATA.zapasy.map(m => ({ match_id: m.id, home_team: m.domaci, away_team: m.host, match_date: "2026-06-12", match_time: "18:00", real_score_home: m.goly_domaci, real_score_away: m.goly_host }));
+        renderFantasyMatches(); return;
+    }
+    
+    const url = `${WEB_APP_URL}?action=getMatches&player_name=${encodeURIComponent(name)}&pin_code=${encodeURIComponent(pin)}`;
+    fetch(url).then(res => res.json()).then(data => {
+          if(data.success) { FANTASY_MATCHES = data.matches; renderFantasyMatches(); } 
+          else { content.innerHTML = '<div class="empty">Chyba: ' + data.error + '</div>'; }
+      }).catch(err => { content.innerHTML = '<div class="empty">Chyba pripojenia.</div>'; });
+}
+
+// Opravená funkcia pre správne formátovanie dátumu
+function formatDateTime(d, t) {
+    if(!d) return "ČAS NEURČENÝ";
+    try {
+        let dateStr = d.split('T')[0];
+        let dateParts;
+        if (dateStr.includes('-')) {
+            dateParts = dateStr.split('-');
+            if (dateParts[0].length === 4) return `${parseInt(dateParts[2])}. ${parseInt(dateParts[1])}. ${dateParts[0]} | ${t || ''}`;
+        } else if (dateStr.includes('/')) {
+            dateParts = dateStr.split('/');
+            return `${parseInt(dateParts[1])}. ${parseInt(dateParts[0])}. ${dateParts[2]} | ${t || ''}`;
+        }
+    } catch(e) {}
+    return `${d} | ${t || ''}`;
+}
+
+function renderFantasyMatches() {
+    if(!FANTASY_MATCHES || FANTASY_MATCHES.length === 0) {
+        document.getElementById('fantasy-content').innerHTML = '<div class="empty">Žiadne zápasy na tipovanie.</div>'; return;
+    }
+    
+    let html = '';
+    FANTASY_MATCHES.forEach(m => {
+        const mId = m.match_id || m.id; const hTeam = m.home_team || m.domaci || "Tím 1"; const aTeam = m.away_team || m.host || "Tím 2";
+        const hScore = (m.real_score_home !== undefined && m.real_score_home !== '') ? m.real_score_home : '?';
+        const aScore = (m.real_score_away !== undefined && m.real_score_away !== '') ? m.real_score_away : '?';
+        const datetime = formatDateTime(m.match_date, m.match_time);
+        
+        let predState = 'none'; let predDisplay = '';
+        let myPred = localPreds[mId] || m.my_prediction; 
+        if (myPred) { predState = myPred.locked ? 'locked' : 'draft'; predDisplay = myPred.val; }
+
+        let actionHtml = '';
+        if (predState === 'none') {
+            actionHtml = `
+            <div class="f-action-wrapper">
+                <button class="f-btn f-btn-predict" onclick="openPredictorModal('${mId}', '${hTeam}', '${aTeam}')">
+                    <i class="fa-solid fa-plus"></i>PREDIKOVAŤ
+                </button>
+            </div>`;
+        } else if (predState === 'draft') {
+            actionHtml = `
+            <div class="f-action-wrapper">
+                <button class="f-btn f-btn-draft" onclick="openPredictorModal('${mId}', '${hTeam}', '${aTeam}')">
+                    <span style="font-size: 8px; font-weight: 600;">KONCEPT</span>
+                    <span style="font-size: 14px; margin-top:2px; font-weight: 900;">${predDisplay}</span>
+                </button>
+                <button class="f-btn f-btn-lock-action" onclick="quickLockPrediction('${mId}')">
+                    <i class="fa-solid fa-lock"></i>ZAMKNÚŤ
+                </button>
+            </div>`;
+        } else if (predState === 'locked') {
+            actionHtml = `
+            <div class="f-action-wrapper">
+                <button class="f-btn f-btn-locked-val">
+                    <span style="font-size: 8px; font-weight: 600;">TVOJ TIP</span>
+                    <span style="font-size: 14px; margin-top:2px; font-weight: 900;">${predDisplay}</span>
+                </button>
+                <button class="f-btn f-btn-locked-state">
+                    <i class="fa-solid fa-lock"></i>UZAMKNUTÉ
+                </button>
+            </div>`;
+        }
+        
+        html += `
+        <div class="f-card">
+          <div class="f-info">
+             <div class="f-datetime">${datetime}</div>
+             <div class="f-matchup">
+                 <div class="f-teams"><div class="f-team">${hTeam}</div><div class="f-team">${aTeam}</div></div>
+                 <div class="f-score"><div class="f-score-val">${hScore}</div><div class="f-score-val">${aScore}</div></div>
+             </div>
+          </div>
+          ${actionHtml}
+        </div>`;
+    });
+    
+    document.getElementById('fantasy-content').innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+// LOGIKA - FANTASY PREDICTOR MODAL A TABS
+// ═══════════════════════════════════════
+function openPredictorModal(matchId, home, away) {
+    currentPredMatchId = matchId; document.getElementById('pred-modal-title').innerText = `${home} vs ${away}`;
+    switchPredMode(1); document.getElementById('pred-score-home').value = ''; document.getElementById('pred-score-away').value = '';
+    document.getElementById('predictor-modal').style.display = 'flex';
+}
+function closePredictorModal() { document.getElementById('predictor-modal').style.display = 'none'; }
+
+function switchPredMode(mode) {
+    currentPredMode = mode; currentPredValue = null;
+    document.querySelectorAll('.pred-opt-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.pred-tab').forEach((tab, index) => { if (index + 1 === mode) tab.classList.add('active'); else tab.classList.remove('active'); });
+    document.querySelectorAll('.pred-content').forEach((content, index) => { if (index + 1 === mode) content.classList.add('active'); else content.classList.remove('active'); });
+}
+
+function selectPrediction(mode, val, btnEl) {
+    if (currentPredMode !== mode) return;
+    if (mode === 1 || mode === 2) {
+        currentPredValue = val;
+        const container = document.getElementById(`pred-mode-${mode}`);
+        container.querySelectorAll('.pred-opt-btn').forEach(b => b.classList.remove('selected'));
+        if (btnEl) btnEl.classList.add('selected');
+    } 
+    else if (mode === 3) { currentPredValue = "exact"; }
+}
+
+function submitPrediction(isLock) {
+    let payloadValue = null;
+    if (currentPredMode === 1 || currentPredMode === 2) {
+        if (!currentPredValue || currentPredValue === "exact") { alert("Vyber jednu z možností!"); return; }
+        payloadValue = currentPredValue;
+    } else if (currentPredMode === 3) {
+        const h = document.getElementById('pred-score-home').value; const a = document.getElementById('pred-score-away').value;
+        if (h === '' || a === '') { alert("Zadaj presné skóre pre oba tímy!"); return; }
+        payloadValue = `${h}:${a}`; 
+    }
+    
+    localPreds[currentPredMatchId] = { val: payloadValue, locked: isLock, mode: currentPredMode };
+    renderFantasyMatches(); closePredictorModal();
+}
+
+function quickLockPrediction(mId) {
+    if(localPreds[mId]) { localPreds[mId].locked = true; renderFantasyMatches(); }
+}
+
+function switchFantasyTab(tab) {
+    if(tab === 'preds') {
+        document.getElementById('f-tab-btn-preds').classList.add('active'); document.getElementById('f-tab-btn-leader').classList.remove('active');
+        document.getElementById('fantasy-matches-view').style.display = 'block'; document.getElementById('fantasy-leaderboard-view').style.display = 'none';
+    } else {
+        document.getElementById('f-tab-btn-preds').classList.remove('active'); document.getElementById('f-tab-btn-leader').classList.add('active');
+        document.getElementById('fantasy-matches-view').style.display = 'none'; document.getElementById('fantasy-leaderboard-view').style.display = 'block';
+        renderFantasyLeaderboard();
+    }
+}
+
+function renderFantasyLeaderboard() {
+    const html = FANTASY_PLAYERS.map((p, i) => {
+        const pts = (FANTASY_PLAYERS.length - i) * 15; // Random testovacie body pre ukážku
+        return `
+        <tr>
+          <td style="text-align: left; padding-left: 12px;">
+              <span class="s-rank">${i+1}.</span> ${p}
+          </td>
+          <td style="color: var(--accent); font-weight: 800;">${pts} BODOV</td>
+        </tr>`;
+    }).join('');
+    document.getElementById('fantasy-leaderboard-content').innerHTML = html;
 }
 
 // ═══════════════════════════════════════
