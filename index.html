@@ -642,6 +642,17 @@
     @media (max-width: 1023px) {
       .desktop-settings-wrap { display: none; }
     }
+    .premie-container { padding: 10px; }
+    .premie-section { margin-bottom: 30px; }
+    .premie-title { font-size: 12px; font-weight: 800; color: var(--accent); margin-bottom: 15px; text-transform: uppercase; }
+    .progress-track { position: relative; height: 12px; background: #333; border-radius: 6px; width: 100%; margin-top: 25px; }
+    .progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); border-radius: 6px; transition: width 0.5s ease; }
+    .checkpoint { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; background: #222; border: 2px solid #555; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: var(--muted); z-index: 2; transition: 0.3s; }
+    .checkpoint.reached { border-color: var(--accent); background: var(--accent); color: var(--accent-contrast); box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.6); }
+    .checkpoint-reward { position: absolute; top: -20px; font-size: 10px; font-weight: 800; color: var(--accent); text-shadow: 0 0 5px rgba(var(--accent-rgb), 0.5); white-space: nowrap; }
+    .my-fantasy-row td { background: rgba(var(--accent-rgb), 0.15) !important; color: #fff; text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.6); box-shadow: inset 0 0 10px rgba(var(--accent-rgb), 0.3); border-top: 1px solid var(--accent); border-bottom: 1px solid var(--accent); }
+    #scroll-to-next-btn { position: fixed; bottom: 110px; right: 20px; width: 45px; height: 45px; background: var(--accent); color: var(--accent-contrast); border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5), 0 0 15px rgba(var(--accent-rgb), 0.5); z-index: 99; transition: 0.3s; border: none; }
+    #scroll-to-next-btn:hover { filter: brightness(1.2); }
   </style>
 </head>
 <body>
@@ -668,7 +679,8 @@
     </div>
   </header>
 
-  <main>
+  <main onscroll="handleMainScroll()">
+    <button id="scroll-to-next-btn" onclick="scrollToNextUpcomingMatch()"><i class="fa-solid fa-arrow-down"></i></button>
     
     <div class="page active" id="page-zapasy">
       <div class="desktop-page-title">
@@ -753,14 +765,19 @@
       </div>
       
       <div class="global-switcher" style="margin-bottom: 20px;">
-          <button class="gs-btn active" id="f-tab-btn-preds" onclick="switchFantasyTab('preds')">MOJE PREDIKCIE</button>
-          <button class="gs-btn" id="f-tab-btn-leader" onclick="switchFantasyTab('leader')">PORADIE HRÁČOV</button>
+          <button class="gs-btn active" id="f-tab-btn-preds" onclick="switchFantasyTab('preds')">ZÁPASY</button>
+          <button class="gs-btn" id="f-tab-btn-premie" onclick="switchFantasyTab('premie')">PRÉMIE</button>
+          <button class="gs-btn" id="f-tab-btn-leader" onclick="switchFantasyTab('leader')">LEADERBOARD</button>
       </div>
       
       <div id="fantasy-matches-view">
           <div id="fantasy-content">
              <div class="loader"><div class="spinner"></div>Načítavam dáta predikcií...</div>
           </div>
+      </div>
+
+      <div id="fantasy-premie-view" style="display: none;">
+          <div id="premie-content"></div>
       </div>
       
       <div id="fantasy-leaderboard-view">
@@ -1464,15 +1481,22 @@ function quickLockPrediction(mId) {
 }
 
 function switchFantasyTab(tab) {
-    if(tab === 'preds') {
+    document.getElementById('f-tab-btn-preds').classList.remove('active');
+    document.getElementById('f-tab-btn-premie').classList.remove('active');
+    document.getElementById('f-tab-btn-leader').classList.remove('active');
+    document.getElementById('fantasy-matches-view').style.display = 'none';
+    document.getElementById('fantasy-premie-view').style.display = 'none';
+    document.getElementById('fantasy-leaderboard-view').style.display = 'none';
+
+    if (tab === 'preds') {
         document.getElementById('f-tab-btn-preds').classList.add('active');
-        document.getElementById('f-tab-btn-leader').classList.remove('active');
         document.getElementById('fantasy-matches-view').style.display = 'block';
-        document.getElementById('fantasy-leaderboard-view').style.display = 'none';
+    } else if (tab === 'premie') {
+        document.getElementById('f-tab-btn-premie').classList.add('active');
+        document.getElementById('fantasy-premie-view').style.display = 'block';
+        renderFantasyPremie();
     } else {
-        document.getElementById('f-tab-btn-preds').classList.remove('active');
         document.getElementById('f-tab-btn-leader').classList.add('active');
-        document.getElementById('fantasy-matches-view').style.display = 'none';
         document.getElementById('fantasy-leaderboard-view').style.display = 'block';
         renderFantasyLeaderboard();
     }
@@ -1480,63 +1504,71 @@ function switchFantasyTab(tab) {
 
 function renderFantasyLeaderboard() {
     let playerPoints = {};
-    FANTASY_PLAYERS.forEach(p => playerPoints[p] = 0);
+    for (let i = 0; i < FANTASY_PLAYERS.length; i++) {
+        playerPoints[FANTASY_PLAYERS[i]] = 0;
+    }
 
     if (FANTASY_MATCHES && FANTASY_MATCHES.length > 0) {
-        FANTASY_MATCHES.forEach(m => {
-            // Zistíme reálne skóre z tabuľky
-            const hScore = (m.real_score_home !== undefined && m.real_score_home !== '') ? m.real_score_home : '?';
-            const aScore = (m.real_score_away !== undefined && m.real_score_away !== '') ? m.real_score_away : '?';
+        for (let i = 0; i < FANTASY_MATCHES.length; i++) {
+            let m = FANTASY_MATCHES[i];
+            let hScore = '?';
+            let aScore = '?';
+            if (m.real_score_home !== undefined && m.real_score_home !== '') {
+                hScore = m.real_score_home;
+            }
+            if (m.real_score_away !== undefined && m.real_score_away !== '') {
+                aScore = m.real_score_away;
+            }
 
-            FANTASY_PLAYERS.forEach(p => {
+            for (let j = 0; j < FANTASY_PLAYERS.length; j++) {
+                let p = FANTASY_PLAYERS[j];
                 let pPred = null;
-                const savedName = localStorage.getItem('fantasy_name');
+                let savedName = localStorage.getItem('fantasy_name');
                 
-                // Rozdielne hľadanie pre prihláseného hráča a pre ostatných
                 if (p === savedName) {
                     pPred = m.my_prediction;
                 } else if (m.predictions) {
-                    pPred = m.predictions.find(pred => 
-                        String(pred.player_name).trim().toLowerCase() === String(p).trim().toLowerCase()
-                    );
+                    for (let k = 0; k < m.predictions.length; k++) {
+                        if (String(m.predictions[k].player_name).trim().toLowerCase() === String(p).trim().toLowerCase()) {
+                            pPred = m.predictions[k];
+                            break;
+                        }
+                    }
                 }
 
                 if (pPred) {
-                    // Pre teba sa zámok volá "locked", pre ostatných "is_locked"
-                    const isLocked = pPred.locked === true || 
-                                     String(pPred.is_locked).trim().toUpperCase() === "TRUE" || 
-                                     String(pPred.is_locked).trim().toUpperCase() === "PRAVDA" ||
-                                     String(pPred.is_locked) === "1" ||
-                                     pPred.is_locked === true;
-                                     
-                    // Pre teba sa tip volá "val", pre ostatných "pred_value"
-                    const tipValue = pPred.val !== undefined ? pPred.val : pPred.pred_value;
+                    let rawLock = String(pPred.is_locked || pPred.locked).trim().toUpperCase();
+                    let isLocked = (rawLock === "TRUE" || rawLock === "PRAVDA" || rawLock === "1" || pPred.locked === true || pPred.is_locked === true);
+                    let tipValue = pPred.val !== undefined ? pPred.val : pPred.pred_value;
 
-                    // Body pripočítame len ak je tip uzamknutý, poznáme reálny výsledok a tip nie je skrytý (?)
                     if (isLocked && hScore !== '?' && aScore !== '?' && tipValue && tipValue !== "?") {
                         playerPoints[p] += calculateFantasyPoints(pPred.pred_mode, tipValue, hScore, aScore);
                     }
                 }
-            });
+            }
+        }
+    }
+
+    let sortedPlayers = [];
+    let keys = Object.keys(playerPoints);
+    for (let i = 0; i < keys.length; i++) {
+        let pName = keys[i];
+        let bonusData = calculatePlayerPremiePoints(pName);
+        sortedPlayers.push({
+            name: pName,
+            pts: playerPoints[pName] + bonusData.totalBonus
         });
     }
 
-    // Zotriedenie hráčov podľa bodov (od najlepšieho)
-    const sortedPlayers = Object.keys(playerPoints).map(p => ({
-        name: p,
-        pts: playerPoints[p]
-    })).sort((a, b) => b.pts - a.pts);
+    sortedPlayers.sort(sortPlayersDesc);
 
-    // Vygenerovanie HTML tabuľky
-    const html = sortedPlayers.map((p, i) => {
-        return `
-        <tr>
-          <td style="text-align: left; padding-left: 12px;">
-              <span class="s-rank">${i+1}.</span> ${p.name}
-          </td>
-          <td style="color: var(--accent); font-weight: 800; text-align: right; padding-right: 12px;">${p.pts}</td>
-        </tr>`;
-    }).join('');
+    let html = '';
+    let savedName = localStorage.getItem('fantasy_name');
+    for (let i = 0; i < sortedPlayers.length; i++) {
+        let p = sortedPlayers[i];
+        let rowClass = (p.name === savedName) ? 'my-fantasy-row' : '';
+        html += '<tr class="' + rowClass + '"><td style="text-align: left; padding-left: 12px;"><span class="s-rank">' + (i+1) + '.</span> ' + p.name + '</td><td style="color: var(--accent); font-weight: 800; text-align: right; padding-right: 12px;">' + p.pts + '</td></tr>';
+    }
     
     document.getElementById('fantasy-leaderboard-content').innerHTML = html;
 }
@@ -1594,6 +1626,7 @@ async function loadAll() {
     renderVykony();
     renderStrelci(); 
     renderPlayoff();
+    scrollToNextUpcomingMatch();
   } catch(err) {
     document.querySelectorAll('.loader').forEach(l => l.innerHTML = '❌ Chyba pri načítaní dát.');
   }
@@ -1841,7 +1874,7 @@ function createMatchCard(z, isUp) {
   const logoHost = `loga_timov/${z.host}.png`;
 
   return `
-    <div class="match-card ${compactClass}">
+    <div class="match-card ${compactClass}" id="match-${z.id}">
       <img src="${logoDomaci}" class="mc-bg-logo left" onerror="this.style.display='none'" alt="">
       <img src="${logoHost}" class="mc-bg-logo right" onerror="this.style.display='none'" alt="">
       
@@ -1906,6 +1939,7 @@ function renderZapasy() {
   }
   
   document.getElementById('zapasy-content').innerHTML = html || '<div class="empty">Zápasy nenájdené.</div>';
+  handleMainScroll();
 }
 
 // ═══════════════════════════════════════
@@ -2379,21 +2413,33 @@ function renderStrelci() {
 // NAVIGÁCIA (A GESTÁ)
 // ═══════════════════════════════════════
 function navTo(id, el) {
-  if (id === 'nastavenia') {
-      openSettingsModal();
-      return;
-  }
-  
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  if(el) el.classList.add('active');
-  
-  document.getElementById('bottom-nav').classList.remove('expanded');
-  
-  if(id === 'playoff') {
-      setTimeout(centerPlayoffScroll, 10);
-  }
+    if (id === 'nastavenia') {
+        openSettingsModal();
+        return;
+    }
+
+    let pages = document.querySelectorAll('.page');
+    for (let i = 0; i < pages.length; i++) {
+        pages[i].classList.remove('active');
+    }
+    
+    let items = document.querySelectorAll('.nav-item');
+    for (let i = 0; i < items.length; i++) {
+        items[i].classList.remove('active');
+    }
+    
+    document.getElementById('page-'+id).classList.add('active');
+    if(el) el.classList.add('active');
+
+    document.getElementById('bottom-nav').classList.remove('expanded');
+
+    if(id === 'playoff') {
+        setTimeout(centerPlayoffScroll, 10);
+    }
+    if(id === 'zapasy') {
+        setTimeout(scrollToNextUpcomingMatch, 100);
+        setTimeout(handleMainScroll, 200);
+    }
 }
 
 function toggleNav() {
@@ -2424,6 +2470,174 @@ dragArea.addEventListener('touchend', e => {
    }
 });
 
+function sortPlayersDesc(a, b) {
+    return b.pts - a.pts;
+}
+
+function calculatePlayerPremiePoints(playerName) {
+    let countMode1 = 0;
+    let countMode2 = 0;
+    let countMode3 = 0;
+    let premiePts = 0;
+
+    for (let i = 0; i < FANTASY_MATCHES.length; i++) {
+        let m = FANTASY_MATCHES[i];
+        let hScore = '?';
+        let aScore = '?';
+        if (m.real_score_home !== undefined && m.real_score_home !== '') {
+            hScore = m.real_score_home;
+        }
+        if (m.real_score_away !== undefined && m.real_score_away !== '') {
+            aScore = m.real_score_away;
+        }
+
+        let pPred = null;
+        let savedName = localStorage.getItem('fantasy_name');
+        if (playerName === savedName) {
+            pPred = m.my_prediction;
+        } else if (m.predictions) {
+            for (let j = 0; j < m.predictions.length; j++) {
+                if (String(m.predictions[j].player_name).trim().toLowerCase() === String(playerName).trim().toLowerCase()) {
+                    pPred = m.predictions[j];
+                    break;
+                }
+            }
+        }
+
+        if (pPred) {
+            let rawLock = String(pPred.is_locked || pPred.locked).trim().toUpperCase();
+            let isLocked = (rawLock === "TRUE" || rawLock === "PRAVDA" || rawLock === "1" || pPred.locked === true || pPred.is_locked === true);
+            let tipValue = pPred.val !== undefined ? pPred.val : pPred.pred_value;
+
+            if (isLocked && hScore !== '?' && aScore !== '?' && tipValue && tipValue !== "?") {
+                let pts = calculateFantasyPoints(pPred.pred_mode, tipValue, hScore, aScore);
+                if (pts > 0) {
+                    let modeNum = parseInt(pPred.pred_mode);
+                    if (modeNum === 1) countMode1++;
+                    if (modeNum === 2) countMode2++;
+                    if (modeNum === 3) countMode3++;
+                }
+            }
+        }
+    }
+
+    if (countMode1 >= 20) premiePts += 50;
+    if (countMode2 >= 5) premiePts += 25;
+    if (countMode2 >= 20) premiePts += 100;
+    if (countMode3 >= 2) premiePts += 25;
+    if (countMode3 >= 5) premiePts += 60;
+    if (countMode3 >= 10) premiePts += 120;
+    if (countMode3 >= 20) premiePts += 250;
+
+    return {
+        totalBonus: premiePts,
+        m1: countMode1,
+        m2: countMode2,
+        m3: countMode3
+    };
+}
+
+function generateProgressSection(title, current, maxPointsStr) {
+    let ptsArr = maxPointsStr.split(',');
+    let lastPtStr = ptsArr[ptsArr.length - 1];
+    let maxVal = parseInt(lastPtStr.split(':')[0]);
+    
+    let pct = (current / maxVal) * 100;
+    if (pct > 100) pct = 100;
+    
+    let html = '<div class="premie-section"><div class="premie-title">' + title + ' (' + current + ' SPRÁVNYCH)</div><div class="progress-track"><div class="progress-fill" style="width: ' + pct + '%;"></div>';
+    
+    for (let i = 0; i < ptsArr.length; i++) {
+        let ptStr = ptsArr[i];
+        let ptVal = parseInt(ptStr.split(':')[0]);
+        let reward = ptStr.split(':')[1];
+        let ptPct = (ptVal / maxVal) * 100;
+        let isReached = current >= ptVal;
+        let cClass = isReached ? 'checkpoint reached' : 'checkpoint';
+        let icon = isReached ? '<i class="fa-solid fa-check"></i>' : ptVal;
+        
+        html += '<div class="' + cClass + '" style="left: ' + ptPct + '%;"><div class="checkpoint-reward">+' + reward + 'B</div>' + icon + '</div>';
+    }
+    
+    html += '</div></div>';
+    return html;
+}
+
+function renderFantasyPremie() {
+    let savedName = localStorage.getItem('fantasy_name');
+    if (!savedName) {
+        document.getElementById('premie-content').innerHTML = '<div class="empty">Musíš sa prihlásiť.</div>';
+        return;
+    }
+
+    let stats = calculatePlayerPremiePoints(savedName);
+    let html = '<div class="premie-container">';
+    
+    html += generateProgressSection('DVOJTIPY (1X/X2)', stats.m1, '20:50');
+    html += generateProgressSection('VÝSLEDKY (1/X/2)', stats.m2, '5:25,20:100');
+    html += generateProgressSection('PRESNÉ SKÓRE', stats.m3, '2:25,5:60,10:120,20:250');
+    
+    html += '</div>';
+    document.getElementById('premie-content').innerHTML = html;
+}
+
+function sortMatchesAsc(a, b) {
+    return parseInt(a.id) - parseInt(b.id);
+}
+
+function findNextUpcomingMatchId() {
+    let zap = DATA.zapasy;
+    let upcoming = [];
+    for (let i = 0; i < zap.length; i++) {
+        if (zap[i].goly_domaci === '' || zap[i].goly_host === '') {
+            upcoming.push(zap[i]);
+        }
+    }
+    
+    upcoming.sort(sortMatchesAsc);
+    if (upcoming.length > 0) return upcoming[0].id;
+    return null;
+}
+
+function scrollToNextUpcomingMatch() {
+    let targetId = findNextUpcomingMatchId();
+    if (targetId) {
+        let el = document.getElementById('match-' + targetId);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+}
+
+function handleMainScroll() {
+    let btn = document.getElementById('scroll-to-next-btn');
+    if (!btn) return;
+    
+    let pageZapasy = document.getElementById('page-zapasy');
+    if (!pageZapasy || !pageZapasy.classList.contains('active')) {
+        btn.style.display = 'none';
+        return;
+    }
+
+    let targetId = findNextUpcomingMatchId();
+    if (!targetId) {
+        btn.style.display = 'none';
+        return;
+    }
+
+    let el = document.getElementById('match-' + targetId);
+    if (!el) {
+        btn.style.display = 'none';
+        return;
+    }
+
+    let rect = el.getBoundingClientRect();
+    if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+        btn.style.display = 'none';
+    } else {
+        btn.style.display = 'flex';
+    }
+}
 loadAll();
 </script>
 </body>
