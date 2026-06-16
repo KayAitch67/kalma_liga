@@ -645,6 +645,7 @@
     .premie-container { padding: 10px; }
     .premie-section { background: #151515; border: 1px solid #333; border-radius: 12px; padding: 12px 16px 16px 16px; margin-bottom: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
     .premie-title { font-size: 16px; font-weight: 800; color: var(--accent); margin-bottom: 0; text-transform: uppercase; }
+    .toggle-premie-icon { position: absolute; bottom: 12px; right: 16px; cursor: pointer; color: var(--muted); font-size: 14px; transition: transform 0.3s; }
     .progress-track { position: relative; height: 12px; background: #333; border-radius: 6px; width: calc(100% - 30px); margin: 25px 24px 35px 6px; }
     .progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); border-radius: 6px; transition: width 0.5s ease; }
     .checkpoint { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; background: #222; border: 2px solid #555; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: var(--muted); z-index: 2; transition: 0.3s; }
@@ -2500,7 +2501,14 @@ function calculatePlayerPremiePoints(playerName) {
     };
 }
 
-function generateProgressSection(title, current, maxPointsStr) {
+function generateProgressSection(title, mode, maxPointsStr) {
+    let savedName = localStorage.getItem('fantasy_name');
+    let mainStats = calculatePlayerPremiePoints(savedName);
+    let current = 0;
+    if (mode === 1) current = mainStats.m1;
+    if (mode === 2) current = mainStats.m2;
+    if (mode === 3) current = mainStats.m3;
+
     let ptsArr = maxPointsStr.split(',');
     let lastPtStr = ptsArr[ptsArr.length - 1];
     let maxVal = parseInt(lastPtStr.split(':')[0]);
@@ -2508,11 +2516,12 @@ function generateProgressSection(title, current, maxPointsStr) {
     let pct = (current / maxVal) * 100;
     if (pct > 100) pct = 100;
     
-    let html = '<div class="premie-section">';
+    let sectionId = 'premie-sec-' + mode;
+    
+    let html = '<div class="premie-section" style="position: relative;">';
     html += '<div style="margin-bottom: 35px;"><div class="premie-title">' + title + '</div></div>';
     
     html += '<div class="progress-track"><div class="progress-fill" style="width: ' + pct + '%;"></div>';
-    
     html += '<div style="position: absolute; top: 18px; left: ' + pct + '%; transform: translateX(-50%); font-size: 10px; font-weight: 900; color: var(--accent); white-space: nowrap; z-index: 1;">' + current + '</div>';
     
     for (let i = 0; i < ptsArr.length; i++) {
@@ -2526,8 +2535,47 @@ function generateProgressSection(title, current, maxPointsStr) {
         
         html += '<div class="' + cClass + '" style="left: ' + ptPct + '%;"><div class="checkpoint-reward">+' + ' ' + reward + ' b.</div>' + icon + '</div>';
     }
+    html += '</div>';
     
-    html += '</div></div>';
+    html += '<div id="others-' + sectionId + '" style="display: none; margin-top: 30px; border-top: 1px dashed #333; padding-top: 20px;">';
+    
+    for (let pIdx = 0; pIdx < FANTASY_PLAYERS.length; pIdx++) {
+        let pName = FANTASY_PLAYERS[pIdx];
+        if (pName === savedName) continue;
+        
+        let otherStats = calculatePlayerPremiePoints(pName);
+        let oCurrent = 0;
+        if (mode === 1) oCurrent = otherStats.m1;
+        if (mode === 2) oCurrent = otherStats.m2;
+        if (mode === 3) oCurrent = otherStats.m3;
+        
+        let oPct = (oCurrent / maxVal) * 100;
+        if (oPct > 100) oPct = 100;
+        
+        html += '<div style="margin-bottom: 35px; margin-top: 25px;"><div style="font-size: 11.2px; font-weight: 800; color: #888; text-transform: uppercase;">' + pName + '</div></div>';
+        
+        html += '<div class="progress-track"><div class="progress-fill" style="width: ' + oPct + '%; background: #888;"></div>';
+        html += '<div style="position: absolute; top: 18px; left: ' + oPct + '%; transform: translateX(-50%); font-size: 10px; font-weight: 900; color: #888; white-space: nowrap; z-index: 1;">' + oCurrent + '</div>';
+        
+        for (let i = 0; i < ptsArr.length; i++) {
+            let ptStr = ptsArr[i];
+            let ptVal = parseInt(ptStr.split(':')[0]);
+            let reward = ptStr.split(':')[1];
+            let ptPct = (ptVal / maxVal) * 100;
+            let isReached = oCurrent >= ptVal;
+            let cClass = isReached ? 'checkpoint reached' : 'checkpoint';
+            let icon = isReached ? '<i class="fa-solid fa-check"></i>' : ptVal;
+            
+            let cpStyle = isReached ? 'border-color: #888 !important; background: #888 !important; color: #111 !important; box-shadow: none !important;' : '';
+            
+            html += '<div class="' + cClass + '" style="left: ' + ptPct + '%; ' + cpStyle + '"><div class="checkpoint-reward">+' + ' ' + reward + ' b.</div>' + icon + '</div>';
+        }
+        html += '</div>';
+    }
+    
+    html += '</div>';
+    html += '<i class="fa-solid fa-chevron-down toggle-premie-icon" id="arrow-' + sectionId + '" onclick="togglePremieSection(\'' + sectionId + '\')"></i>';
+    html += '</div>';
     
     return html;
 }
@@ -2539,15 +2587,27 @@ function renderFantasyPremie() {
         return;
     }
 
-    let stats = calculatePlayerPremiePoints(savedName);
     let html = '<div class="premie-container">';
-    
-    html += generateProgressSection('DVOJTIPY (1X/X2)', stats.m1, '20:50');
-    html += generateProgressSection('VÝSLEDKY (1/X/2)', stats.m2, '5:25,20:100');
-    html += generateProgressSection('PRESNÉ SKÓRE', stats.m3, '2:25,5:60,10:120,20:250');
-    
+    html += generateProgressSection('DVOJTIPY (1X/X2)', 1, '20:50');
+    html += generateProgressSection('VÝSLEDKY (1/X/2)', 2, '5:25,20:100');
+    html += generateProgressSection('PRESNÉ SKÓRE', 3, '2:25,5:60,10:120,20:250');
     html += '</div>';
+    
     document.getElementById('premie-content').innerHTML = html;
+}
+
+function togglePremieSection(sectionId) {
+    let content = document.getElementById('others-' + sectionId);
+    let arrow = document.getElementById('arrow-' + sectionId);
+    if (!content || !arrow) return;
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        arrow.style.transform = 'rotate(180deg)';
+    } else {
+        content.style.display = 'none';
+        arrow.style.transform = 'rotate(0deg)';
+    }
 }
 
 function sortMatchesAsc(a, b) {
