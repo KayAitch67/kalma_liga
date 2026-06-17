@@ -1427,19 +1427,22 @@ function sortPlayersDesc(a, b) {
 
 function getMatchMultiplier(mId) {
     if (!DATA || !DATA.zapasy) return 1;
+    
     let groupMatches = [];
     for (let i = 0; i < DATA.zapasy.length; i++) {
         let sk = DATA.zapasy[i].skupina;
-        if (sk === 'A' || sk === 'B') {
+        // Zoberieme len zápasy s vyplnenou skupinou
+        if (sk === 'A' || sk === 'B' || sk === 'a' || sk === 'b') {
             groupMatches.push(DATA.zapasy[i]);
         }
     }
     
+    // Zoradenie len podľa čistých čísel z ID zápasov (odstráni akékoľvek texty/medzery)
     for (let i = 0; i < groupMatches.length; i++) {
         for (let j = i + 1; j < groupMatches.length; j++) {
-            let idA = parseInt(groupMatches[i].id);
-            let idB = parseInt(groupMatches[j].id);
-            if (idA > idB) {
+            let numA = parseInt(String(groupMatches[i].id).replace(/\D/g, '')) || 0;
+            let numB = parseInt(String(groupMatches[j].id).replace(/\D/g, '')) || 0;
+            if (numA > numB) {
                 let temp = groupMatches[i];
                 groupMatches[i] = groupMatches[j];
                 groupMatches[j] = temp;
@@ -1449,9 +1452,12 @@ function getMatchMultiplier(mId) {
     
     let len = groupMatches.length;
     let idx = -1;
-    let targetId = parseInt(mId);
+    // Očistíme aj target ID od backendu
+    let targetNum = parseInt(String(mId).replace(/\D/g, '')) || 0;
+    
     for (let i = 0; i < len; i++) {
-        if (parseInt(groupMatches[i].id) === targetId) {
+        let currentNum = parseInt(String(groupMatches[i].id).replace(/\D/g, '')) || 0;
+        if (currentNum === targetNum && targetNum !== 0) {
             idx = i;
             break;
         }
@@ -1530,16 +1536,16 @@ function renderFantasyMatches() {
         
         if (mult === 2) {
             infoStyle = 'background: linear-gradient(135deg, var(--surface), rgba(var(--accent-rgb), 0.08)); border-color: rgba(var(--accent-rgb), 0.3);';
-            multHtml = '<div style="position: absolute; top: 12px; left: 0; font-size: 9px; font-weight: 800; color: #fff; text-shadow: 0 0 4px #fff;">2X BONUS</div>';
+            multHtml = '<div style="position: absolute; top: 27px; left: 12px; font-size: 10px; font-weight: 900; color: #fff; text-shadow: 0 0 5px rgba(255,255,255,0.6); z-index: 5;">2X BONUS</div>';
         } else if (mult === 5) {
             infoStyle = 'background: linear-gradient(135deg, var(--surface), rgba(var(--accent-rgb), 0.2)); border-color: rgba(var(--accent-rgb), 0.6);';
-            multHtml = '<div style="position: absolute; top: 12px; left: 0; font-size: 9px; font-weight: 800; color: #fff; text-shadow: 0 0 6px #fff;">5X BONUS</div>';
+            multHtml = '<div style="position: absolute; top: 27px; left: 12px; font-size: 10px; font-weight: 900; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.8); z-index: 5;">5X BONUS</div>';
         } else if (mult === 10) {
-            infoStyle = 'background: linear-gradient(135deg, var(--surface), rgba(var(--accent-rgb), 0.4)); border-color: var(--accent); box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.4);';
-            multHtml = '<div style="position: absolute; top: 12px; left: 0; font-size: 9px; font-weight: 800; color: #fff; text-shadow: 0 0 10px #fff;">10X BONUS</div>';
+            infoStyle = 'background: linear-gradient(135deg, var(--surface), rgba(var(--accent-rgb), 0.4)); border-color: var(--accent); box-shadow: inset 0 0 15px rgba(var(--accent-rgb), 0.2);';
+            multHtml = '<div style="position: absolute; top: 27px; left: 12px; font-size: 10px; font-weight: 900; color: #fff; text-shadow: 0 0 10px #fff; z-index: 5;">10X BONUS</div>';
         }
         
-        html += '<div class="f-card ' + isUpcomingFantasy + '"><div class="f-info" style="' + infoStyle + '"><div style="position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;"><div class="f-datetime" style="margin-bottom: 0;">' + datetime + '</div>' + multHtml + '<div class="f-pts">' + ptsText + '</div></div><div class="f-matchup"><div class="f-teams"><div class="f-team">' + hTeam + '</div><div class="f-team">' + aTeam + '</div></div><div class="f-score"><div class="f-score-val">' + hScore + '</div><div class="f-score-val">' + aScore + '</div></div></div></div>' + actionHtml + '</div>';
+        html += '<div class="f-card ' + isUpcomingFantasy + '"><div class="f-info" style="position: relative; ' + infoStyle + '"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;"><div class="f-datetime" style="margin-bottom: 0;">' + datetime + '</div><div class="f-pts">' + ptsText + '</div></div>' + multHtml + '<div class="f-matchup"><div class="f-teams"><div class="f-team">' + hTeam + '</div><div class="f-team">' + aTeam + '</div></div><div class="f-score"><div class="f-score-val">' + hScore + '</div><div class="f-score-val">' + aScore + '</div></div></div></div>' + actionHtml + '</div>';
     }
     
     contentEl.innerHTML = html;
