@@ -113,7 +113,8 @@
     .global-switcher {
       display: flex; background: #1e1e1e; padding: 4px; border-radius: 12px; gap: 4px; border: 1px solid #333; margin-bottom: 12px; width: 100%;
     }
-    .fantasy-sticky-tabs { position: sticky; top: -16px; z-index: 50; background: var(--bg); padding: 16px 0 10px 0; margin-top: -16px; }
+    .fantasy-sticky-tabs { position: sticky; top: -16px; z-index: 50; transition: all 0.2s ease; }
+    .fantasy-sticky-tabs.sticky-active { width: calc(100% + 32px) !important; margin-left: -16px !important; padding: 20px 16px 12px 16px !important; border-radius: 0 !important; border: none !important; border-bottom: 1px solid #444 !important; background: rgba(18, 18, 18, 0.95) !important; backdrop-filter: blur(10px); }
     .gs-btn {
       flex: 1;
       background: #2a2a2a; border: 1px solid #444; border-radius: 8px;
@@ -767,7 +768,7 @@
         <i class="fa-solid fa-star"></i>
       </div>
       
-      <div class="global-switcher fantasy-sticky-tabs" style="margin-bottom: 20px;">
+      <div class="global-switcher fantasy-sticky-tabs" id="fantasy-tabs-container" style="margin-bottom: 20px;">
           <button class="gs-btn active" id="f-tab-btn-preds" onclick="switchFantasyTab('preds')">ZÁPASY</button>
           <button class="gs-btn" id="f-tab-btn-premie" onclick="switchFantasyTab('premie')">PRÉMIE</button>
           <button class="gs-btn" id="f-tab-btn-leader" onclick="switchFantasyTab('leader')">LEADERBOARD</button>
@@ -835,7 +836,7 @@
       </div>
       
       <div id="pred-mode-1" class="pred-content active">
-          <div class="pred-explainer">Uhádnutá výhra alebo remíza = 5 bodov</div>
+          <div class="pred-explainer" id="explainer-1">Uhádnutá výhra alebo remíza = 5 bodov</div>
           <div class="pred-options">
               <button class="pred-opt-btn" onclick="selectPrediction(1, '1X', this)">1X</button>
               <button class="pred-opt-btn" onclick="selectPrediction(1, 'X2', this)">X2</button>
@@ -843,7 +844,7 @@
       </div>
       
       <div id="pred-mode-2" class="pred-content">
-          <div class="pred-explainer">Uhádnutý výsledok zápasu = 10 bodov</div>
+          <div class="pred-explainer" id="explainer-2">Uhádnutý výsledok zápasu = 10 bodov</div>
           <div class="pred-options">
               <button class="pred-opt-btn" onclick="selectPrediction(2, '1', this)">1</button>
               <button class="pred-opt-btn" onclick="selectPrediction(2, 'X', this)">X</button>
@@ -852,7 +853,7 @@
       </div>
       
       <div id="pred-mode-3" class="pred-content">
-          <div class="pred-explainer">Uhádnuté presné skóre zápasu = 25 bodov</div>
+          <div class="pred-explainer" id="explainer-3">Uhádnuté presné skóre zápasu = 25 bodov</div>
           <div class="pred-score-inputs">
               <input type="number" id="pred-score-home" class="pred-input" placeholder="0" min="0" oninput="selectPrediction(3)">
               <span style="font-size: 20px; font-weight: 900; color: #555;">:</span>
@@ -1198,7 +1199,24 @@ function formatDateTime(d, t) {
 // ═══════════════════════════════════════
 function openPredictorModal(matchId, home, away) {
     currentPredMatchId = matchId;
-    document.getElementById('pred-modal-title').innerText = `${home} vs ${away}`;
+    document.getElementById('pred-modal-title').innerText = home + ' vs ' + away;
+    
+    let mult = 1;
+    if (typeof getMatchMultiplier === 'function') {
+        mult = getMatchMultiplier(matchId);
+    }
+    
+    let pts1 = 5 * mult;
+    let pts2 = 10 * mult;
+    let pts3 = 25 * mult;
+    
+    let ex1 = document.getElementById('explainer-1');
+    let ex2 = document.getElementById('explainer-2');
+    let ex3 = document.getElementById('explainer-3');
+    
+    if (ex1) ex1.innerText = 'Uhádnutá výhra alebo remíza = ' + pts1 + ' bodov';
+    if (ex2) ex2.innerText = 'Uhádnutý výsledok zápasu = ' + pts2 + ' bodov';
+    if (ex3) ex3.innerText = 'Uhádnuté presné skóre zápasu = ' + pts3 + ' bodov';
     
     switchPredMode(1);
     document.getElementById('pred-score-home').value = '';
@@ -1758,7 +1776,7 @@ function renderFantasyLeaderboard() {
             }
         }
         
-        let chartHtml = '<tr class="team-details-row" id="' + safeId + '" style="display: none;"><td colspan="2" style="padding: 0;"><div class="team-details-container" style="padding: 20px 15px; background: #151515;"><div style="font-size: 10px; font-weight: 800; color: var(--muted); margin-bottom: 15px; text-align: center;">BODOVÝ ZISK ZA ZÁPAS</div><div style="position: relative; height: 50px; width: calc(100% - 20px); margin: 0 auto; border-bottom: 1px solid #444; margin-bottom: 5px;">' + barsHtml + '</div><div style="position: relative; width: calc(100% - 20px); margin: 0 auto; height: 12px; font-size: 9px; font-weight: 800; color: var(--muted);"><span style="position: absolute; left: 0; transform: translateX(-50%);">0</span><span style="position: absolute; left: 83.33%; transform: translateX(-50%);">60</span><span style="position: absolute; right: 0; transform: translateX(50%);">72</span></div></div></td></tr>';
+        let chartHtml = '<tr class="team-details-row" id="' + safeId + '" style="display: none;"><td colspan="2" style="padding: 0;"><div class="team-details-container" style="padding: 20px 15px; background: #151515;"><div style="font-size: 10px; font-weight: 800; color: var(--muted); margin-bottom: 15px; text-align: center;">BODOVÝ ZISK ZA ZÁPAS</div><div style="position: relative; height: 100px; width: calc(100% - 20px); margin: 0 auto; border-bottom: 1px solid #444; margin-bottom: 5px;">' + barsHtml + '</div><div style="position: relative; width: calc(100% - 20px); margin: 0 auto; height: 12px; font-size: 9px; font-weight: 800; color: var(--muted);"><span style="position: absolute; left: 0; transform: translateX(-50%);">0</span><span style="position: absolute; left: 83.33%; transform: translateX(-50%);">60</span><span style="position: absolute; right: 0; transform: translateX(50%);">72</span></div></div></td></tr>';
         
         html += chartHtml;
     }
@@ -2866,12 +2884,30 @@ function scrollToNextUpcomingMatch() {
 }
 
 function handleMainScroll() {
+    let fTabs = document.getElementById('fantasy-tabs-container');
+    if (fTabs) {
+        let mainEl = document.querySelector('main');
+        if (mainEl && mainEl.scrollTop > 10) {
+            fTabs.classList.add('sticky-active');
+        } else {
+            fTabs.classList.remove('sticky-active');
+        }
+    }
+    
     let btn = document.getElementById('scroll-to-next-btn');
     if (!btn) return;
     
     let pageFantasy = document.getElementById('page-fantasy');
     let matchesView = document.getElementById('fantasy-matches-view');
-    if (!pageFantasy || !pageFantasy.classList.contains('active') || !matchesView || matchesView.style.display === 'none') {
+    
+    let isActive = false;
+    if (pageFantasy && pageFantasy.classList.contains('active')) {
+        if (matchesView && matchesView.style.display !== 'none') {
+            isActive = true;
+        }
+    }
+    
+    if (!isActive) {
         btn.style.display = 'none';
         return;
     }
