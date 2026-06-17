@@ -1192,70 +1192,6 @@ function formatDateTime(d, t) {
     return displayDate;
 }
 
-function renderFantasyMatches() {
-    if(!FANTASY_MATCHES || FANTASY_MATCHES.length === 0) {
-        document.getElementById('fantasy-content').innerHTML = '<div class="empty">Žiadne zápasy na tipovanie.</div>';
-        return;
-    }
-    
-    let html = '';
-    for (let i = 0; i < FANTASY_MATCHES.length; i++) {
-        let m = FANTASY_MATCHES[i];
-        let hTeam = m.home_team || m.domaci || "Tím 1"; 
-        let aTeam = m.away_team || m.host || "Tím 2";
-        let hScore = (m.real_score_home !== undefined && m.real_score_home !== '') ? m.real_score_home : '?';
-        let aScore = (m.real_score_away !== undefined && m.real_score_away !== '') ? m.real_score_away : '?';
-        let datetime = formatDateTime(m.match_date, m.match_time);
-        
-        let mId = m.match_id || m.id;
-        let predState = 'none'; 
-        let predDisplay = '';
-        let myPred = localPreds[mId] || m.my_prediction; 
-        
-        if (myPred) { 
-            predState = myPred.locked ? 'locked' : 'draft'; 
-            predDisplay = myPred.val; 
-        }
-        
-        let mult = getMatchMultiplier(mId);
-        
-        let ptsText = ''; 
-        if (predState === 'locked' && hScore !== '?' && aScore !== '?') {
-            let calculatedPts = calculateFantasyPoints(myPred.pred_mode, myPred.val, hScore, aScore) * mult;
-            ptsText = '+' + calculatedPts + ' BODOV';
-        }
-
-        let actionHtml = '';
-        if (predState === 'none') {
-            actionHtml = '<div class="f-action-wrapper"><button class="f-btn f-btn-predict" onclick="openPredictorModal(\'' + mId + '\', \'' + hTeam + '\', \'' + aTeam + '\')"><i class="fa-solid fa-plus"></i>PREDIKOVAŤ</button></div>';
-        } else if (predState === 'draft') {
-            actionHtml = '<div class="f-action-wrapper"><button class="f-btn f-btn-draft" onclick="openPredictorModal(\'' + mId + '\', \'' + hTeam + '\', \'' + aTeam + '\')"><span style="font-size: 8px; font-weight: 600;">PREDBEŽNÝ TIP</span><span style="font-size: 14px; margin-top:2px; font-weight: 900;">' + predDisplay + '</span></button><button class="f-btn f-btn-lock-action" onclick="quickLockPrediction(\'' + mId + '\')"><i class="fa-solid fa-lock"></i>ZAMKNÚŤ</button></div>';
-        } else if (predState === 'locked') {
-            actionHtml = '<div class="f-action-wrapper"><button class="f-btn f-btn-locked-val" onclick="openLockedTipsModal(\'' + mId + '\', \'' + hTeam + '\', \'' + aTeam + '\', \'' + predDisplay + '\')"><span style="font-size: 8px; font-weight: 600;">MÔJ TIP</span><span style="font-size: 14px; margin-top:2px; font-weight: 900;">' + predDisplay + '</span></button><button class="f-btn f-btn-locked-state"><i class="fa-solid fa-lock"></i>UZAMKNUTÉ</button></div>';
-        }
-        
-        let isUpcomingFantasy = (hScore === '?' || aScore === '?') ? 'upcoming-fantasy-match' : '';
-        
-        let infoStyle = '';
-        let multHtml = '';
-        if (mult === 2) {
-            infoStyle = 'background: linear-gradient(135deg, var(--surface), rgba(var(--accent-rgb), 0.08)); border-color: rgba(var(--accent-rgb), 0.3);';
-            multHtml = '<div style="position: absolute; top: 12px; left: 0; font-size: 9px; font-weight: 800; color: #fff; text-shadow: 0 0 4px #fff;">2X BONUS</div>';
-        } else if (mult === 5) {
-            infoStyle = 'background: linear-gradient(135deg, var(--surface), rgba(var(--accent-rgb), 0.2)); border-color: rgba(var(--accent-rgb), 0.6);';
-            multHtml = '<div style="position: absolute; top: 12px; left: 0; font-size: 9px; font-weight: 800; color: #fff; text-shadow: 0 0 6px #fff;">5X BONUS</div>';
-        } else if (mult === 10) {
-            infoStyle = 'background: linear-gradient(135deg, var(--surface), rgba(var(--accent-rgb), 0.4)); border-color: var(--accent); box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.4);';
-            multHtml = '<div style="position: absolute; top: 12px; left: 0; font-size: 9px; font-weight: 800; color: #fff; text-shadow: 0 0 10px #fff;">10X BONUS</div>';
-        }
-        
-        html += '<div class="f-card ' + isUpcomingFantasy + '"><div class="f-info" style="' + infoStyle + '"><div style="position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;"><div class="f-datetime" style="margin-bottom: 0;">' + datetime + '</div>' + multHtml + '<div class="f-pts">' + ptsText + '</div></div><div class="f-matchup"><div class="f-teams"><div class="f-team">' + hTeam + '</div><div class="f-team">' + aTeam + '</div></div><div class="f-score"><div class="f-score-val">' + hScore + '</div><div class="f-score-val">' + aScore + '</div></div></div></div>' + actionHtml + '</div>';
-    }
-    
-    document.getElementById('fantasy-content').innerHTML = html;
-    handleMainScroll();
-}
-
 // ═══════════════════════════════════════
 // LOGIKA - FANTASY PREDICTOR MODALS A TABS
 // ═══════════════════════════════════════
@@ -1481,6 +1417,127 @@ function switchFantasyTab(tab) {
     }
 }
 
+function sortMatchesById(a, b) {
+    return parseInt(a.id) - parseInt(b.id);
+}
+
+function sortPlayersDesc(a, b) {
+    return b.pts - a.pts;
+}
+
+function getMatchMultiplier(mId) {
+    let groupMatches = [];
+    if (!DATA || !DATA.zapasy) return 1;
+    
+    for(let i=0; i<DATA.zapasy.length; i++) {
+        let sk = DATA.zapasy[i].skupina;
+        if(sk === 'A' || sk === 'B') {
+            groupMatches.push(DATA.zapasy[i]);
+        }
+    }
+    
+    groupMatches.sort(sortMatchesById);
+    
+    let len = groupMatches.length;
+    let idx = -1;
+    let strId = String(mId);
+    let targetId = parseInt(strId);
+    
+    for(let i=0; i<len; i++) {
+        if(parseInt(groupMatches[i].id) === targetId) {
+            idx = i; break;
+        }
+    }
+    
+    if (idx === -1) return 1;
+    if (idx === len - 1) return 10;
+    if (idx >= len - 3) return 5;
+    if (idx >= len - 12) return 2;
+    return 1;
+}
+
+function renderFantasyMatches() {
+    let contentEl = document.getElementById('fantasy-content');
+    if (!FANTASY_MATCHES || FANTASY_MATCHES.length === 0) {
+        contentEl.innerHTML = '<div class="empty">Žiadne zápasy na tipovanie.</div>';
+        return;
+    }
+    
+    let html = '';
+    for (let i = 0; i < FANTASY_MATCHES.length; i++) {
+        let m = FANTASY_MATCHES[i];
+        let hTeam = m.home_team || m.domaci || "Tím 1"; 
+        let aTeam = m.away_team || m.host || "Tím 2";
+        
+        let hScore = '?';
+        if (m.real_score_home !== undefined && m.real_score_home !== '') {
+            hScore = m.real_score_home;
+        }
+        
+        let aScore = '?';
+        if (m.real_score_away !== undefined && m.real_score_away !== '') {
+            aScore = m.real_score_away;
+        }
+        
+        let datetime = formatDateTime(m.match_date, m.match_time);
+        
+        let mId = m.match_id || m.id;
+        let predState = 'none'; 
+        let predDisplay = '';
+        let myPred = localPreds[mId] || m.my_prediction; 
+        
+        if (myPred) { 
+            if (myPred.locked) {
+                predState = 'locked';
+            } else {
+                predState = 'draft';
+            }
+            predDisplay = myPred.val; 
+        }
+        
+        let mult = getMatchMultiplier(mId);
+        
+        let ptsText = ''; 
+        if (predState === 'locked' && hScore !== '?' && aScore !== '?') {
+            let calculatedPts = calculateFantasyPoints(myPred.pred_mode, myPred.val, hScore, aScore) * mult;
+            ptsText = '+' + calculatedPts + ' BODOV';
+        }
+
+        let actionHtml = '';
+        if (predState === 'none') {
+            actionHtml = '<div class="f-action-wrapper"><button class="f-btn f-btn-predict" onclick="openPredictorModal(\'' + mId + '\', \'' + hTeam + '\', \'' + aTeam + '\')"><i class="fa-solid fa-plus"></i>PREDIKOVAŤ</button></div>';
+        } else if (predState === 'draft') {
+            actionHtml = '<div class="f-action-wrapper"><button class="f-btn f-btn-draft" onclick="openPredictorModal(\'' + mId + '\', \'' + hTeam + '\', \'' + aTeam + '\')"><span style="font-size: 8px; font-weight: 600;">PREDBEŽNÝ TIP</span><span style="font-size: 14px; margin-top:2px; font-weight: 900;">' + predDisplay + '</span></button><button class="f-btn f-btn-lock-action" onclick="quickLockPrediction(\'' + mId + '\')"><i class="fa-solid fa-lock"></i>ZAMKNÚŤ</button></div>';
+        } else if (predState === 'locked') {
+            actionHtml = '<div class="f-action-wrapper"><button class="f-btn f-btn-locked-val" onclick="openLockedTipsModal(\'' + mId + '\', \'' + hTeam + '\', \'' + aTeam + '\', \'' + predDisplay + '\')"><span style="font-size: 8px; font-weight: 600;">MÔJ TIP</span><span style="font-size: 14px; margin-top:2px; font-weight: 900;">' + predDisplay + '</span></button><button class="f-btn f-btn-locked-state"><i class="fa-solid fa-lock"></i>UZAMKNUTÉ</button></div>';
+        }
+        
+        let isUpcomingFantasy = '';
+        if (hScore === '?' || aScore === '?') {
+            isUpcomingFantasy = 'upcoming-fantasy-match';
+        }
+        
+        let infoStyle = '';
+        let multHtml = '';
+        
+        if (mult === 2) {
+            infoStyle = 'background: linear-gradient(135deg, var(--surface), rgba(var(--accent-rgb), 0.08)); border-color: rgba(var(--accent-rgb), 0.3);';
+            multHtml = '<div style="position: absolute; top: 12px; left: 0; font-size: 9px; font-weight: 800; color: #fff; text-shadow: 0 0 4px #fff;">2X BONUS</div>';
+        } else if (mult === 5) {
+            infoStyle = 'background: linear-gradient(135deg, var(--surface), rgba(var(--accent-rgb), 0.2)); border-color: rgba(var(--accent-rgb), 0.6);';
+            multHtml = '<div style="position: absolute; top: 12px; left: 0; font-size: 9px; font-weight: 800; color: #fff; text-shadow: 0 0 6px #fff;">5X BONUS</div>';
+        } else if (mult === 10) {
+            infoStyle = 'background: linear-gradient(135deg, var(--surface), rgba(var(--accent-rgb), 0.4)); border-color: var(--accent); box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.4);';
+            multHtml = '<div style="position: absolute; top: 12px; left: 0; font-size: 9px; font-weight: 800; color: #fff; text-shadow: 0 0 10px #fff;">10X BONUS</div>';
+        }
+        
+        html += '<div class="f-card ' + isUpcomingFantasy + '"><div class="f-info" style="' + infoStyle + '"><div style="position: relative; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;"><div class="f-datetime" style="margin-bottom: 0;">' + datetime + '</div>' + multHtml + '<div class="f-pts">' + ptsText + '</div></div><div class="f-matchup"><div class="f-teams"><div class="f-team">' + hTeam + '</div><div class="f-team">' + aTeam + '</div></div><div class="f-score"><div class="f-score-val">' + hScore + '</div><div class="f-score-val">' + aScore + '</div></div></div></div>' + actionHtml + '</div>';
+    }
+    
+    contentEl.innerHTML = html;
+    handleMainScroll();
+}
+
 function renderFantasyLeaderboard() {
     let playerPoints = {};
     for (let i = 0; i < FANTASY_PLAYERS.length; i++) {
@@ -1546,7 +1603,10 @@ function renderFantasyLeaderboard() {
     let savedName = localStorage.getItem('fantasy_name');
     for (let i = 0; i < sortedPlayers.length; i++) {
         let p = sortedPlayers[i];
-        let rowClass = (p.name === savedName) ? 'my-fantasy-row' : '';
+        let rowClass = '';
+        if (p.name === savedName) {
+            rowClass = 'my-fantasy-row';
+        }
         html += '<tr class="' + rowClass + '"><td style="text-align: left; padding-left: 12px;"><span class="s-rank">' + (i+1) + '.</span> ' + p.name + '</td><td style="color: var(--accent); font-weight: 800; text-align: right; padding-right: 12px;">' + p.pts + '</td></tr>';
     }
     
@@ -2676,28 +2736,6 @@ function handleMainScroll() {
     }
 }
 
-function getMatchMultiplier(mId) {
-    let groupMatches = [];
-    for(let i=0; i<DATA.zapasy.length; i++) {
-        let sk = DATA.zapasy[i].skupina;
-        if(sk === 'A' || sk === 'B') {
-            groupMatches.push(DATA.zapasy[i]);
-        }
-    }
-    groupMatches.sort(sortMatchesAsc);
-    let len = groupMatches.length;
-    let idx = -1;
-    for(let i=0; i<len; i++) {
-        if(String(groupMatches[i].id) === String(mId)) {
-            idx = i; break;
-        }
-    }
-    if (idx === -1) return 1;
-    if (idx === len - 1) return 10;
-    if (idx >= len - 3) return 5;
-    if (idx >= len - 12) return 2;
-    return 1;
-}
 loadAll();
 </script>
 </body>
