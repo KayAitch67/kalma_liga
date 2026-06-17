@@ -1426,26 +1426,34 @@ function sortPlayersDesc(a, b) {
 }
 
 function getMatchMultiplier(mId) {
-    let groupMatches = [];
     if (!DATA || !DATA.zapasy) return 1;
-    
-    for(let i=0; i<DATA.zapasy.length; i++) {
+    let groupMatches = [];
+    for (let i = 0; i < DATA.zapasy.length; i++) {
         let sk = DATA.zapasy[i].skupina;
-        if(sk === 'A' || sk === 'B') {
+        if (sk === 'A' || sk === 'B') {
             groupMatches.push(DATA.zapasy[i]);
         }
     }
     
-    groupMatches.sort(sortMatchesById);
+    for (let i = 0; i < groupMatches.length; i++) {
+        for (let j = i + 1; j < groupMatches.length; j++) {
+            let idA = parseInt(groupMatches[i].id);
+            let idB = parseInt(groupMatches[j].id);
+            if (idA > idB) {
+                let temp = groupMatches[i];
+                groupMatches[i] = groupMatches[j];
+                groupMatches[j] = temp;
+            }
+        }
+    }
     
     let len = groupMatches.length;
     let idx = -1;
-    let strId = String(mId);
-    let targetId = parseInt(strId);
-    
-    for(let i=0; i<len; i++) {
-        if(parseInt(groupMatches[i].id) === targetId) {
-            idx = i; break;
+    let targetId = parseInt(mId);
+    for (let i = 0; i < len; i++) {
+        if (parseInt(groupMatches[i].id) === targetId) {
+            idx = i;
+            break;
         }
     }
     
@@ -1466,32 +1474,34 @@ function renderFantasyMatches() {
     let html = '';
     for (let i = 0; i < FANTASY_MATCHES.length; i++) {
         let m = FANTASY_MATCHES[i];
-        let hTeam = m.home_team || m.domaci || "Tím 1"; 
-        let aTeam = m.away_team || m.host || "Tím 2";
+        let hTeam = "Tím 1";
+        if (m.home_team) hTeam = m.home_team;
+        else if (m.domaci) hTeam = m.domaci;
+        
+        let aTeam = "Tím 2";
+        if (m.away_team) aTeam = m.away_team;
+        else if (m.host) aTeam = m.host;
         
         let hScore = '?';
-        if (m.real_score_home !== undefined && m.real_score_home !== '') {
-            hScore = m.real_score_home;
-        }
+        if (m.real_score_home !== undefined && m.real_score_home !== '') hScore = m.real_score_home;
         
         let aScore = '?';
-        if (m.real_score_away !== undefined && m.real_score_away !== '') {
-            aScore = m.real_score_away;
-        }
+        if (m.real_score_away !== undefined && m.real_score_away !== '') aScore = m.real_score_away;
         
         let datetime = formatDateTime(m.match_date, m.match_time);
         
-        let mId = m.match_id || m.id;
+        let mId = m.id;
+        if (m.match_id) mId = m.match_id;
+        
         let predState = 'none'; 
         let predDisplay = '';
-        let myPred = localPreds[mId] || m.my_prediction; 
+        
+        let myPred = m.my_prediction;
+        if (localPreds && localPreds[mId]) myPred = localPreds[mId];
         
         if (myPred) { 
-            if (myPred.locked) {
-                predState = 'locked';
-            } else {
-                predState = 'draft';
-            }
+            if (myPred.locked) predState = 'locked';
+            else predState = 'draft';
             predDisplay = myPred.val; 
         }
         
@@ -1513,9 +1523,7 @@ function renderFantasyMatches() {
         }
         
         let isUpcomingFantasy = '';
-        if (hScore === '?' || aScore === '?') {
-            isUpcomingFantasy = 'upcoming-fantasy-match';
-        }
+        if (hScore === '?' || aScore === '?') isUpcomingFantasy = 'upcoming-fantasy-match';
         
         let infoStyle = '';
         let multHtml = '';
@@ -1535,7 +1543,10 @@ function renderFantasyMatches() {
     }
     
     contentEl.innerHTML = html;
-    handleMainScroll();
+    
+    if (typeof handleMainScroll === 'function') {
+        handleMainScroll();
+    }
 }
 
 function renderFantasyLeaderboard() {
@@ -1549,12 +1560,8 @@ function renderFantasyLeaderboard() {
             let m = FANTASY_MATCHES[i];
             let hScore = '?';
             let aScore = '?';
-            if (m.real_score_home !== undefined && m.real_score_home !== '') {
-                hScore = m.real_score_home;
-            }
-            if (m.real_score_away !== undefined && m.real_score_away !== '') {
-                aScore = m.real_score_away;
-            }
+            if (m.real_score_home !== undefined && m.real_score_home !== '') hScore = m.real_score_home;
+            if (m.real_score_away !== undefined && m.real_score_away !== '') aScore = m.real_score_away;
 
             for (let j = 0; j < FANTASY_PLAYERS.length; j++) {
                 let p = FANTASY_PLAYERS[j];
@@ -1565,7 +1572,9 @@ function renderFantasyLeaderboard() {
                     pPred = m.my_prediction;
                 } else if (m.predictions) {
                     for (let k = 0; k < m.predictions.length; k++) {
-                        if (String(m.predictions[k].player_name).trim().toLowerCase() === String(p).trim().toLowerCase()) {
+                        let predName = String(m.predictions[k].player_name).trim().toLowerCase();
+                        let targetName = String(p).trim().toLowerCase();
+                        if (predName === targetName) {
                             pPred = m.predictions[k];
                             break;
                         }
@@ -1573,12 +1582,23 @@ function renderFantasyLeaderboard() {
                 }
 
                 if (pPred) {
-                    let rawLock = String(pPred.is_locked || pPred.locked).trim().toUpperCase();
-                    let isLocked = (rawLock === "TRUE" || rawLock === "PRAVDA" || rawLock === "1" || pPred.locked === true || pPred.is_locked === true);
-                    let tipValue = pPred.val !== undefined ? pPred.val : pPred.pred_value;
+                    let rawLock = '';
+                    if (pPred.is_locked !== undefined) rawLock = String(pPred.is_locked).trim().toUpperCase();
+                    else if (pPred.locked !== undefined) rawLock = String(pPred.locked).trim().toUpperCase();
+                    
+                    let isLocked = false;
+                    if (rawLock === "TRUE" || rawLock === "PRAVDA" || rawLock === "1" || pPred.locked === true || pPred.is_locked === true) {
+                        isLocked = true;
+                    }
+                    
+                    let tipValue = '?';
+                    if (pPred.val !== undefined) tipValue = pPred.val;
+                    else if (pPred.pred_value !== undefined) tipValue = pPred.pred_value;
 
                     if (isLocked && hScore !== '?' && aScore !== '?' && tipValue && tipValue !== "?") {
-                        let mult = getMatchMultiplier(m.match_id || m.id);
+                        let mId = m.id;
+                        if (m.match_id) mId = m.match_id;
+                        let mult = getMatchMultiplier(mId);
                         playerPoints[p] += calculateFantasyPoints(pPred.pred_mode, tipValue, hScore, aScore) * mult;
                     }
                 }
@@ -1590,14 +1610,30 @@ function renderFantasyLeaderboard() {
     let keys = Object.keys(playerPoints);
     for (let i = 0; i < keys.length; i++) {
         let pName = keys[i];
-        let bonusData = calculatePlayerPremiePoints(pName);
+        let totalPts = playerPoints[pName];
+        
+        if (typeof calculatePlayerPremiePoints === 'function') {
+            let bonusData = calculatePlayerPremiePoints(pName);
+            if (bonusData && bonusData.totalBonus) {
+                totalPts += bonusData.totalBonus;
+            }
+        }
+        
         sortedPlayers.push({
             name: pName,
-            pts: playerPoints[pName] + bonusData.totalBonus
+            pts: totalPts
         });
     }
 
-    sortedPlayers.sort(sortPlayersDesc);
+    for (let i = 0; i < sortedPlayers.length; i++) {
+        for (let j = i + 1; j < sortedPlayers.length; j++) {
+            if (sortedPlayers[i].pts < sortedPlayers[j].pts) {
+                let temp = sortedPlayers[i];
+                sortedPlayers[i] = sortedPlayers[j];
+                sortedPlayers[j] = temp;
+            }
+        }
+    }
 
     let html = '';
     let savedName = localStorage.getItem('fantasy_name');
@@ -1610,7 +1646,8 @@ function renderFantasyLeaderboard() {
         html += '<tr class="' + rowClass + '"><td style="text-align: left; padding-left: 12px;"><span class="s-rank">' + (i+1) + '.</span> ' + p.name + '</td><td style="color: var(--accent); font-weight: 800; text-align: right; padding-right: 12px;">' + p.pts + '</td></tr>';
     }
     
-    document.getElementById('fantasy-leaderboard-content').innerHTML = html;
+    let lbContent = document.getElementById('fantasy-leaderboard-content');
+    if (lbContent) lbContent.innerHTML = html;
 }
 
 // ═══════════════════════════════════════
