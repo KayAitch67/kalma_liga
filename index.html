@@ -113,6 +113,7 @@
     .global-switcher {
       display: flex; background: #1e1e1e; padding: 4px; border-radius: 12px; gap: 4px; border: 1px solid #333; margin-bottom: 12px; width: 100%;
     }
+    .fantasy-sticky-tabs { position: sticky; top: -16px; z-index: 50; background: var(--bg); padding: 16px 0 10px 0; margin-top: -16px; }
     .gs-btn {
       flex: 1;
       background: #2a2a2a; border: 1px solid #444; border-radius: 8px;
@@ -766,7 +767,7 @@
         <i class="fa-solid fa-star"></i>
       </div>
       
-      <div class="global-switcher" style="margin-bottom: 20px;">
+      <div class="global-switcher fantasy-sticky-tabs" style="margin-bottom: 20px;">
           <button class="gs-btn active" id="f-tab-btn-preds" onclick="switchFantasyTab('preds')">ZÁPASY</button>
           <button class="gs-btn" id="f-tab-btn-premie" onclick="switchFantasyTab('premie')">PRÉMIE</button>
           <button class="gs-btn" id="f-tab-btn-leader" onclick="switchFantasyTab('leader')">LEADERBOARD</button>
@@ -1425,23 +1426,53 @@ function sortPlayersDesc(a, b) {
     return b.pts - a.pts;
 }
 
+function toggleFantasyPlayerDetails(id) {
+    let el = document.getElementById(id);
+    if (el) {
+        if (el.style.display === 'none') {
+            el.style.display = 'table-row';
+        } else {
+            el.style.display = 'none';
+        }
+    }
+}
+
 function getMatchMultiplier(mId) {
     if (!DATA || !DATA.zapasy) return 1;
-    
     let groupMatches = [];
+    
     for (let i = 0; i < DATA.zapasy.length; i++) {
-        let sk = DATA.zapasy[i].skupina;
-        // Zoberieme len zápasy s vyplnenou skupinou
-        if (sk === 'A' || sk === 'B' || sk === 'a' || sk === 'b') {
+        let sk = String(DATA.zapasy[i].skupina).trim().toUpperCase();
+        let isPlayoff = false;
+        if (sk === '') isPlayoff = true;
+        if (sk.indexOf('FINALE') !== -1) isPlayoff = true;
+        if (sk.indexOf('PLAYOFF') !== -1) isPlayoff = true;
+        if (sk.indexOf('PO') !== -1) isPlayoff = true;
+        if (sk === 'O') isPlayoff = true;
+        if (sk === 'S') isPlayoff = true;
+        if (sk === 'F') isPlayoff = true;
+        
+        if (!isPlayoff) {
             groupMatches.push(DATA.zapasy[i]);
         }
     }
     
-    // Zoradenie len podľa čistých čísel z ID zápasov (odstráni akékoľvek texty/medzery)
     for (let i = 0; i < groupMatches.length; i++) {
         for (let j = i + 1; j < groupMatches.length; j++) {
-            let numA = parseInt(String(groupMatches[i].id).replace(/\D/g, '')) || 0;
-            let numB = parseInt(String(groupMatches[j].id).replace(/\D/g, '')) || 0;
+            let strA = String(groupMatches[i].id);
+            let cleanA = "";
+            for (let k = 0; k < strA.length; k++) {
+                if (strA.charCodeAt(k) >= 48 && strA.charCodeAt(k) <= 57) cleanA += strA[k];
+            }
+            let numA = parseInt(cleanA) || 0;
+            
+            let strB = String(groupMatches[j].id);
+            let cleanB = "";
+            for (let k = 0; k < strB.length; k++) {
+                if (strB.charCodeAt(k) >= 48 && strB.charCodeAt(k) <= 57) cleanB += strB[k];
+            }
+            let numB = parseInt(cleanB) || 0;
+            
             if (numA > numB) {
                 let temp = groupMatches[i];
                 groupMatches[i] = groupMatches[j];
@@ -1450,13 +1481,31 @@ function getMatchMultiplier(mId) {
         }
     }
     
-    let len = groupMatches.length;
+    let newGrpMatches = [];
+    let maxLimit = 72;
+    if (groupMatches.length < 72) maxLimit = groupMatches.length;
+    for (let i = 0; i < maxLimit; i++) {
+        newGrpMatches.push(groupMatches[i]);
+    }
+    
+    let targetStr = String(mId);
+    let targetClean = "";
+    for (let k = 0; k < targetStr.length; k++) {
+        if (targetStr.charCodeAt(k) >= 48 && targetStr.charCodeAt(k) <= 57) targetClean += targetStr[k];
+    }
+    let targetNum = parseInt(targetClean) || 0;
+    
+    let len = newGrpMatches.length;
     let idx = -1;
-    // Očistíme aj target ID od backendu
-    let targetNum = parseInt(String(mId).replace(/\D/g, '')) || 0;
     
     for (let i = 0; i < len; i++) {
-        let currentNum = parseInt(String(groupMatches[i].id).replace(/\D/g, '')) || 0;
+        let curStr = String(newGrpMatches[i].id);
+        let curClean = "";
+        for (let k = 0; k < curStr.length; k++) {
+            if (curStr.charCodeAt(k) >= 48 && curStr.charCodeAt(k) <= 57) curClean += curStr[k];
+        }
+        let currentNum = parseInt(curClean) || 0;
+        
         if (currentNum === targetNum && targetNum !== 0) {
             idx = i;
             break;
@@ -1489,10 +1538,18 @@ function renderFantasyMatches() {
         else if (m.host) aTeam = m.host;
         
         let hScore = '?';
-        if (m.real_score_home !== undefined && m.real_score_home !== '') hScore = m.real_score_home;
+        let hScoreStyle = 'color: #ffffff;';
+        if (m.real_score_home !== undefined && m.real_score_home !== '') {
+            hScore = m.real_score_home;
+            hScoreStyle = 'color: var(--accent);';
+        }
         
         let aScore = '?';
-        if (m.real_score_away !== undefined && m.real_score_away !== '') aScore = m.real_score_away;
+        let aScoreStyle = 'color: #ffffff;';
+        if (m.real_score_away !== undefined && m.real_score_away !== '') {
+            aScore = m.real_score_away;
+            aScoreStyle = 'color: var(--accent);';
+        }
         
         let datetime = formatDateTime(m.match_date, m.match_time);
         
@@ -1545,7 +1602,7 @@ function renderFantasyMatches() {
             multHtml = '<div style="position: absolute; top: 27px; left: 12px; font-size: 10px; font-weight: 900; color: #fff; text-shadow: 0 0 10px #fff; z-index: 5;">10X BONUS</div>';
         }
         
-        html += '<div class="f-card ' + isUpcomingFantasy + '"><div class="f-info" style="position: relative; ' + infoStyle + '"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;"><div class="f-datetime" style="margin-bottom: 0;">' + datetime + '</div><div class="f-pts">' + ptsText + '</div></div>' + multHtml + '<div class="f-matchup"><div class="f-teams"><div class="f-team">' + hTeam + '</div><div class="f-team">' + aTeam + '</div></div><div class="f-score"><div class="f-score-val">' + hScore + '</div><div class="f-score-val">' + aScore + '</div></div></div></div>' + actionHtml + '</div>';
+        html += '<div class="f-card ' + isUpcomingFantasy + '"><div class="f-info" style="position: relative; ' + infoStyle + '"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;"><div class="f-datetime" style="margin-bottom: 0;">' + datetime + '</div><div class="f-pts">' + ptsText + '</div></div>' + multHtml + '<div class="f-matchup"><div class="f-teams"><div class="f-team">' + hTeam + '</div><div class="f-team">' + aTeam + '</div></div><div class="f-score"><div class="f-score-val" style="' + hScoreStyle + '">' + hScore + '</div><div class="f-score-val" style="' + aScoreStyle + '">' + aScore + '</div></div></div></div>' + actionHtml + '</div>';
     }
     
     contentEl.innerHTML = html;
@@ -1557,8 +1614,15 @@ function renderFantasyMatches() {
 
 function renderFantasyLeaderboard() {
     let playerPoints = {};
+    let playerMatchPoints = {};
+    
     for (let i = 0; i < FANTASY_PLAYERS.length; i++) {
-        playerPoints[FANTASY_PLAYERS[i]] = 0;
+        let pName = FANTASY_PLAYERS[i];
+        playerPoints[pName] = 0;
+        playerMatchPoints[pName] = {};
+        for (let j = 1; j <= 72; j++) {
+            playerMatchPoints[pName][j] = 0;
+        }
     }
 
     if (FANTASY_MATCHES && FANTASY_MATCHES.length > 0) {
@@ -1568,6 +1632,16 @@ function renderFantasyLeaderboard() {
             let aScore = '?';
             if (m.real_score_home !== undefined && m.real_score_home !== '') hScore = m.real_score_home;
             if (m.real_score_away !== undefined && m.real_score_away !== '') aScore = m.real_score_away;
+
+            let mId = m.id;
+            if (m.match_id) mId = m.match_id;
+            
+            let targetStr = String(mId);
+            let targetClean = "";
+            for (let k = 0; k < targetStr.length; k++) {
+                if (targetStr.charCodeAt(k) >= 48 && targetStr.charCodeAt(k) <= 57) targetClean += targetStr[k];
+            }
+            let targetNum = parseInt(targetClean) || 0;
 
             for (let j = 0; j < FANTASY_PLAYERS.length; j++) {
                 let p = FANTASY_PLAYERS[j];
@@ -1602,10 +1676,12 @@ function renderFantasyLeaderboard() {
                     else if (pPred.pred_value !== undefined) tipValue = pPred.pred_value;
 
                     if (isLocked && hScore !== '?' && aScore !== '?' && tipValue && tipValue !== "?") {
-                        let mId = m.id;
-                        if (m.match_id) mId = m.match_id;
                         let mult = getMatchMultiplier(mId);
-                        playerPoints[p] += calculateFantasyPoints(pPred.pred_mode, tipValue, hScore, aScore) * mult;
+                        let pts = calculateFantasyPoints(pPred.pred_mode, tipValue, hScore, aScore) * mult;
+                        playerPoints[p] += pts;
+                        if (targetNum > 0 && targetNum <= 72) {
+                            playerMatchPoints[p][targetNum] = pts;
+                        }
                     }
                 }
             }
@@ -1613,9 +1689,8 @@ function renderFantasyLeaderboard() {
     }
 
     let sortedPlayers = [];
-    let keys = Object.keys(playerPoints);
-    for (let i = 0; i < keys.length; i++) {
-        let pName = keys[i];
+    for (let i = 0; i < FANTASY_PLAYERS.length; i++) {
+        let pName = FANTASY_PLAYERS[i];
         let totalPts = playerPoints[pName];
         
         if (typeof calculatePlayerPremiePoints === 'function') {
@@ -1649,7 +1724,43 @@ function renderFantasyLeaderboard() {
         if (p.name === savedName) {
             rowClass = 'my-fantasy-row';
         }
-        html += '<tr class="' + rowClass + '"><td style="text-align: left; padding-left: 12px;"><span class="s-rank">' + (i+1) + '.</span> ' + p.name + '</td><td style="color: var(--accent); font-weight: 800; text-align: right; padding-right: 12px;">' + p.pts + '</td></tr>';
+        
+        let safeStr = String(p.name);
+        let safeId = "fp-";
+        for (let k = 0; k < safeStr.length; k++) {
+            let c = safeStr.charCodeAt(k);
+            if ((c >= 65 && c <= 90) || (c >= 97 && c <= 122) || (c >= 48 && c <= 57)) {
+                safeId += safeStr[k];
+            } else {
+                safeId += "-";
+            }
+        }
+        
+        html += '<tr class="' + rowClass + '" onclick="toggleFantasyPlayerDetails(\'' + safeId + '\')" style="cursor: pointer;"><td style="text-align: left; padding-left: 12px;"><span class="s-rank">' + (i+1) + '.</span> ' + p.name + '</td><td style="color: var(--accent); font-weight: 800; text-align: right; padding-right: 12px;">' + p.pts + '</td></tr>';
+        
+        let scaleMax = 50;
+        for (let n = 1; n <= 72; n++) {
+            if (playerMatchPoints[p.name][n] > scaleMax) {
+                scaleMax = playerMatchPoints[p.name][n];
+            }
+        }
+        
+        let barsHtml = '';
+        for (let n = 1; n <= 72; n++) {
+            let pts = playerMatchPoints[p.name][n];
+            let hPct = (pts / scaleMax) * 100;
+            if (hPct > 100) hPct = 100;
+            
+            let lPct = (n / 72) * 100;
+            
+            if (pts > 0) {
+                barsHtml += '<div style="position: absolute; bottom: 0; left: ' + lPct + '%; width: 2px; height: ' + hPct + '%; background: var(--accent); border-radius: 1px; transform: translateX(-50%);"></div>';
+            }
+        }
+        
+        let chartHtml = '<tr class="team-details-row" id="' + safeId + '" style="display: none;"><td colspan="2" style="padding: 0;"><div class="team-details-container" style="padding: 20px 15px; background: #151515;"><div style="font-size: 10px; font-weight: 800; color: var(--muted); margin-bottom: 15px; text-align: center;">BODOVÝ ZISK ZA ZÁPAS</div><div style="position: relative; height: 50px; width: calc(100% - 20px); margin: 0 auto; border-bottom: 1px solid #444; margin-bottom: 5px;">' + barsHtml + '</div><div style="position: relative; width: calc(100% - 20px); margin: 0 auto; height: 12px; font-size: 9px; font-weight: 800; color: var(--muted);"><span style="position: absolute; left: 0; transform: translateX(-50%);">0</span><span style="position: absolute; left: 83.33%; transform: translateX(-50%);">60</span><span style="position: absolute; right: 0; transform: translateX(50%);">72</span></div></div></td></tr>';
+        
+        html += chartHtml;
     }
     
     let lbContent = document.getElementById('fantasy-leaderboard-content');
