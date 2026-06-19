@@ -1320,95 +1320,151 @@ function selectPrediction(mode, val, btnEl) {
     }
 }
 
-function submitPrediction(isLock) {
+function updateLocalMatchPrediction(mId, mode, val, isLocked, pName) {
+    let len = FANTASY_MATCHES.length;
+    for (let i = 0; i < len; i++) {
+        let m = FANTASY_MATCHES[i];
+        let checkId = m.match_id;
+        if (!checkId) checkId = m.id;
+        
+        if (String(checkId) === String(mId)) {
+            let newPred = {
+                player_name: pName,
+                pred_mode: mode,
+                pred_value: val,
+                val: val,
+                is_locked: isLocked,
+                locked: isLocked
+            };
+            m.my_prediction = newPred;
+            
+            if (!m.predictions) m.predictions = [];
+            let pLen = m.predictions.length;
+            let found = false;
+            for (let j = 0; j < pLen; j++) {
+                let predName = String(m.predictions[j].player_name).trim().toLowerCase();
+                let targetName = String(pName).trim().toLowerCase();
+                if (predName === targetName) {
+                    m.predictions[j] = newPred;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                m.predictions.push(newPred);
+            }
+            break;
+        }
+    }
+}
+
+async function submitPrediction(isLock) {
     let payloadValue = null;
     
     if (currentPredMode === 1 || currentPredMode === 2) {
         if (!currentPredValue || currentPredValue === "exact") {
-            alert("Vyber jednu z možností!"); return;
+            alert("Vyber jednu z možností!"); 
+            return;
         }
         payloadValue = currentPredValue;
     } else if (currentPredMode === 3) {
-        const h = document.getElementById('pred-score-home').value;
-        const a = document.getElementById('pred-score-away').value;
+        let h = document.getElementById('pred-score-home').value;
+        let a = document.getElementById('pred-score-away').value;
         if (h === '' || a === '') {
-            alert("Zadaj presné skóre pre oba tímy!"); return;
+            alert("Zadaj presné skóre pre oba tímy!"); 
+            return;
         }
-        payloadValue = `${h}:${a}`;
+        payloadValue = h + ':' + a;
     }
     
-    const btnDraft = document.querySelector('.btn-draft');
-    const btnLock = document.querySelector('.btn-lock');
-    const originalDraft = btnDraft.innerHTML;
-    const originalLock = btnLock.innerHTML;
+    let pName = localStorage.getItem('fantasy_name');
+    let pin = localStorage.getItem('fantasy_pin');
     
-    // Optická odozva točiaceho sa kolieska
-    if (isLock) btnLock.innerHTML = '<div class="spinner" style="width: 12px; height: 12px; border-width: 2px;"></div>';
-    else btnDraft.innerHTML = '<div class="spinner" style="width: 12px; height: 12px; border-width: 2px;"></div>';
-    
-    const payload = {
-        player_name: localStorage.getItem('fantasy_name'),
-        pin_code: localStorage.getItem('fantasy_pin'),
+    let payload = {
+        player_name: pName,
+        pin_code: pin,
         match_id: currentPredMatchId,
         pred_mode: currentPredMode,
         pred_value: payloadValue,
         is_locked: isLock
     };
+
+    updateLocalMatchPrediction(currentPredMatchId, currentPredMode, payloadValue, isLock, pName);
+    closePredictorModal();
+    renderFantasyMatches();
     
-    fetch(WEB_APP_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.success) {
-            fetchFantasyData(localStorage.getItem('fantasy_name'), localStorage.getItem('fantasy_pin'));
-            closePredictorModal();
-        } else {
-            alert("Chyba: " + data.error);
+    if (typeof renderFantasyLeaderboard === 'function') {
+        renderFantasyLeaderboard();
+    }
+    if (typeof renderFantasyPremie === 'function') {
+        renderFantasyPremie();
+    }
+    
+    try {
+        let res = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        let data = await res.json();
+        if (!data.success) {
+            alert("Chyba ukladania: " + data.error);
         }
-    })
-    .catch(err => {
-        alert("Chyba pripojenia. Skontroluj internet.");
-    })
-    .finally(() => {
-        btnDraft.innerHTML = originalDraft;
-        btnLock.innerHTML = originalLock;
-    });
+    } catch(err) {
+        alert("Chyba pripojenia pri ukladaní.");
+    }
 }
 
-function quickLockPrediction(mId) {
-    const match = FANTASY_MATCHES.find(m => m.match_id === mId || m.id === mId);
-    if (!match || !match.my_prediction) return;
+async function quickLockPrediction(mId) {
+    let matchToLock = null;
+    let len = FANTASY_MATCHES.length;
+    for (let i = 0; i < len; i++) {
+        let checkId = FANTASY_MATCHES[i].match_id;
+        if (!checkId) checkId = FANTASY_MATCHES[i].id;
+        if (String(checkId) === String(mId)) {
+            matchToLock = FANTASY_MATCHES[i];
+            break;
+        }
+    }
     
-    const payload = {
-        player_name: localStorage.getItem('fantasy_name'),
-        pin_code: localStorage.getItem('fantasy_pin'),
+    if (!matchToLock || !matchToLock.my_prediction) return;
+    
+    let pName = localStorage.getItem('fantasy_name');
+    let pin = localStorage.getItem('fantasy_pin');
+    let pMode = matchToLock.my_prediction.pred_mode;
+    let pVal = matchToLock.my_prediction.val;
+    if (pVal === undefined) pVal = matchToLock.my_prediction.pred_value;
+    
+    let payload = {
+        player_name: pName,
+        pin_code: pin,
         match_id: mId,
-        pred_mode: match.my_prediction.pred_mode,
-        pred_value: match.my_prediction.val,
+        pred_mode: pMode,
+        pred_value: pVal,
         is_locked: true
     };
     
-    document.getElementById('fantasy-content').innerHTML = '<div class="loader"><div class="spinner"></div>Uzamykám tip...</div>';
+    updateLocalMatchPrediction(mId, pMode, pVal, true, pName);
+    renderFantasyMatches();
     
-    fetch(WEB_APP_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload)
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.success) {
-            fetchFantasyData(localStorage.getItem('fantasy_name'), localStorage.getItem('fantasy_pin'));
-        } else {
-            alert("Chyba: " + data.error);
-            fetchFantasyData(localStorage.getItem('fantasy_name'), localStorage.getItem('fantasy_pin'));
+    if (typeof renderFantasyLeaderboard === 'function') {
+        renderFantasyLeaderboard();
+    }
+    if (typeof renderFantasyPremie === 'function') {
+        renderFantasyPremie();
+    }
+    
+    try {
+        let res = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        let data = await res.json();
+        if (!data.success) {
+            alert("Chyba ukladania: " + data.error);
         }
-    })
-    .catch(err => {
-        alert("Chyba pripojenia.");
-        fetchFantasyData(localStorage.getItem('fantasy_name'), localStorage.getItem('fantasy_pin'));
-    });
+    } catch(err) {
+        alert("Chyba pripojenia pri ukladaní.");
+    }
 }
 
 function switchFantasyTab(tab) {
@@ -1680,21 +1736,15 @@ function renderFantasyLeaderboard() {
                 }
 
                 if (pPred) {
-                    let rawLock = '';
-                    if (pPred.is_locked !== undefined) rawLock = String(pPred.is_locked).trim().toUpperCase();
-                    else if (pPred.locked !== undefined) rawLock = String(pPred.locked).trim().toUpperCase();
-                    
-                    let isLocked = false;
-                    if (rawLock === "TRUE" || rawLock === "PRAVDA" || rawLock === "1" || pPred.locked === true || pPred.is_locked === true) {
-                        isLocked = true;
-                    }
-                    
                     let tipValue = '?';
                     if (pPred.val !== undefined) tipValue = pPred.val;
                     else if (pPred.pred_value !== undefined) tipValue = pPred.pred_value;
 
-                    if (isLocked && hScore !== '?' && aScore !== '?' && tipValue && tipValue !== "?") {
-                        let mult = getMatchMultiplier(mId);
+                    if (hScore !== '?' && aScore !== '?' && tipValue && tipValue !== "?") {
+                        let mult = 1;
+                        if (typeof getMatchMultiplier === 'function') {
+                            mult = getMatchMultiplier(mId);
+                        }
                         let pts = calculateFantasyPoints(pPred.pred_mode, tipValue, hScore, aScore) * mult;
                         playerPoints[p] += pts;
                         if (targetNum > 0 && targetNum <= 72) {
@@ -2709,7 +2759,9 @@ function calculatePlayerPremiePoints(playerName) {
             pPred = m.my_prediction;
         } else if (m.predictions) {
             for (let j = 0; j < m.predictions.length; j++) {
-                if (String(m.predictions[j].player_name).trim().toLowerCase() === String(playerName).trim().toLowerCase()) {
+                let pNameStr = String(m.predictions[j].player_name).trim().toLowerCase();
+                let targetStr = String(playerName).trim().toLowerCase();
+                if (pNameStr === targetStr) {
                     pPred = m.predictions[j];
                     break;
                 }
@@ -2717,11 +2769,11 @@ function calculatePlayerPremiePoints(playerName) {
         }
 
         if (pPred) {
-            let rawLock = String(pPred.is_locked || pPred.locked).trim().toUpperCase();
-            let isLocked = (rawLock === "TRUE" || rawLock === "PRAVDA" || rawLock === "1" || pPred.locked === true || pPred.is_locked === true);
-            let tipValue = pPred.val !== undefined ? pPred.val : pPred.pred_value;
+            let tipValue = '?';
+            if (pPred.val !== undefined) tipValue = pPred.val;
+            else if (pPred.pred_value !== undefined) tipValue = pPred.pred_value;
 
-            if (isLocked && hScore !== '?' && aScore !== '?' && tipValue && tipValue !== "?") {
+            if (hScore !== '?' && aScore !== '?' && tipValue && tipValue !== "?") {
                 let pts = calculateFantasyPoints(pPred.pred_mode, tipValue, hScore, aScore);
                 if (pts > 0) {
                     let modeNum = parseInt(pPred.pred_mode);
