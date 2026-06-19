@@ -66,7 +66,7 @@
       border-bottom: 1px solid var(--accent);
     }
     .header-left { display: flex; align-items: center; gap: 10px; }
-    .header-logo { width: 45px; height: auto; }
+    .header-logo { width: 38px; height: auto; }
     .header-title-wrap { display: flex; flex-direction: column; justify-content: center; }
     .header-title { 
       font-family: 'Audiowide', cursive;
@@ -1512,84 +1512,22 @@ function toggleFantasyPlayerDetails(id) {
 }
 
 function getMatchMultiplier(mId) {
-    if (!DATA || !DATA.zapasy) return 1;
-    let groupMatches = [];
-    
-    for (let i = 0; i < DATA.zapasy.length; i++) {
-        let sk = String(DATA.zapasy[i].skupina).trim().toUpperCase();
-        let isPlayoff = false;
-        if (sk === '') isPlayoff = true;
-        if (sk.indexOf('FINALE') !== -1) isPlayoff = true;
-        if (sk.indexOf('PLAYOFF') !== -1) isPlayoff = true;
-        if (sk.indexOf('PO') !== -1) isPlayoff = true;
-        if (sk === 'O') isPlayoff = true;
-        if (sk === 'S') isPlayoff = true;
-        if (sk === 'F') isPlayoff = true;
-        
-        if (!isPlayoff) {
-            groupMatches.push(DATA.zapasy[i]);
-        }
-    }
-    
-    for (let i = 0; i < groupMatches.length; i++) {
-        for (let j = i + 1; j < groupMatches.length; j++) {
-            let strA = String(groupMatches[i].id);
-            let cleanA = "";
-            for (let k = 0; k < strA.length; k++) {
-                if (strA.charCodeAt(k) >= 48 && strA.charCodeAt(k) <= 57) cleanA += strA[k];
-            }
-            let numA = parseInt(cleanA) || 0;
-            
-            let strB = String(groupMatches[j].id);
-            let cleanB = "";
-            for (let k = 0; k < strB.length; k++) {
-                if (strB.charCodeAt(k) >= 48 && strB.charCodeAt(k) <= 57) cleanB += strB[k];
-            }
-            let numB = parseInt(cleanB) || 0;
-            
-            if (numA > numB) {
-                let temp = groupMatches[i];
-                groupMatches[i] = groupMatches[j];
-                groupMatches[j] = temp;
-            }
-        }
-    }
-    
-    let newGrpMatches = [];
-    let maxLimit = 72;
-    if (groupMatches.length < 72) maxLimit = groupMatches.length;
-    for (let i = 0; i < maxLimit; i++) {
-        newGrpMatches.push(groupMatches[i]);
-    }
-    
     let targetStr = String(mId);
     let targetClean = "";
+    
     for (let k = 0; k < targetStr.length; k++) {
-        if (targetStr.charCodeAt(k) >= 48 && targetStr.charCodeAt(k) <= 57) targetClean += targetStr[k];
+        let c = targetStr.charCodeAt(k);
+        if (c >= 48 && c <= 57) {
+            targetClean += targetStr[k];
+        }
     }
+    
     let targetNum = parseInt(targetClean) || 0;
     
-    let len = newGrpMatches.length;
-    let idx = -1;
+    if (targetNum === 72) return 10;
+    if (targetNum === 71 || targetNum === 70) return 5;
+    if (targetNum >= 61 && targetNum <= 69) return 2;
     
-    for (let i = 0; i < len; i++) {
-        let curStr = String(newGrpMatches[i].id);
-        let curClean = "";
-        for (let k = 0; k < curStr.length; k++) {
-            if (curStr.charCodeAt(k) >= 48 && curStr.charCodeAt(k) <= 57) curClean += curStr[k];
-        }
-        let currentNum = parseInt(curClean) || 0;
-        
-        if (currentNum === targetNum && targetNum !== 0) {
-            idx = i;
-            break;
-        }
-    }
-    
-    if (idx === -1) return 1;
-    if (idx === len - 1) return 10;
-    if (idx >= len - 3) return 5;
-    if (idx >= len - 12) return 2;
     return 1;
 }
 
