@@ -789,9 +789,9 @@
               <thead>
                   <tr>
                       <th style="text-align: left; padding-left: 12px;"><span class="s-rank">#</span> HRÁČ</th>
-                      <th style="width: 12%; text-align: right; padding-right: 8px; font-size: 10px;">PRIEMER</th>
-                      <th style="width: 16%; text-align: right; padding-right: 8px; font-size: 10px;">PRÉMIE</th>
-                      <th style="width: 16%; text-align: right; padding-right: 12px; font-size: 10px;">BODY</th>
+                      <th style="width: 12%; text-align: center; font-size: 11px;">PRIEMER</th>
+                      <th style="width: 16%; text-align: center; font-size: 11px;">PRÉMIE</th>
+                      <th style="width: 16%; text-align: right; padding-right: 12px; font-size: 11px;">BODY</th>
                   </tr>
               </thead>
               <tbody id="fantasy-leaderboard-content">
@@ -1649,8 +1649,7 @@ function renderFantasyLeaderboard() {
         }
     }
 
-    let totalMatchesAvailable = FANTASY_MATCHES ? FANTASY_MATCHES.length : 0;
-    if (totalMatchesAvailable === 0) totalMatchesAvailable = 72;
+    let totalPlayedMatches = 0;
 
     if (FANTASY_MATCHES && FANTASY_MATCHES.length > 0) {
         for (let i = 0; i < FANTASY_MATCHES.length; i++) {
@@ -1661,7 +1660,10 @@ function renderFantasyLeaderboard() {
             if (m.real_score_away !== undefined && m.real_score_away !== '') aScore = m.real_score_away;
             
             let isPlayed = false;
-            if (hScore !== '?' && aScore !== '?') isPlayed = true;
+            if (hScore !== '?' && aScore !== '?') {
+                isPlayed = true;
+                totalPlayedMatches++;
+            }
 
             let mId = m.id;
             if (m.match_id) mId = m.match_id;
@@ -1700,28 +1702,30 @@ function renderFantasyLeaderboard() {
 
                 let hasTip = (tipValue !== '?' && tipValue !== '' && tipValue !== null && tipValue !== undefined);
 
-                if (hasTip) {
-                    let modeStr = String(pPred.pred_mode);
-                    if (modeStr === "1") playerStats[p].m1 += 1;
-                    else if (modeStr === "2") playerStats[p].m2 += 1;
-                    else if (modeStr === "3") playerStats[p].m3 += 1;
-                }
-
-                if (isPlayed && hasTip) {
-                    let mult = 1;
-                    if (typeof getMatchMultiplier === 'function') {
-                        mult = getMatchMultiplier(mId);
-                    }
-                    
-                    let basePts = calculateFantasyPoints(pPred.pred_mode, tipValue, hScore, aScore);
-                    let finalPts = basePts * mult;
-                    
-                    playerStats[p].totalPts += finalPts;
-                    playerStats[p].basePts += basePts;
-                    playerStats[p].tippedPlayedCount += 1;
-                    
-                    if (targetNum > 0 && targetNum <= 72) {
-                        playerStats[p].matchPtsArr[targetNum] = finalPts;
+                if (isPlayed) {
+                    if (hasTip) {
+                        let modeStr = String(pPred.pred_mode);
+                        if (modeStr === "1") playerStats[p].m1 += 1;
+                        else if (modeStr === "2") playerStats[p].m2 += 1;
+                        else if (modeStr === "3") playerStats[p].m3 += 1;
+                        
+                        let mult = 1;
+                        if (typeof getMatchMultiplier === 'function') {
+                            mult = getMatchMultiplier(mId);
+                        }
+                        
+                        let basePts = calculateFantasyPoints(pPred.pred_mode, tipValue, hScore, aScore);
+                        let finalPts = basePts * mult;
+                        
+                        playerStats[p].totalPts += finalPts;
+                        playerStats[p].basePts += basePts;
+                        playerStats[p].tippedPlayedCount += 1;
+                        
+                        if (targetNum > 0 && targetNum <= 72) {
+                            playerStats[p].matchPtsArr[targetNum] = finalPts;
+                        }
+                    } else {
+                        playerStats[p].missed += 1;
                     }
                 }
             }
@@ -1743,9 +1747,6 @@ function renderFantasyLeaderboard() {
         
         st.totalPts += bonusPts;
         st.bonusPts = bonusPts;
-        
-        st.missed = totalMatchesAvailable - (st.m1 + st.m2 + st.m3);
-        if (st.missed < 0) st.missed = 0;
         
         let avg = "0.00";
         if (st.tippedPlayedCount > 0) {
@@ -1792,8 +1793,8 @@ function renderFantasyLeaderboard() {
         
         html += '<tr class="' + rowClass + '" onclick="toggleFantasyPlayerDetails(\'' + safeId + '\')" style="cursor: pointer;">';
         html += '<td style="text-align: left; padding-left: 12px;"><span class="s-rank">' + (i+1) + '.</span> ' + p.name + '</td>';
-        html += '<td style="color: #ffffff; font-weight: 700; text-align: right; padding-right: 8px;">' + st.avg + '</td>';
-        html += '<td style="color: #ffffff; font-weight: 700; text-align: right; padding-right: 8px;">' + st.bonusPts + '</td>';
+        html += '<td style="color: #ffffff; font-weight: 700; text-align: center;">' + st.avg + '</td>';
+        html += '<td style="color: #ffffff; font-weight: 700; text-align: center;">' + st.bonusPts + '</td>';
         html += '<td style="color: var(--accent); font-weight: 900; text-align: right; padding-right: 12px;">' + st.totalPts + '</td>';
         html += '</tr>';
         
@@ -1815,7 +1816,7 @@ function renderFantasyLeaderboard() {
             }
         }
         
-        let totalStat = totalMatchesAvailable;
+        let totalStat = totalPlayedMatches;
         if (totalStat === 0) totalStat = 1;
         let pctM3 = (st.m3 / totalStat) * 100;
         let pctM2 = (st.m2 / totalStat) * 100;
@@ -1831,7 +1832,7 @@ function renderFantasyLeaderboard() {
         chartHtml += '<div style="position: relative; width: calc(100% - 20px); margin: 0 auto; height: 12px; font-size: 9px; font-weight: 800; color: var(--muted);"><span style="position: absolute; left: 0; transform: translateX(-50%);">0</span><span style="position: absolute; left: 83.33%; transform: translateX(-50%);">60</span><span style="position: absolute; right: 0; transform: translateX(50%);">72</span></div>';
         
         chartHtml += '<div style="margin-top: 25px; padding: 0 5px;">';
-        chartHtml += '<div style="font-size: 10px; font-weight: 800; color: var(--muted); margin-bottom: 12px; text-align: center;">ŠTATISTIKA TIPOV (ZO ' + totalMatchesAvailable + ' ZÁPASOV)</div>';
+        chartHtml += '<div style="font-size: 10px; font-weight: 800; color: var(--muted); margin-bottom: 12px; text-align: center;">ŠTATISTIKA TIPOV (Z ' + totalPlayedMatches + ' ODOHRATÝCH ZÁPASOV)</div>';
         chartHtml += '<div style="display: flex; width: 100%; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 15px;">';
         chartHtml += '<div style="width: ' + pctM1 + '%; background: rgba(var(--accent-rgb), 0.3);"></div>';
         chartHtml += '<div style="width: ' + pctM2 + '%; background: rgba(var(--accent-rgb), 0.65);"></div>';
