@@ -932,7 +932,30 @@
          <div id="match-modal-body"></div>
       </div>
     </div>
+
+    <div id="season-2-container" style="display: none;">
+      <div class="s2-nav-wrapper">
+          <button id="s2-btn-1" class="s2-nav-btn active" onclick="switchSeason2Phase(1)">Fáza 1: Swiss</button>
+          <button id="s2-btn-2" class="s2-nav-btn" onclick="switchSeason2Phase(2)">Fáza 2: Skupina Majstrov</button>
+          <button id="s2-btn-3" class="s2-nav-btn" onclick="switchSeason2Phase(3)">Fáza 3: Grand Final</button>
+      </div>
   
+      <div id="s2-phase-1" style="display: block;">
+          <div id="swiss-content"></div>
+      </div>
+  
+      <div id="s2-phase-2" style="display: none;">
+          <div style="text-align: center; color: var(--muted); padding: 40px 0; font-size: 12px; font-weight: 800;">
+              ZAMKNUTÉ (ČAKÁ SA NA KONIEC FÁZY 1)
+          </div>
+      </div>
+  
+      <div id="s2-phase-3" style="display: none;">
+          <div style="text-align: center; color: var(--muted); padding: 40px 0; font-size: 12px; font-weight: 800;">
+              ZAMKNUTÉ (ČAKÁ SA NA FINALISTOV)
+          </div>
+      </div>
+    </div>
     <nav id="bottom-nav">
       <div class="nav-drag-area" id="navDragArea">
         <div class="nav-handle"></div>
@@ -959,29 +982,6 @@
         <div class="nav-item bottom-row" onclick="openSettingsModal()">
           <i class="fa-solid fa-gear"></i><span>Nastavenia</span>
         </div>
-      </div>
-    </div>
-    <div id="season-2-container" style="display: none;">
-      <div class="s2-nav-wrapper">
-          <button id="s2-btn-1" class="s2-nav-btn active" onclick="switchSeason2Phase(1)">Fáza 1: Swiss</button>
-          <button id="s2-btn-2" class="s2-nav-btn" onclick="switchSeason2Phase(2)">Fáza 2: Skupina Majstrov</button>
-          <button id="s2-btn-3" class="s2-nav-btn" onclick="switchSeason2Phase(3)">Fáza 3: Grand Final</button>
-      </div>
-  
-      <div id="s2-phase-1" style="display: block;">
-          <div id="swiss-content"></div>
-      </div>
-  
-      <div id="s2-phase-2" style="display: none;">
-          <div style="text-align: center; color: var(--muted); padding: 40px 0; font-size: 12px; font-weight: 800;">
-              ZAMKNUTÉ (ČAKÁ SA NA KONIEC FÁZY 1)
-          </div>
-      </div>
-  
-      <div id="s2-phase-3" style="display: none;">
-          <div style="text-align: center; color: var(--muted); padding: 40px 0; font-size: 12px; font-weight: 800;">
-              ZAMKNUTÉ (ČAKÁ SA NA FINALISTOV)
-          </div>
       </div>
     </div>
   </nav>
