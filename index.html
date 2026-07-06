@@ -555,22 +555,25 @@
       display: flex; flex-direction: column; z-index: 100; height: 90px;
       transition: height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 -4px 20px rgba(0,0,0,0.6); overflow: hidden; 
     }
-    nav.expanded { height: 30vh; }
+    nav.expanded { height: 21vh; }
     .nav-drag-area { width: 100%; height: 24px; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; }
     .nav-handle { width: 40px; height: 4px; background: #555; border-radius: 2px; transition: background 0.2s; }
     .nav-drag-area:hover .nav-handle { background: var(--accent); }
     
     .nav-items-container {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      width: 100%; padding-top: 5px; height: calc(100% - 24px);
+      display: grid; 
+      grid-template-columns: repeat(4, 1fr); 
+      width: 100%; 
+      padding-top: 5px; 
+      height: calc(100% - 24px);
+      align-content: start;
+      row-gap: 5px;
     }
     
     .nav-item {
       position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
       color: var(--muted); cursor: pointer; transition: 0.2s; height: 60px; 
     }
-    .nav-item.top-row { transform: translateY(-5px); width: 100%; }
-    .nav-item.bottom-row { margin-top: 10px; width: 100%; }
        
     .nav-item i { font-size: 20px; }
     .nav-item span { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;}
@@ -674,18 +677,43 @@
     .season-btn { flex: 1; padding: 6px 16px; font-size: 9px; font-weight: 800; color: var(--muted); background: transparent; border: none; border-radius: 4px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; white-space: nowrap; }
     .season-btn.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.3); border: 1px solid #444; }
     .season-dropdown {
-    background: #111;
-    color: var(--accent);
-    border: 1px solid #444;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 900;
-    text-transform: uppercase;
-    outline: none;
-    cursor: pointer;
-    margin-left: 15px;
-    }  
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent url('data:image/svg+xml;utf8,<svg fill="%23ffffff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat left center;
+      background-size: 16px;
+      color: #ffffff;
+      border: none;
+      padding: 2px 0 2px 16px;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      outline: none;
+      cursor: pointer;
+      margin: 0;
+      line-height: 1;
+    }
+  
+    .season-dropdown option {
+      background: #111;
+      color: #ffffff;
+    }
+    
+    .s2-phase-title { font-size: 14px; font-weight: 900; color: #fff; text-align: center; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+    .s2-rr-container { display: flex; flex-direction: column; gap: 20px; }
+    .s2-rr-table-wrap { background: var(--surface); border-radius: 8px; overflow: hidden; border: 1px solid #333; }
+    .s2-rr-matches { display: flex; flex-direction: column; gap: 10px; }
+    .s2-gf-container { background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.15), #111); border: 1px solid var(--accent); border-radius: 12px; padding: 40px 20px; text-align: center; box-shadow: 0 0 25px rgba(var(--accent-rgb), 0.1); margin-top: 10px; }
+    .s2-gf-players { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 20px; }
+    .s2-gf-player { font-size: 16px; font-weight: 900; color: #fff; width: 40%; text-transform: uppercase; }
+    .s2-gf-vs { font-size: 20px; font-weight: 900; color: var(--accent); font-style: italic; text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.8); }
+    .s2-gf-score { font-size: 45px; font-weight: 900; color: #fff; margin-bottom: 10px; line-height: 1; }
+    .s2-gf-bo3 { font-size: 10px; font-weight: 800; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+    
+    @media(min-width: 768px) { 
+        .s2-rr-container { flex-direction: row; align-items: flex-start; } 
+        .s2-rr-table-wrap { flex: 1; } 
+        .s2-rr-matches { flex: 1; } 
+    }
   </style>
 </head>
 <body>
@@ -2819,41 +2847,45 @@ function sortPlayersDesc(a, b) {
 }
 
 function updateHeaderProgress() {
-    let currentMatches = [];
-    
     if (GLOBAL_CURRENT_SEASON === 1 && typeof MATCHES !== 'undefined') {
-        currentMatches = MATCHES;
-    } else if (GLOBAL_CURRENT_SEASON === 2 && typeof S2_MATCHES !== 'undefined') {
-        currentMatches = S2_MATCHES;
-    }
-    
-    let totalLeagueMatches = currentMatches.length;
-    let playedLeagueMatches = 0;
+        let totalLeagueMatches = MATCHES.length;
+        let playedLeagueMatches = 0;
 
-    for (let i = 0; i < totalLeagueMatches; i++) {
-        let m = currentMatches[i];
-        let hScore = '?';
-        if (m.home_score !== undefined && m.home_score !== '') hScore = m.home_score;
-        else if (m.skore_domaci !== undefined && m.skore_domaci !== '') hScore = m.skore_domaci;
+        for (let i = 0; i < totalLeagueMatches; i++) {
+            let m = MATCHES[i];
+            let hScore = '?';
+            if (m.home_score !== undefined && m.home_score !== '') hScore = m.home_score;
+            else if (m.skore_domaci !== undefined && m.skore_domaci !== '') hScore = m.skore_domaci;
 
-        if (hScore !== '?') {
-            playedLeagueMatches++;
+            if (hScore !== '?') {
+                playedLeagueMatches++;
+            }
         }
-    }
 
-    let progressPct = 0;
-    if (totalLeagueMatches > 0) {
-        progressPct = (playedLeagueMatches / totalLeagueMatches) * 100;
-    }
+        let progressPct = 0;
+        if (totalLeagueMatches > 0) {
+            progressPct = (playedLeagueMatches / totalLeagueMatches) * 100;
+        }
 
-    let pieChartEl = document.getElementById('header-pie-chart'); 
-    if (pieChartEl) {
-        pieChartEl.style.background = 'conic-gradient(var(--accent) ' + progressPct + '%, #222 ' + progressPct + '%)';
-    }
+        let pieChartEl = document.getElementById('header-pie-chart'); 
+        if (pieChartEl) {
+            pieChartEl.style.background = 'conic-gradient(var(--accent) ' + progressPct + '%, #222 ' + progressPct + '%)';
+        }
 
-    let progressTextEl = document.getElementById('header-progress-text');
-    if (progressTextEl) {
-        progressTextEl.innerHTML = playedLeagueMatches + '/' + totalLeagueMatches;
+        let progressTextEl = document.getElementById('header-progress-text');
+        if (progressTextEl) {
+            progressTextEl.innerHTML = playedLeagueMatches + '/' + totalLeagueMatches;
+        }
+    } else if (GLOBAL_CURRENT_SEASON === 2) {
+        let pieChartEl = document.getElementById('header-pie-chart'); 
+        if (pieChartEl) {
+            pieChartEl.style.background = 'conic-gradient(var(--accent) 0%, #222 0%)';
+        }
+
+        let progressTextEl = document.getElementById('header-progress-text');
+        if (progressTextEl) {
+            progressTextEl.innerHTML = '0/17';
+        }
     }
 }
   
@@ -3148,7 +3180,7 @@ function renderSeason2SwissPlaceholder() {
     
     html += '<div class="swiss-col">';
     html += '<div class="swiss-col-title">3. KOLO</div>';
-    html += '<div class="swiss-group-title" style="color: #ffaa00;">SKÓRE 1-1 (KTO Z KOHO)</div>';
+    html += '<div class="swiss-group-title" style="color: #ffaa00;">SKÓRE 1-1 (DECIDER)</div>';
     
     for (let i = 1; i <= 2; i++) {
         html += '<div class="swiss-match" style="border-color: rgba(255, 170, 0, 0.5);">';
@@ -3164,6 +3196,39 @@ function renderSeason2SwissPlaceholder() {
     if (contentEl) contentEl.innerHTML = html;
 }
 
+function renderSeason2RestPlaceholders() {
+    let p2Html = '<div class="s2-phase-title">SKUPINA MAJSTROV</div>';
+    p2Html += '<div class="s2-rr-container">';
+    p2Html += '<div class="s2-rr-table-wrap"><table class="standings-table"><thead><tr><th style="text-align:left; padding-left:12px;">HRÁČ</th><th style="width:12%; text-align:center;">Z</th><th style="width:12%; text-align:center;">V</th><th style="width:12%; text-align:center;">P</th><th style="width:18%; text-align:center;">B</th></tr></thead><tbody>';
+    
+    for (let i = 1; i <= 4; i++) {
+        let rowStyle = '';
+        if (i <= 2) rowStyle = 'background: rgba(var(--accent-rgb), 0.15); border-left: 3px solid var(--accent);';
+        p2Html += '<tr style="' + rowStyle + '"><td style="text-align:left; padding-left:12px; font-weight:700;">' + i + '. Hráč ' + String.fromCharCode(64 + i) + '</td><td style="text-align:center; color:var(--muted); font-weight:700;">0</td><td style="text-align:center; color:var(--muted); font-weight:700;">0</td><td style="text-align:center; color:var(--muted); font-weight:700;">0</td><td style="text-align:center; font-weight:900; color:var(--accent);">0</td></tr>';
+    }
+    
+    p2Html += '</tbody></table></div>';
+    
+    p2Html += '<div class="s2-rr-matches">';
+    for (let i = 1; i <= 6; i++) {
+        p2Html += '<div class="swiss-match"><div class="swiss-match-team"><span>Hráč X</span><span class="swiss-score">-</span></div><div class="swiss-match-team"><span>Hráč Y</span><span class="swiss-score">-</span></div></div>';
+    }
+    p2Html += '</div></div>';
+    
+    let p2El = document.getElementById('s2-phase-2');
+    if (p2El) p2El.innerHTML = p2Html;
+
+    let p3Html = '<div class="s2-phase-title">GRAND FINAL</div>';
+    p3Html += '<div class="s2-gf-container">';
+    p3Html += '<div class="s2-gf-players"><div class="s2-gf-player">Finalista 1</div><div class="s2-gf-vs">VS</div><div class="s2-gf-player">Finalista 2</div></div>';
+    p3Html += '<div class="s2-gf-score">0 : 0</div>';
+    p3Html += '<div class="s2-gf-bo3">BO3 SÉRIA O TITUL</div>';
+    p3Html += '</div>';
+    
+    let p3El = document.getElementById('s2-phase-3');
+    if (p3El) p3El.innerHTML = p3Html;
+}  
+  
 let GLOBAL_CURRENT_SEASON = 1;
 
 function switchGlobalSeason(seasonNum) {
@@ -3207,7 +3272,7 @@ function switchGlobalSeason(seasonNum) {
         renderScorers();
     }
 }
-
+renderSeason2RestPlaceholders();
 renderSeason2SwissPlaceholder();
 loadAll();
 </script>
