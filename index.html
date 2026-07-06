@@ -658,7 +658,8 @@
     .my-fantasy-row td { background: rgba(var(--accent-rgb), 0.15) !important; color: #fff; text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.6); border: none !important; box-shadow: none !important; }
     #scroll-to-next-btn { position: fixed; bottom: 110px; right: 20px; width: 45px; height: 45px; background: #ffffff; color: #333333; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5), 0 0 15px rgba(255,255,255, 0.3); z-index: 99; transition: 0.3s; border: none; }
     #scroll-to-next-btn:hover { filter: brightness(0.8); }
-    .s2-nav-wrapper { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; overflow-x: auto; }
+    .s2-nav-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px; overflow-x: auto; }
+    .s2-nav-arrow { color: #555; font-size: 10px; font-weight: 900; flex-shrink: 0; }
     .s2-nav-btn { background: transparent; border: 1px solid #444; color: var(--muted); padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
     .s2-nav-btn.active { background: rgba(var(--accent-rgb), 0.15); border-color: var(--accent); color: var(--accent); }
     .s2-nav-btn:hover { border-color: var(--accent); color: #fff; }
@@ -861,9 +862,11 @@
     
     <div id="season-2-container" style="display: none;">
       <div class="s2-nav-wrapper">
-          <button id="s2-btn-1" class="s2-nav-btn active" onclick="switchSeason2Phase(1)">Fáza 1: Swiss</button>
-          <button id="s2-btn-2" class="s2-nav-btn" onclick="switchSeason2Phase(2)">Fáza 2: Skupina Majstrov</button>
-          <button id="s2-btn-3" class="s2-nav-btn" onclick="switchSeason2Phase(3)">Fáza 3: Grand Final</button>
+          <button id="s2-btn-1" class="s2-nav-btn active" onclick="switchSeason2Phase(1)">STAGE 1</button>
+          <span class="s2-nav-arrow">&#10095;</span>
+          <button id="s2-btn-2" class="s2-nav-btn" onclick="switchSeason2Phase(2)">STAGE 2</button>
+          <span class="s2-nav-arrow">&#10095;</span>
+          <button id="s2-btn-3" class="s2-nav-btn" onclick="switchSeason2Phase(3)">GRAND FINAL</button>
       </div>
   
       <div id="s2-phase-1" style="display: block;">
@@ -3197,14 +3200,28 @@ function renderSeason2SwissPlaceholder() {
 }
 
 function renderSeason2RestPlaceholders() {
-    let p2Html = '<div class="s2-phase-title">SKUPINA MAJSTROV</div>';
+    let p2Html = '<div class="s2-phase-title">STAGE 2</div>';
     p2Html += '<div class="s2-rr-container">';
-    p2Html += '<div class="s2-rr-table-wrap"><table class="standings-table"><thead><tr><th style="text-align:left; padding-left:12px;">HRÁČ</th><th style="width:12%; text-align:center;">Z</th><th style="width:12%; text-align:center;">V</th><th style="width:12%; text-align:center;">P</th><th style="width:18%; text-align:center;">B</th></tr></thead><tbody>';
+    p2Html += '<div class="s2-rr-table-wrap"><table class="standings-table" style="width: 100%; border-collapse: collapse;"><thead><tr><th style="width: 12%; text-align: center; padding-left: 12px;">#</th><th style="text-align: left;">HRÁČ</th><th style="width: 12%; text-align: center;">Z</th><th style="width: 12%; text-align: center;">V</th><th style="width: 12%; text-align: center;">P</th><th style="width: 18%; text-align: center; padding-right: 12px;">B</th></tr></thead><tbody>';
     
     for (let i = 1; i <= 4; i++) {
-        let rowStyle = '';
-        if (i <= 2) rowStyle = 'background: rgba(var(--accent-rgb), 0.15); border-left: 3px solid var(--accent);';
-        p2Html += '<tr style="' + rowStyle + '"><td style="text-align:left; padding-left:12px; font-weight:700;">' + i + '. Hráč ' + String.fromCharCode(64 + i) + '</td><td style="text-align:center; color:var(--muted); font-weight:700;">0</td><td style="text-align:center; color:var(--muted); font-weight:700;">0</td><td style="text-align:center; color:var(--muted); font-weight:700;">0</td><td style="text-align:center; font-weight:900; color:var(--accent);">0</td></tr>';
+        let rowStyle = 'border-bottom: 1px solid #222;';
+        let rankStyle = 'color: var(--muted);';
+        
+        if (i <= 2) {
+            rowStyle += ' background: rgba(var(--accent-rgb), 0.15);';
+            rankStyle = 'color: var(--accent);';
+        }
+        if (i === 4) rowStyle = rowStyle.replace('border-bottom: 1px solid #222;', ''); 
+        
+        p2Html += '<tr style="' + rowStyle + '">';
+        p2Html += '<td style="text-align: center; font-weight: 900; padding-left: 12px; ' + rankStyle + '">' + i + '.</td>';
+        p2Html += '<td style="text-align: left; font-weight: 700;">Hráč ' + String.fromCharCode(64 + i) + '</td>';
+        p2Html += '<td style="text-align: center; color: var(--muted); font-weight: 700;">0</td>';
+        p2Html += '<td style="text-align: center; color: var(--muted); font-weight: 700;">0</td>';
+        p2Html += '<td style="text-align: center; color: var(--muted); font-weight: 700;">0</td>';
+        p2Html += '<td style="text-align: center; font-weight: 900; color: var(--accent); padding-right: 12px;">0</td>';
+        p2Html += '</tr>';
     }
     
     p2Html += '</tbody></table></div>';
@@ -3227,39 +3244,27 @@ function renderSeason2RestPlaceholders() {
     
     let p3El = document.getElementById('s2-phase-3');
     if (p3El) p3El.innerHTML = p3Html;
-}  
+}
   
 let GLOBAL_CURRENT_SEASON = 1;
 
 function switchGlobalSeason(seasonNum) {
     GLOBAL_CURRENT_SEASON = seasonNum;
     
-    let navPoradie = document.getElementById('nav-btn-poradie');
-    let navPlayoff = document.getElementById('nav-btn-playoff');
-    
     let s1Container = document.getElementById('season-1-container');
     let s2Container = document.getElementById('season-2-container');
     
+    let bottomNav = document.querySelector('nav') || document.querySelector('.bottom-nav');
+    
     if (seasonNum === 1) {
-        if (navPoradie) navPoradie.style.display = 'flex';
-        if (navPlayoff) navPlayoff.style.display = 'flex';
-        
+        if (bottomNav) bottomNav.style.display = 'grid'; 
         if (s1Container) s1Container.style.display = 'block';
         if (s2Container) s2Container.style.display = 'none';
         
     } else if (seasonNum === 2) {
-        if (navPoradie) navPoradie.style.display = 'none';
-        if (navPlayoff) navPlayoff.style.display = 'none';
-        
+        if (bottomNav) bottomNav.style.display = 'none';
         if (s1Container) s1Container.style.display = 'none';
         if (s2Container) s2Container.style.display = 'block';
-        
-        let activeTab = localStorage.getItem('activeMainTab');
-        if (activeTab === 'poradie' || activeTab === 'playoff') {
-            if (typeof switchMainTab === 'function') {
-                switchMainTab('zapasy');
-            }
-        }
     }
     
     if (typeof updateHeaderProgress === 'function') {
