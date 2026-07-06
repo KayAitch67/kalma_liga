@@ -561,7 +561,7 @@
     .nav-drag-area:hover .nav-handle { background: var(--accent); }
     
     .nav-items-container {
-      display: flex; flex-wrap: wrap; justify-content: flex-start; align-content: flex-start;
+      display: grid; grid-template-columns: repeat(4, 1fr);
       width: 100%; padding-top: 5px; height: calc(100% - 24px);
     }
     
@@ -569,11 +569,9 @@
       position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
       color: var(--muted); cursor: pointer; transition: 0.2s; height: 60px; 
     }
-    .nav-item.top-row { width: 25%; transform: translateY(-5px); }
-    .nav-item.bottom-row { width: 33.33%; margin-top: 10px; }
-    .nav-item.top-row:not(:last-child)::after { content: ""; position: absolute; right: 0; top: 25%; bottom: 25%; width: 2px; background: #333; }
-    .nav-item.bottom-row:not(:last-child)::after { content: ""; position: absolute; right: 0; top: 25%; bottom: 25%; width: 2px; background: #333; }
-    
+    .nav-item.top-row { transform: translateY(-5px); width: 100%; }
+    .nav-item.bottom-row { margin-top: 10px; width: 100%; }
+       
     .nav-item i { font-size: 20px; }
     .nav-item span { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;}
     .nav-item.active { color: var(--accent); }
@@ -675,6 +673,19 @@
     .global-season-switcher { display: flex; background: rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 2px; margin: 10px 0 15px 0; width: fit-content; border: 1px solid #333; }
     .season-btn { flex: 1; padding: 6px 16px; font-size: 9px; font-weight: 800; color: var(--muted); background: transparent; border: none; border-radius: 4px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; white-space: nowrap; }
     .season-btn.active { background: var(--surface); color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.3); border: 1px solid #444; }
+    .season-dropdown {
+    background: #111;
+    color: var(--accent);
+    border: 1px solid #444;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    outline: none;
+    cursor: pointer;
+    margin-left: 15px;
+    }  
   </style>
 </head>
 <body>
@@ -684,10 +695,10 @@
       <img src="logo transparent.png" alt="Logo" class="header-logo" onerror="this.style.display='none'">
       <div class="header-title-wrap">
         <span class="header-title">KALMA LIGA</span>
-        <div class="global-season-switcher">
-            <button id="global-s1-btn" class="season-btn active" onclick="switchGlobalSeason(1)">SEZÓNA 1</button>
-            <button id="global-s2-btn" class="season-btn" onclick="switchGlobalSeason(2)">SEZÓNA 2</button>
-        </div>
+        <select class="season-dropdown" onchange="switchGlobalSeason(parseInt(this.value))">
+            <option value="1">SEZÓNA 1</option>
+            <option value="2">SEZÓNA 2</option>
+        </select>
       </div>
     </div>
     <div class="header-right">
@@ -2807,6 +2818,45 @@ function sortPlayersDesc(a, b) {
     return b.pts - a.pts;
 }
 
+function updateHeaderProgress() {
+    let currentMatches = [];
+    
+    if (GLOBAL_CURRENT_SEASON === 1 && typeof MATCHES !== 'undefined') {
+        currentMatches = MATCHES;
+    } else if (GLOBAL_CURRENT_SEASON === 2 && typeof S2_MATCHES !== 'undefined') {
+        currentMatches = S2_MATCHES;
+    }
+    
+    let totalLeagueMatches = currentMatches.length;
+    let playedLeagueMatches = 0;
+
+    for (let i = 0; i < totalLeagueMatches; i++) {
+        let m = currentMatches[i];
+        let hScore = '?';
+        if (m.home_score !== undefined && m.home_score !== '') hScore = m.home_score;
+        else if (m.skore_domaci !== undefined && m.skore_domaci !== '') hScore = m.skore_domaci;
+
+        if (hScore !== '?') {
+            playedLeagueMatches++;
+        }
+    }
+
+    let progressPct = 0;
+    if (totalLeagueMatches > 0) {
+        progressPct = (playedLeagueMatches / totalLeagueMatches) * 100;
+    }
+
+    let pieChartEl = document.getElementById('header-pie-chart'); 
+    if (pieChartEl) {
+        pieChartEl.style.background = 'conic-gradient(var(--accent) ' + progressPct + '%, #222 ' + progressPct + '%)';
+    }
+
+    let progressTextEl = document.getElementById('header-progress-text');
+    if (progressTextEl) {
+        progressTextEl.innerHTML = playedLeagueMatches + '/' + totalLeagueMatches;
+    }
+}
+  
 function calculatePlayerPremiePoints(playerName) {
     let countMode1 = 0;
     let countMode2 = 0;
@@ -3119,19 +3169,6 @@ let GLOBAL_CURRENT_SEASON = 1;
 function switchGlobalSeason(seasonNum) {
     GLOBAL_CURRENT_SEASON = seasonNum;
     
-    let btn1 = document.getElementById('global-s1-btn');
-    let btn2 = document.getElementById('global-s2-btn');
-    
-    if (btn1 && btn2) {
-        if (seasonNum === 1) {
-            btn1.classList.add('active');
-            btn2.classList.remove('active');
-        } else if (seasonNum === 2) {
-            btn1.classList.remove('active');
-            btn2.classList.add('active');
-        }
-    }
-    
     let navPoradie = document.getElementById('nav-btn-poradie');
     let navPlayoff = document.getElementById('nav-btn-playoff');
     
@@ -3160,6 +3197,9 @@ function switchGlobalSeason(seasonNum) {
         }
     }
     
+    if (typeof updateHeaderProgress === 'function') {
+        updateHeaderProgress();
+    }
     if (typeof renderStats === 'function') {
         renderStats();
     }
@@ -3167,6 +3207,7 @@ function switchGlobalSeason(seasonNum) {
         renderScorers();
     }
 }
+
 renderSeason2SwissPlaceholder();
 loadAll();
 </script>
