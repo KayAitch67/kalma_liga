@@ -854,7 +854,7 @@
           <span class="s2-nav-arrow">&#10095;</span>
           <button id="s2-btn-2" class="s2-nav-btn" onclick="switchSeason2Phase(2)">STAGE 2</button>
           <span class="s2-nav-arrow">&#10095;</span>
-          <button id="s2-btn-3" class="s2-nav-btn" onclick="switchSeason2Phase(3)">GRAND FINAL</button>
+          <button id="s2-btn-3" class="s2-nav-btn" onclick="switchSeason2Phase(3)">FINÁLE</button>
       </div>
   
       <div id="s2-phase-1" style="display: block;">
@@ -3147,9 +3147,16 @@ function renderSeason2Swiss() {
     
     for (let i = 0; i < S2_DATA.length; i++) {
         let m = S2_DATA[i];
-        if (m.phase === 'swiss') {
-            let rnd = Number(m.round);
-            let mid = Number(m.id);
+        let phase = '';
+        if (m.phase) phase = String(m.phase).trim().toLowerCase();
+        
+        if (phase === 'swiss') {
+            let rnd = 0;
+            if (m.round) rnd = Number(String(m.round).trim());
+            
+            let mid = 0;
+            if (m.id) mid = Number(String(m.id).trim());
+            
             if (rnd === 1) r1.push(m);
             else if (rnd === 2 && (mid === 5 || mid === 6)) r2w.push(m);
             else if (rnd === 2 && (mid === 7 || mid === 8)) r2l.push(m);
@@ -3162,61 +3169,111 @@ function renderSeason2Swiss() {
     while(r2l.length < 2) r2l.push({home: 'TBD', away: 'TBD'});
     while(r3.length < 2) r3.push({home: 'TBD', away: 'TBD'});
 
+    // Vnútorná funkcia na vyhodnotenie statusu (šípky / postup)
+    let getStatus = function(rnd, mid, isHome, hScore, aScore) {
+        if (hScore === '-' || aScore === '-') return '';
+        let h = Number(hScore);
+        let a = Number(aScore);
+        if (isNaN(h) || isNaN(a) || h === a) return ''; 
+
+        let isWin = isHome ? (h > a) : (a > h);
+        
+        let arrUp = '<i class="fa-solid fa-arrow-up" style="color: #00FF4D; margin-right: 8px; font-size: 10px;"></i>';
+        let arrDn = '<i class="fa-solid fa-arrow-down" style="color: #FF003C; margin-right: 8px; font-size: 10px;"></i>';
+        let post = '<span style="color: #00FF4D; text-shadow: 0 0 8px rgba(0,255,77,0.8); font-size: 8px; font-weight: 900; margin-right: 8px; letter-spacing: 1px;">POSTUP</span>';
+        let elim = '<span style="color: #FF003C; text-shadow: 0 0 8px rgba(255,0,60,0.8); font-size: 8px; font-weight: 900; margin-right: 8px; letter-spacing: 1px;">ELIMINÁCIA</span>';
+
+        if (rnd === 1) {
+            return isWin ? arrUp : arrDn;
+        } else if (rnd === 2 && (mid === 5 || mid === 6)) {
+            return isWin ? post : arrDn;
+        } else if (rnd === 2 && (mid === 7 || mid === 8)) {
+            return isWin ? arrUp : elim;
+        } else if (rnd === 3) {
+            return isWin ? post : elim;
+        }
+        return '';
+    };
+
     let html = '<div class="swiss-board">';
     
     html += '<div class="swiss-col">';
-    html += '<div class="swiss-col-title">STAGE 1: 1. KOLO</div>';
+    html += '<div class="swiss-col-title">PRVÉ KOLO</div>';
     html += '<div class="swiss-group-title">SKÓRE 0-0</div>';
     for (let i = 0; i < r1.length; i++) {
-        let hTeam = r1[i].home !== undefined ? r1[i].home : (r1[i].domaci !== undefined ? r1[i].domaci : 'TBD');
-        let aTeam = r1[i].away !== undefined ? r1[i].away : (r1[i].host !== undefined ? r1[i].host : 'TBD');
-        let hScore = (r1[i].home_score !== '' && r1[i].home_score !== undefined) ? r1[i].home_score : '-';
-        let aScore = (r1[i].away_score !== '' && r1[i].away_score !== undefined) ? r1[i].away_score : '-';
+        let m = r1[i];
+        let mid = Number(m.id) || 0;
+        let hTeam = m.home; if (!hTeam || String(hTeam).trim() === '') hTeam = m.domaci; if (!hTeam || String(hTeam).trim() === '') hTeam = 'TBD';
+        let aTeam = m.away; if (!aTeam || String(aTeam).trim() === '') aTeam = m.host; if (!aTeam || String(aTeam).trim() === '') aTeam = 'TBD';
+        let hScore = m.home_score; if (hScore === undefined || hScore === '') hScore = m.goly_domaci; if (hScore === undefined || hScore === '') hScore = '-';
+        let aScore = m.away_score; if (aScore === undefined || aScore === '') aScore = m.goly_host; if (aScore === undefined || aScore === '') aScore = '-';
+        
+        let sH = getStatus(1, mid, true, hScore, aScore);
+        let sA = getStatus(1, mid, false, hScore, aScore);
+
         html += '<div class="swiss-match">';
-        html += '<div class="swiss-match-team"><span>' + hTeam + '</span><span class="swiss-score">' + hScore + '</span></div>';
-        html += '<div class="swiss-match-team"><span>' + aTeam + '</span><span class="swiss-score">' + aScore + '</span></div>';
+        html += '<div class="swiss-match-team"><span>' + hTeam + '</span><span class="swiss-score">' + sH + hScore + '</span></div>';
+        html += '<div class="swiss-match-team"><span>' + aTeam + '</span><span class="swiss-score">' + sA + aScore + '</span></div>';
         html += '</div>';
     }
     html += '</div>';
     
     html += '<div class="swiss-col">';
-    html += '<div class="swiss-col-title">STAGE 1: 2. KOLO</div>';
-    html += '<div class="swiss-group-title" style="color: var(--accent);">SKÓRE 1-0 (VÍŤAZI POSTUPUJÚ)</div>';
+    html += '<div class="swiss-col-title">DRUHÉ KOLO</div>';
+    html += '<div class="swiss-group-title" style="color: var(--accent);">SKÓRE 1-0</div>';
     for (let i = 0; i < r2w.length; i++) {
-        let hTeam = r2w[i].home !== undefined ? r2w[i].home : (r2w[i].domaci !== undefined ? r2w[i].domaci : 'TBD');
-        let aTeam = r2w[i].away !== undefined ? r2w[i].away : (r2w[i].host !== undefined ? r2w[i].host : 'TBD');
-        let hScore = (r2w[i].home_score !== '' && r2w[i].home_score !== undefined) ? r2w[i].home_score : '-';
-        let aScore = (r2w[i].away_score !== '' && r2w[i].away_score !== undefined) ? r2w[i].away_score : '-';
+        let m = r2w[i];
+        let mid = Number(m.id) || 0;
+        let hTeam = m.home; if (!hTeam || String(hTeam).trim() === '') hTeam = m.domaci; if (!hTeam || String(hTeam).trim() === '') hTeam = 'TBD';
+        let aTeam = m.away; if (!aTeam || String(aTeam).trim() === '') aTeam = m.host; if (!aTeam || String(aTeam).trim() === '') aTeam = 'TBD';
+        let hScore = m.home_score; if (hScore === undefined || hScore === '') hScore = m.goly_domaci; if (hScore === undefined || hScore === '') hScore = '-';
+        let aScore = m.away_score; if (aScore === undefined || aScore === '') aScore = m.goly_host; if (aScore === undefined || aScore === '') aScore = '-';
+        
+        let sH = getStatus(2, mid, true, hScore, aScore);
+        let sA = getStatus(2, mid, false, hScore, aScore);
+
         html += '<div class="swiss-match" style="border-color: rgba(var(--accent-rgb), 0.5);">';
-        html += '<div class="swiss-match-team"><span>' + hTeam + '</span><span class="swiss-score">' + hScore + '</span></div>';
-        html += '<div class="swiss-match-team"><span>' + aTeam + '</span><span class="swiss-score">' + aScore + '</span></div>';
+        html += '<div class="swiss-match-team"><span>' + hTeam + '</span><span class="swiss-score">' + sH + hScore + '</span></div>';
+        html += '<div class="swiss-match-team"><span>' + aTeam + '</span><span class="swiss-score">' + sA + aScore + '</span></div>';
         html += '</div>';
     }
     
-    html += '<div class="swiss-group-title" style="color: #ff4444; margin-top: 15px;">SKÓRE 0-1 (PORAZENÍ KONČIA)</div>';
+    html += '<div class="swiss-group-title" style="color: #ff4444; margin-top: 15px;">SKÓRE 0-1</div>';
     for (let i = 0; i < r2l.length; i++) {
-        let hTeam = r2l[i].home !== undefined ? r2l[i].home : (r2l[i].domaci !== undefined ? r2l[i].domaci : 'TBD');
-        let aTeam = r2l[i].away !== undefined ? r2l[i].away : (r2l[i].host !== undefined ? r2l[i].host : 'TBD');
-        let hScore = (r2l[i].home_score !== '' && r2l[i].home_score !== undefined) ? r2l[i].home_score : '-';
-        let aScore = (r2l[i].away_score !== '' && r2l[i].away_score !== undefined) ? r2l[i].away_score : '-';
+        let m = r2l[i];
+        let mid = Number(m.id) || 0;
+        let hTeam = m.home; if (!hTeam || String(hTeam).trim() === '') hTeam = m.domaci; if (!hTeam || String(hTeam).trim() === '') hTeam = 'TBD';
+        let aTeam = m.away; if (!aTeam || String(aTeam).trim() === '') aTeam = m.host; if (!aTeam || String(aTeam).trim() === '') aTeam = 'TBD';
+        let hScore = m.home_score; if (hScore === undefined || hScore === '') hScore = m.goly_domaci; if (hScore === undefined || hScore === '') hScore = '-';
+        let aScore = m.away_score; if (aScore === undefined || aScore === '') aScore = m.goly_host; if (aScore === undefined || aScore === '') aScore = '-';
+        
+        let sH = getStatus(2, mid, true, hScore, aScore);
+        let sA = getStatus(2, mid, false, hScore, aScore);
+
         html += '<div class="swiss-match" style="border-color: rgba(255, 68, 68, 0.3); opacity: 0.8;">';
-        html += '<div class="swiss-match-team"><span>' + hTeam + '</span><span class="swiss-score">' + hScore + '</span></div>';
-        html += '<div class="swiss-match-team"><span>' + aTeam + '</span><span class="swiss-score">' + aScore + '</span></div>';
+        html += '<div class="swiss-match-team"><span>' + hTeam + '</span><span class="swiss-score">' + sH + hScore + '</span></div>';
+        html += '<div class="swiss-match-team"><span>' + aTeam + '</span><span class="swiss-score">' + sA + aScore + '</span></div>';
         html += '</div>';
     }
     html += '</div>';
     
     html += '<div class="swiss-col">';
-    html += '<div class="swiss-col-title">STAGE 1: 3. KOLO</div>';
-    html += '<div class="swiss-group-title" style="color: #ffaa00;">SKÓRE 1-1 (KTO Z KOHO)</div>';
+    html += '<div class="swiss-col-title">DECIDER</div>';
+    html += '<div class="swiss-group-title" style="color: #ffaa00;">SKÓRE 1-1</div>';
     for (let i = 0; i < r3.length; i++) {
-        let hTeam = r3[i].home !== undefined ? r3[i].home : (r3[i].domaci !== undefined ? r3[i].domaci : 'TBD');
-        let aTeam = r3[i].away !== undefined ? r3[i].away : (r3[i].host !== undefined ? r3[i].host : 'TBD');
-        let hScore = (r3[i].home_score !== '' && r3[i].home_score !== undefined) ? r3[i].home_score : '-';
-        let aScore = (r3[i].away_score !== '' && r3[i].away_score !== undefined) ? r3[i].away_score : '-';
+        let m = r3[i];
+        let mid = Number(m.id) || 0;
+        let hTeam = m.home; if (!hTeam || String(hTeam).trim() === '') hTeam = m.domaci; if (!hTeam || String(hTeam).trim() === '') hTeam = 'TBD';
+        let aTeam = m.away; if (!aTeam || String(aTeam).trim() === '') aTeam = m.host; if (!aTeam || String(aTeam).trim() === '') aTeam = 'TBD';
+        let hScore = m.home_score; if (hScore === undefined || hScore === '') hScore = m.goly_domaci; if (hScore === undefined || hScore === '') hScore = '-';
+        let aScore = m.away_score; if (aScore === undefined || aScore === '') aScore = m.goly_host; if (aScore === undefined || aScore === '') aScore = '-';
+        
+        let sH = getStatus(3, mid, true, hScore, aScore);
+        let sA = getStatus(3, mid, false, hScore, aScore);
+
         html += '<div class="swiss-match" style="border-color: rgba(255, 170, 0, 0.5);">';
-        html += '<div class="swiss-match-team"><span>' + hTeam + '</span><span class="swiss-score">' + hScore + '</span></div>';
-        html += '<div class="swiss-match-team"><span>' + aTeam + '</span><span class="swiss-score">' + aScore + '</span></div>';
+        html += '<div class="swiss-match-team"><span>' + hTeam + '</span><span class="swiss-score">' + sH + hScore + '</span></div>';
+        html += '<div class="swiss-match-team"><span>' + aTeam + '</span><span class="swiss-score">' + sA + aScore + '</span></div>';
         html += '</div>';
     }
     html += '</div>';
@@ -3237,61 +3294,66 @@ function renderSeason2Rest() {
 
     for (let i = 0; i < S2_DATA.length; i++) {
         let m = S2_DATA[i];
+        let phase = '';
+        if (m.phase) phase = String(m.phase).trim().toLowerCase();
         
-        let hTeam = m.home !== undefined ? m.home : (m.domaci !== undefined ? m.domaci : 'TBD');
-        let aTeam = m.away !== undefined ? m.away : (m.host !== undefined ? m.host : 'TBD');
-        
-        if (m.phase === 'groups') {
-            groupsMatches.push(m);
-            let hScoreStr = String(m.home_score !== undefined ? m.home_score : (m.goly_domaci !== undefined ? m.goly_domaci : ''));
-            let aScoreStr = String(m.away_score !== undefined ? m.away_score : (m.goly_host !== undefined ? m.goly_host : ''));
+        if (phase === 'groups' || phase === 'final') {
+            let hTeam = m.home; if (!hTeam || String(hTeam).trim() === '') hTeam = m.domaci; if (!hTeam || String(hTeam).trim() === '') hTeam = 'TBD';
+            let aTeam = m.away; if (!aTeam || String(aTeam).trim() === '') aTeam = m.host; if (!aTeam || String(aTeam).trim() === '') aTeam = 'TBD';
             
-            let isPlayed = false;
-            if (hScoreStr !== '' && aScoreStr !== '' && hScoreStr !== 'undefined' && aScoreStr !== 'undefined') {
-                isPlayed = true;
-            }
-
-            let homeIdx = -1;
-            let awayIdx = -1;
-            
-            for (let j = 0; j < standings.length; j++) {
-                if (standings[j].name === hTeam) homeIdx = j;
-                if (standings[j].name === aTeam) awayIdx = j;
-            }
-            
-            if (homeIdx === -1 && hTeam !== 'TBD' && hTeam !== '') {
-                standings.push({ name: hTeam, z: 0, v: 0, p: 0, b: 0 });
-                homeIdx = standings.length - 1;
-            }
-            if (awayIdx === -1 && aTeam !== 'TBD' && aTeam !== '') {
-                standings.push({ name: aTeam, z: 0, v: 0, p: 0, b: 0 });
-                awayIdx = standings.length - 1;
-            }
-
-            if (isPlayed && homeIdx !== -1 && awayIdx !== -1) {
-                let hScore = (Number(hScoreStr)) || 0;
-                let aScore = (Number(aScoreStr)) || 0;
+            if (phase === 'groups') {
+                groupsMatches.push(m);
                 
-                standings[homeIdx].z += 1;
-                standings[awayIdx].z += 1;
+                let hScoreStr = m.home_score; if (hScoreStr === undefined || hScoreStr === '') hScoreStr = m.goly_domaci; if (hScoreStr === undefined || hScoreStr === null) hScoreStr = '';
+                let aScoreStr = m.away_score; if (aScoreStr === undefined || aScoreStr === '') aScoreStr = m.goly_host; if (aScoreStr === undefined || aScoreStr === null) aScoreStr = '';
                 
-                if (hScore > aScore) {
-                    standings[homeIdx].v += 1;
-                    standings[homeIdx].b += 3;
-                    standings[awayIdx].p += 1;
-                } else if (aScore > hScore) {
-                    standings[awayIdx].v += 1;
-                    standings[awayIdx].b += 3;
-                    standings[homeIdx].p += 1;
-                } else {
-                    standings[homeIdx].b += 1;
-                    standings[awayIdx].b += 1;
+                let isPlayed = false;
+                if (String(hScoreStr).trim() !== '' && String(aScoreStr).trim() !== '') {
+                    isPlayed = true;
+                }
+
+                let homeIdx = -1;
+                let awayIdx = -1;
+                
+                for (let j = 0; j < standings.length; j++) {
+                    if (standings[j].name === hTeam) homeIdx = j;
+                    if (standings[j].name === aTeam) awayIdx = j;
+                }
+                
+                if (homeIdx === -1 && hTeam !== 'TBD') {
+                    standings.push({ name: hTeam, z: 0, v: 0, p: 0, b: 0 });
+                    homeIdx = standings.length - 1;
+                }
+                if (awayIdx === -1 && aTeam !== 'TBD') {
+                    standings.push({ name: aTeam, z: 0, v: 0, p: 0, b: 0 });
+                    awayIdx = standings.length - 1;
+                }
+
+                if (isPlayed && homeIdx !== -1 && awayIdx !== -1) {
+                    let hScore = Number(hScoreStr) || 0;
+                    let aScore = Number(aScoreStr) || 0;
+                    
+                    standings[homeIdx].z += 1;
+                    standings[awayIdx].z += 1;
+                    
+                    if (hScore > aScore) {
+                        standings[homeIdx].v += 1;
+                        standings[homeIdx].b += 3;
+                        standings[awayIdx].p += 1;
+                    } else if (aScore > hScore) {
+                        standings[awayIdx].v += 1;
+                        standings[awayIdx].b += 3;
+                        standings[homeIdx].p += 1;
+                    } else {
+                        standings[homeIdx].b += 1;
+                        standings[awayIdx].b += 1;
+                    }
                 }
             }
-        }
-        
-        if (m.phase === 'final') {
-            finalMatch = m;
+            
+            if (phase === 'final') {
+                finalMatch = m;
+            }
         }
     }
     
@@ -3317,12 +3379,13 @@ function renderSeason2Rest() {
 
     let groupMatchesHtml = '';
     for (let i = 0; i < groupsMatches.length; i++) {
-        let hTeamName = groupsMatches[i].home !== undefined ? groupsMatches[i].home : (groupsMatches[i].domaci !== undefined ? groupsMatches[i].domaci : 'TBD');
-        let aTeamName = groupsMatches[i].away !== undefined ? groupsMatches[i].away : (groupsMatches[i].host !== undefined ? groupsMatches[i].host : 'TBD');
-        let hS = (groupsMatches[i].home_score !== '' && groupsMatches[i].home_score !== undefined) ? groupsMatches[i].home_score : '-';
-        let aS = (groupsMatches[i].away_score !== '' && groupsMatches[i].away_score !== undefined) ? groupsMatches[i].away_score : '-';
+        let m = groupsMatches[i];
+        let hTeamName = m.home; if (!hTeamName || String(hTeamName).trim() === '') hTeamName = m.domaci; if (!hTeamName || String(hTeamName).trim() === '') hTeamName = 'TBD';
+        let aTeamName = m.away; if (!aTeamName || String(aTeamName).trim() === '') aTeamName = m.host; if (!aTeamName || String(aTeamName).trim() === '') aTeamName = 'TBD';
+        let hS = m.home_score; if (hS === undefined || hS === '') hS = m.goly_domaci; if (hS === undefined || hS === '') hS = '-';
+        let aS = m.away_score; if (aS === undefined || aS === '') aS = m.goly_host; if (aS === undefined || aS === '') aS = '-';
         
-        groupMatchesHtml += '<div class="swiss-match">';
+        groupMatchesHtml += '<div class="swiss-match" style="height: fit-content;">';
         groupMatchesHtml += '<div class="swiss-match-team"><span>' + hTeamName + '</span><span class="swiss-score">' + hS + '</span></div>';
         groupMatchesHtml += '<div class="swiss-match-team"><span>' + aTeamName + '</span><span class="swiss-score">' + aS + '</span></div>';
         groupMatchesHtml += '</div>';
@@ -3362,7 +3425,9 @@ function renderSeason2Rest() {
     }
     
     p2Html += '</tbody></table></div>';
-    p2Html += '<div class="s2-rr-matches">' + groupMatchesHtml + '</div></div>';
+    
+    // TOTO JE TO MIESTO PRE GRID (2 STĹPCE)
+    p2Html += '<div class="s2-rr-matches" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">' + groupMatchesHtml + '</div></div>';
     
     let p2El = document.getElementById('s2-phase-2');
     if (p2El) p2El.innerHTML = p2Html;
@@ -3371,10 +3436,10 @@ function renderSeason2Rest() {
     p3Html += '<div class="s2-gf-container">';
     
     if (finalMatch) {
-        let finalHScore = (finalMatch.home_score !== '' && finalMatch.home_score !== undefined) ? finalMatch.home_score : '0';
-        let finalAScore = (finalMatch.away_score !== '' && finalMatch.away_score !== undefined) ? finalMatch.away_score : '0';
-        let finalHome = finalMatch.home !== undefined ? finalMatch.home : (finalMatch.domaci !== undefined ? finalMatch.domaci : 'Finalista 1');
-        let finalAway = finalMatch.away !== undefined ? finalMatch.away : (finalMatch.host !== undefined ? finalMatch.host : 'Finalista 2');
+        let finalHScore = finalMatch.home_score; if (finalHScore === undefined || finalHScore === '') finalHScore = finalMatch.goly_domaci; if (finalHScore === undefined || finalHScore === '') finalHScore = '0';
+        let finalAScore = finalMatch.away_score; if (finalAScore === undefined || finalAScore === '') finalAScore = finalMatch.goly_host; if (finalAScore === undefined || finalAScore === '') finalAScore = '0';
+        let finalHome = finalMatch.home; if (!finalHome || String(finalHome).trim() === '') finalHome = finalMatch.domaci; if (!finalHome || String(finalHome).trim() === '') finalHome = 'Finalista 1';
+        let finalAway = finalMatch.away; if (!finalAway || String(finalAway).trim() === '') finalAway = finalMatch.host; if (!finalAway || String(finalAway).trim() === '') finalAway = 'Finalista 2';
         
         p3Html += '<div class="s2-gf-players"><div class="s2-gf-player">' + finalHome + '</div><div class="s2-gf-vs">VS</div><div class="s2-gf-player">' + finalAway + '</div></div>';
         p3Html += '<div class="s2-gf-score">' + finalHScore + ' : ' + finalAScore + '</div>';
