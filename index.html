@@ -3147,71 +3147,76 @@ function switchSeason2Phase(phaseNum) {
 }
 
 function renderSeason2Swiss() {
-    if (typeof S2_MATCHES === 'undefined' || S2_MATCHES.length === 0) return;
+    let S2_MATCHES_SAFE = [];
+    if (typeof S2_MATCHES !== 'undefined') {
+        S2_MATCHES_SAFE = S2_MATCHES;
+    }
+
+    let r1 = [], r2w = [], r2l = [], r3 = [];
+    
+    for (let i = 0; i < S2_MATCHES_SAFE.length; i++) {
+        let m = S2_MATCHES_SAFE[i];
+        if (m.phase === 'swiss') {
+            if (m.round == 1) r1.push(m);
+            else if (m.round == 2 && (m.id == 5 || m.id == 6)) r2w.push(m);
+            else if (m.round == 2 && (m.id == 7 || m.id == 8)) r2l.push(m);
+            else if (m.round == 3) r3.push(m);
+        }
+    }
+
+    while(r1.length < 4) r1.push({home: 'TBD', away: 'TBD'});
+    while(r2w.length < 2) r2w.push({home: 'TBD', away: 'TBD'});
+    while(r2l.length < 2) r2l.push({home: 'TBD', away: 'TBD'});
+    while(r3.length < 2) r3.push({home: 'TBD', away: 'TBD'});
 
     let html = '<div class="swiss-board">';
     
     html += '<div class="swiss-col">';
     html += '<div class="swiss-col-title">STAGE 1: 1. KOLO</div>';
     html += '<div class="swiss-group-title">SKÓRE 0-0</div>';
-    
-    for (let i = 0; i < S2_MATCHES.length; i++) {
-        let m = S2_MATCHES[i];
-        if (m.phase === 'swiss' && m.round == 1) {
-            let hScore = (m.home_score !== '' && m.home_score !== undefined) ? m.home_score : '-';
-            let aScore = (m.away_score !== '' && m.away_score !== undefined) ? m.away_score : '-';
-            html += '<div class="swiss-match">';
-            html += '<div class="swiss-match-team"><span>' + m.home + '</span><span class="swiss-score">' + hScore + '</span></div>';
-            html += '<div class="swiss-match-team"><span>' + m.away + '</span><span class="swiss-score">' + aScore + '</span></div>';
-            html += '</div>';
-        }
+    for (let i = 0; i < r1.length; i++) {
+        let hScore = (r1[i].home_score !== '' && r1[i].home_score !== undefined) ? r1[i].home_score : '-';
+        let aScore = (r1[i].away_score !== '' && r1[i].away_score !== undefined) ? r1[i].away_score : '-';
+        html += '<div class="swiss-match">';
+        html += '<div class="swiss-match-team"><span>' + r1[i].home + '</span><span class="swiss-score">' + hScore + '</span></div>';
+        html += '<div class="swiss-match-team"><span>' + r1[i].away + '</span><span class="swiss-score">' + aScore + '</span></div>';
+        html += '</div>';
     }
     html += '</div>';
     
     html += '<div class="swiss-col">';
     html += '<div class="swiss-col-title">STAGE 1: 2. KOLO</div>';
     html += '<div class="swiss-group-title" style="color: var(--accent);">SKÓRE 1-0 (VÍŤAZI POSTUPUJÚ)</div>';
-    
-    for (let i = 0; i < S2_MATCHES.length; i++) {
-        let m = S2_MATCHES[i];
-        if (m.phase === 'swiss' && m.round == 2 && (m.id == 5 || m.id == 6)) {
-            let hScore = (m.home_score !== '' && m.home_score !== undefined) ? m.home_score : '-';
-            let aScore = (m.away_score !== '' && m.away_score !== undefined) ? m.away_score : '-';
-            html += '<div class="swiss-match" style="border-color: rgba(var(--accent-rgb), 0.5);">';
-            html += '<div class="swiss-match-team"><span>' + m.home + '</span><span class="swiss-score">' + hScore + '</span></div>';
-            html += '<div class="swiss-match-team"><span>' + m.away + '</span><span class="swiss-score">' + aScore + '</span></div>';
-            html += '</div>';
-        }
+    for (let i = 0; i < r2w.length; i++) {
+        let hScore = (r2w[i].home_score !== '' && r2w[i].home_score !== undefined) ? r2w[i].home_score : '-';
+        let aScore = (r2w[i].away_score !== '' && r2w[i].away_score !== undefined) ? r2w[i].away_score : '-';
+        html += '<div class="swiss-match" style="border-color: rgba(var(--accent-rgb), 0.5);">';
+        html += '<div class="swiss-match-team"><span>' + r2w[i].home + '</span><span class="swiss-score">' + hScore + '</span></div>';
+        html += '<div class="swiss-match-team"><span>' + r2w[i].away + '</span><span class="swiss-score">' + aScore + '</span></div>';
+        html += '</div>';
     }
     
     html += '<div class="swiss-group-title" style="color: #ff4444; margin-top: 15px;">SKÓRE 0-1 (PORAZENÍ KONČIA)</div>';
-    for (let i = 0; i < S2_MATCHES.length; i++) {
-        let m = S2_MATCHES[i];
-        if (m.phase === 'swiss' && m.round == 2 && (m.id == 7 || m.id == 8)) {
-            let hScore = (m.home_score !== '' && m.home_score !== undefined) ? m.home_score : '-';
-            let aScore = (m.away_score !== '' && m.away_score !== undefined) ? m.away_score : '-';
-            html += '<div class="swiss-match" style="border-color: rgba(255, 68, 68, 0.3); opacity: 0.8;">';
-            html += '<div class="swiss-match-team"><span>' + m.home + '</span><span class="swiss-score">' + hScore + '</span></div>';
-            html += '<div class="swiss-match-team"><span>' + m.away + '</span><span class="swiss-score">' + aScore + '</span></div>';
-            html += '</div>';
-        }
+    for (let i = 0; i < r2l.length; i++) {
+        let hScore = (r2l[i].home_score !== '' && r2l[i].home_score !== undefined) ? r2l[i].home_score : '-';
+        let aScore = (r2l[i].away_score !== '' && r2l[i].away_score !== undefined) ? r2l[i].away_score : '-';
+        html += '<div class="swiss-match" style="border-color: rgba(255, 68, 68, 0.3); opacity: 0.8;">';
+        html += '<div class="swiss-match-team"><span>' + r2l[i].home + '</span><span class="swiss-score">' + hScore + '</span></div>';
+        html += '<div class="swiss-match-team"><span>' + r2l[i].away + '</span><span class="swiss-score">' + aScore + '</span></div>';
+        html += '</div>';
     }
     html += '</div>';
     
     html += '<div class="swiss-col">';
     html += '<div class="swiss-col-title">STAGE 1: 3. KOLO</div>';
     html += '<div class="swiss-group-title" style="color: #ffaa00;">SKÓRE 1-1 (KTO Z KOHO)</div>';
-    
-    for (let i = 0; i < S2_MATCHES.length; i++) {
-        let m = S2_MATCHES[i];
-        if (m.phase === 'swiss' && m.round == 3) {
-            let hScore = (m.home_score !== '' && m.home_score !== undefined) ? m.home_score : '-';
-            let aScore = (m.away_score !== '' && m.away_score !== undefined) ? m.away_score : '-';
-            html += '<div class="swiss-match" style="border-color: rgba(255, 170, 0, 0.5);">';
-            html += '<div class="swiss-match-team"><span>' + m.home + '</span><span class="swiss-score">' + hScore + '</span></div>';
-            html += '<div class="swiss-match-team"><span>' + m.away + '</span><span class="swiss-score">' + aScore + '</span></div>';
-            html += '</div>';
-        }
+    for (let i = 0; i < r3.length; i++) {
+        let hScore = (r3[i].home_score !== '' && r3[i].home_score !== undefined) ? r3[i].home_score : '-';
+        let aScore = (r3[i].away_score !== '' && r3[i].away_score !== undefined) ? r3[i].away_score : '-';
+        html += '<div class="swiss-match" style="border-color: rgba(255, 170, 0, 0.5);">';
+        html += '<div class="swiss-match-team"><span>' + r3[i].home + '</span><span class="swiss-score">' + hScore + '</span></div>';
+        html += '<div class="swiss-match-team"><span>' + r3[i].away + '</span><span class="swiss-score">' + aScore + '</span></div>';
+        html += '</div>';
     }
     html += '</div>';
     
@@ -3222,21 +3227,25 @@ function renderSeason2Swiss() {
 }
 
 function renderSeason2Rest() {
-    if (typeof S2_MATCHES === 'undefined' || S2_MATCHES.length === 0) return;
+    let S2_MATCHES_SAFE = [];
+    if (typeof S2_MATCHES !== 'undefined') {
+        S2_MATCHES_SAFE = S2_MATCHES;
+    }
 
     let standings = [];
-    let groupMatchesHtml = '';
+    let groupsMatches = [];
     let finalMatch = null;
 
-    for (let i = 0; i < S2_MATCHES.length; i++) {
-        let m = S2_MATCHES[i];
+    for (let i = 0; i < S2_MATCHES_SAFE.length; i++) {
+        let m = S2_MATCHES_SAFE[i];
         
         if (m.phase === 'groups') {
+            groupsMatches.push(m);
             let hScoreStr = String(m.home_score);
             let aScoreStr = String(m.away_score);
             
             let isPlayed = false;
-            if (hScoreStr !== '' && aScoreStr !== '' && hScoreStr !== 'undefined' && aScoreStr !== 'undefined') {
+            if (hScoreStr !== '' && aScoreStr !== '' && hScoreStr !== 'undefined' && aScoreStr !== 'undefined' && hScoreStr !== 'null' && aScoreStr !== 'null') {
                 isPlayed = true;
             }
 
@@ -3258,8 +3267,8 @@ function renderSeason2Rest() {
             }
 
             if (isPlayed && homeIdx !== -1 && awayIdx !== -1) {
-                let hScore = parseFloat(hScoreStr);
-                let aScore = parseFloat(aScoreStr);
+                let hScore = (hScoreStr * 1) || 0;
+                let aScore = (aScoreStr * 1) || 0;
                 
                 standings[homeIdx].z += 1;
                 standings[awayIdx].z += 1;
@@ -3277,19 +3286,21 @@ function renderSeason2Rest() {
                     standings[awayIdx].b += 1;
                 }
             }
-            
-            let dispHScore = isPlayed ? hScoreStr : '-';
-            let dispAScore = isPlayed ? aScoreStr : '-';
-            
-            groupMatchesHtml += '<div class="swiss-match">';
-            groupMatchesHtml += '<div class="swiss-match-team"><span>' + m.home + '</span><span class="swiss-score">' + dispHScore + '</span></div>';
-            groupMatchesHtml += '<div class="swiss-match-team"><span>' + m.away + '</span><span class="swiss-score">' + dispAScore + '</span></div>';
-            groupMatchesHtml += '</div>';
         }
         
         if (m.phase === 'final') {
             finalMatch = m;
         }
+    }
+    
+    while(groupsMatches.length < 6) {
+        groupsMatches.push({home: 'TBD', away: 'TBD'});
+    }
+    while(standings.length < 4) {
+        let charCode = 65 + standings.length;
+        let cStr = "";
+        for(let k=0; k<1; k++) cStr = String.fromCharCode(charCode);
+        standings.push({ name: 'Hráč ' + cStr, z: 0, v: 0, p: 0, b: 0 });
     }
 
     for (let i = 0; i < standings.length; i++) {
@@ -3302,13 +3313,21 @@ function renderSeason2Rest() {
         }
     }
 
+    let groupMatchesHtml = '';
+    for (let i = 0; i < groupsMatches.length; i++) {
+        let hS = (groupsMatches[i].home_score !== '' && groupsMatches[i].home_score !== undefined) ? groupsMatches[i].home_score : '-';
+        let aS = (groupsMatches[i].away_score !== '' && groupsMatches[i].away_score !== undefined) ? groupsMatches[i].away_score : '-';
+        groupMatchesHtml += '<div class="swiss-match">';
+        groupMatchesHtml += '<div class="swiss-match-team"><span>' + groupsMatches[i].home + '</span><span class="swiss-score">' + hS + '</span></div>';
+        groupMatchesHtml += '<div class="swiss-match-team"><span>' + groupsMatches[i].away + '</span><span class="swiss-score">' + aS + '</span></div>';
+        groupMatchesHtml += '</div>';
+    }
+
     let p2Html = '<div class="s2-phase-title">STAGE 2</div>';
     p2Html += '<div class="s2-rr-container">';
     p2Html += '<div class="s2-rr-table-wrap"><table class="standings-table" style="width: 100%; border-collapse: collapse;"><thead><tr><th style="width: 12%; text-align: center; padding-left: 12px;">#</th><th style="text-align: left;">HRÁČ</th><th style="width: 12%; text-align: center;">Z</th><th style="width: 12%; text-align: center;">V</th><th style="width: 12%; text-align: center;">P</th><th style="width: 18%; text-align: center; padding-right: 12px;">B</th></tr></thead><tbody>';
     
-    let rowCount = standings.length > 0 ? standings.length : 4;
-    
-    for (let i = 0; i < rowCount; i++) {
+    for (let i = 0; i < 4; i++) {
         let rank = i + 1;
         let rowStyle = 'border-bottom: 1px solid #222;';
         let rankStyle = 'color: var(--muted);';
@@ -3317,19 +3336,15 @@ function renderSeason2Rest() {
             rowStyle += ' background: rgba(var(--accent-rgb), 0.15);';
             rankStyle = 'color: var(--accent);';
         }
-        if (rank === rowCount) {
-            let targetClean = "";
-            for (let k = 0; k < rowStyle.length; k++) {
-                targetClean += rowStyle[k];
-            }
-            rowStyle = "";
+        if (rank === 4) {
+            rowStyle = ""; 
         } 
         
-        let pName = standings[i] ? standings[i].name : 'TBD';
-        let pZ = standings[i] ? standings[i].z : '0';
-        let pV = standings[i] ? standings[i].v : '0';
-        let pP = standings[i] ? standings[i].p : '0';
-        let pB = standings[i] ? standings[i].b : '0';
+        let pName = standings[i].name;
+        let pZ = standings[i].z;
+        let pV = standings[i].v;
+        let pP = standings[i].p;
+        let pB = standings[i].b;
         
         p2Html += '<tr style="' + rowStyle + '">';
         p2Html += '<td style="text-align: center; font-weight: 900; padding-left: 12px; ' + rankStyle + '">' + rank + '.</td>';
@@ -3381,16 +3396,27 @@ function switchGlobalSeason(seasonNum) {
     let bottomNav = document.querySelector('nav') || document.querySelector('.bottom-nav');
     
     if (seasonNum === 1) {
+        // Zobrazí Sezónu 1 a navigačné menu
         if (bottomNav) bottomNav.style.display = 'grid'; 
         if (s1Container) s1Container.style.display = 'block';
         if (s2Container) s2Container.style.display = 'none';
         
     } else if (seasonNum === 2) {
+        // Zobrazí Sezónu 2 a skryje navigačné menu
         if (bottomNav) bottomNav.style.display = 'none';
         if (s1Container) s1Container.style.display = 'none';
         if (s2Container) s2Container.style.display = 'block';
+        
+        // TOTO JE TO MIESTO - tu sa uistíme, že sa vykreslia fázy Sezóny 2:
+        if (typeof renderSeason2Swiss === 'function') {
+            renderSeason2Swiss();
+        }
+        if (typeof renderSeason2Rest === 'function') {
+            renderSeason2Rest();
+        }
     }
     
+    // Spoločné updaty (koláčový graf v hlavičke, atď.)
     if (typeof updateHeaderProgress === 'function') {
         updateHeaderProgress();
     }
@@ -3401,8 +3427,6 @@ function switchGlobalSeason(seasonNum) {
         renderScorers();
     }
 }
-renderSeason2Rest();
-renderSeason2Swiss();
 loadAll();
 </script>
 </body>
