@@ -2004,12 +2004,31 @@ async function loadAll() {
 // LOGIKA - PROGRESS A DONUT
 // ═══════════════════════════════════════
 function updateProgress() {
-  const total = DATA.zapasy.length;
-  const played = DATA.zapasy.filter(z => z.goly_domaci !== '' && z.goly_host !== '').length;
-  const pct = total === 0 ? 0 : (played / total) * 100;
-  
-  document.getElementById('prog-text').textContent = `${played}/${total}`;
-  document.getElementById('prog-donut').style.setProperty('--pct', pct);
+    let total = 0;
+    let played = 0;
+    
+    // Ak sme v druhej sezóne, ťaháme dáta z DATA.s2_zapasy (presne 17 zápasov)
+    if (typeof GLOBAL_CURRENT_SEASON !== 'undefined' && GLOBAL_CURRENT_SEASON === 2) {
+        let s2 = DATA.s2_zapasy || [];
+        total = 17; 
+        played = s2.filter(z => {
+            let h = z.home_score !== undefined ? z.home_score : z.goly_domaci;
+            let a = z.away_score !== undefined ? z.away_score : z.goly_host;
+            return h !== undefined && h !== '' && a !== undefined && a !== '';
+        }).length;
+    } else {
+        // Inak klasicky prvá sezóna (DATA.zapasy)
+        total = DATA.zapasy.length;
+        played = DATA.zapasy.filter(z => z.goly_domaci !== '' && z.goly_host !== '').length;
+    }
+    
+    const pct = total === 0 ? 0 : (played / total) * 100;
+    
+    const elText = document.getElementById('prog-text');
+    const elDonut = document.getElementById('prog-donut');
+    
+    if (elText) elText.textContent = played + '/' + total;
+    if (elDonut) elDonut.style.setProperty('--pct', pct);
 }
 
 // ═══════════════════════════════════════
@@ -3391,21 +3410,30 @@ function renderSeason2Rest() {
         groupMatchesHtml += '</div>';
     }
 
-    let p2Html = '<div class="s2-phase-title">STAGE 2</div>';
-    p2Html += '<div class="s2-rr-container">';
-    p2Html += '<div class="s2-rr-table-wrap"><table class="standings-table" style="width: 100%; border-collapse: collapse;"><thead><tr><th style="width: 12%; text-align: center; padding-left: 12px;">#</th><th style="text-align: left;">HRÁČ</th><th style="width: 12%; text-align: center;">Z</th><th style="width: 12%; text-align: center;">V</th><th style="width: 12%; text-align: center;">P</th><th style="width: 18%; text-align: center; padding-right: 12px;">B</th></tr></thead><tbody>';
+    let p2Html = '<div class="s2-rr-container" style="display: flex; flex-direction: column; gap: 25px;">';
+    
+    // TABUĽKA S ROVNAKÝM PADDINGOM A ZVÝRAZNENÝMI RIADKAMI
+    p2Html += '<div style="flex: 1;">';
+    p2Html += '<div class="swiss-group-title" style="margin-bottom: 10px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1px;">PORADIE</div>';
+    p2Html += '<div class="s2-rr-table-wrap" style="padding: 16px;"><table class="standings-table" style="width: 100%; border-collapse: collapse; margin-bottom: 0;"><thead><tr><th style="width: 12%; text-align: center;">#</th><th style="text-align: left;">HRÁČ</th><th style="width: 12%; text-align: center;">Z</th><th style="width: 12%; text-align: center;">V</th><th style="width: 12%; text-align: center;">P</th><th style="width: 18%; text-align: center;">B</th></tr></thead><tbody>';
     
     for (let i = 0; i < 4; i++) {
         let rank = i + 1;
         let rowStyle = 'border-bottom: 1px solid #222;';
-        let rankStyle = 'color: var(--muted);';
+        let rankStyle = 'color: var(--muted); font-weight: 900; text-align: center; padding: 12px 0;';
+        let tdName = 'font-weight: 700; text-align: left; padding: 12px 0;';
+        let tdMut = 'color: var(--muted); font-weight: 700; text-align: center; padding: 12px 0;';
+        let tdPts = 'color: var(--accent); font-weight: 900; text-align: center; padding: 12px 0;';
         
         if (rank <= 2) {
-            rowStyle += ' background: rgba(var(--accent-rgb), 0.15);';
-            rankStyle = 'color: var(--accent);';
+            rowStyle += ' background: rgba(var(--accent-rgb), 0.25); border-bottom: none;';
+            rankStyle = 'color: #fff; font-weight: 900; text-align: center; padding: 12px 0;';
+            tdName = 'color: #fff; font-weight: 900; text-align: left; padding: 12px 0;';
+            tdMut = 'color: rgba(255, 255, 255, 0.8); font-weight: 800; text-align: center; padding: 12px 0;';
+            tdPts = 'color: #fff; font-weight: 900; text-align: center; padding: 12px 0; text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.8);';
         }
         if (rank === 4) {
-            rowStyle = ""; 
+            rowStyle = rowStyle.replace('border-bottom: 1px solid #222;', ''); 
         } 
         
         let pName = standings[i].name;
@@ -3415,19 +3443,22 @@ function renderSeason2Rest() {
         let pB = standings[i].b;
         
         p2Html += '<tr style="' + rowStyle + '">';
-        p2Html += '<td style="text-align: center; font-weight: 900; padding-left: 12px; ' + rankStyle + '">' + rank + '.</td>';
-        p2Html += '<td style="text-align: left; font-weight: 700;">' + pName + '</td>';
-        p2Html += '<td style="text-align: center; color: var(--muted); font-weight: 700;">' + pZ + '</td>';
-        p2Html += '<td style="text-align: center; color: var(--muted); font-weight: 700;">' + pV + '</td>';
-        p2Html += '<td style="text-align: center; color: var(--muted); font-weight: 700;">' + pP + '</td>';
-        p2Html += '<td style="text-align: center; font-weight: 900; color: var(--accent); padding-right: 12px;">' + pB + '</td>';
+        p2Html += '<td style="' + rankStyle + '">' + rank + '.</td>';
+        p2Html += '<td style="' + tdName + '">' + pName + '</td>';
+        p2Html += '<td style="' + tdMut + '">' + pZ + '</td>';
+        p2Html += '<td style="' + tdMut + '">' + pV + '</td>';
+        p2Html += '<td style="' + tdMut + '">' + pP + '</td>';
+        p2Html += '<td style="' + tdPts + '">' + pB + '</td>';
         p2Html += '</tr>';
     }
     
-    p2Html += '</tbody></table></div>';
+    p2Html += '</tbody></table></div></div>';
     
-    // TOTO JE TO MIESTO PRE GRID (2 STĹPCE)
+    // ZÁPASY V GRID ROZLOŽENÍ
+    p2Html += '<div style="flex: 1;">';
+    p2Html += '<div class="swiss-group-title" style="margin-bottom: 10px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1px;">ZÁPASY</div>';
     p2Html += '<div class="s2-rr-matches" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">' + groupMatchesHtml + '</div></div>';
+    p2Html += '</div>';
     
     let p2El = document.getElementById('s2-phase-2');
     if (p2El) p2El.innerHTML = p2Html;
@@ -3462,22 +3493,18 @@ function switchGlobalSeason(seasonNum) {
     
     let s1Container = document.getElementById('season-1-container');
     let s2Container = document.getElementById('season-2-container');
-    
     let bottomNav = document.querySelector('nav') || document.querySelector('.bottom-nav');
     
     if (seasonNum === 1) {
-        // Zobrazí Sezónu 1 a navigačné menu
         if (bottomNav) bottomNav.style.display = 'grid'; 
         if (s1Container) s1Container.style.display = 'block';
         if (s2Container) s2Container.style.display = 'none';
         
     } else if (seasonNum === 2) {
-        // Zobrazí Sezónu 2 a skryje navigačné menu
         if (bottomNav) bottomNav.style.display = 'none';
         if (s1Container) s1Container.style.display = 'none';
         if (s2Container) s2Container.style.display = 'block';
         
-        // TOTO JE TO MIESTO - tu sa uistíme, že sa vykreslia fázy Sezóny 2:
         if (typeof renderSeason2Swiss === 'function') {
             renderSeason2Swiss();
         }
@@ -3486,9 +3513,9 @@ function switchGlobalSeason(seasonNum) {
         }
     }
     
-    // Spoločné updaty (koláčový graf v hlavičke, atď.)
-    if (typeof updateHeaderProgress === 'function') {
-        updateHeaderProgress();
+    // Spoločné updaty po prepnutí
+    if (typeof updateProgress === 'function') {
+        updateProgress();
     }
     if (typeof renderStats === 'function') {
         renderStats();
