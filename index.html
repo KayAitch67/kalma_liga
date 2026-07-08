@@ -3417,26 +3417,30 @@ function renderSeason2Rest() {
     // TABUĽKA S ROVNAKÝM PADDINGOM A ZVÝRAZNENÝMI RIADKAMI
     p2Html += '<div style="flex: 1;">';
     p2Html += '<div class="swiss-group-title" style="margin-bottom: 10px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1px;">PORADIE</div>';
-    p2Html += '<div class="s2-rr-table-wrap" style="padding: 6px;"><table class="standings-table" style="width: 100%; border-collapse: collapse; margin-bottom: 0;"><thead><tr><th style="width: 10%; text-align: left;">#</th><th style="text-align: left;">HRÁČ</th><th style="width: 10%; text-align: center;">Z</th><th style="width: 10%; text-align: center;">V</th><th style="width: 10%; text-align: center;">R</th><th style="width: 10%; text-align: center;">P</th><th style="width: 10%; text-align: center;">B</th></tr></thead><tbody>';
+    p2Html += '<div class="s2-rr-table-wrap" style="padding: 6px;"><table class="standings-table" style="width: 100%; border-collapse: collapse; margin-bottom: 0;"><thead><tr><th style="width: 10%; text-align: center;">#</th><th style="text-align: left;">HRÁČ</th><th style="width: 10%; text-align: center;">Z</th><th style="width: 10%; text-align: center;">V</th><th style="width: 10%; text-align: center;">R</th><th style="width: 10%; text-align: center;">P</th><th style="width: 10%; text-align: center;">B</th></tr></thead><tbody>';
     
     for (let i = 0; i < 4; i++) {
         let rank = i + 1;
-        let rowStyle = 'border-bottom: 1px solid #222;';
-        let rankStyle = 'color: var(--muted); font-weight: 900; text-align: center; padding: 12px 0;';
-        let tdName = 'font-weight: 700; text-align: left; padding: 12px 0;';
-        let tdMut = 'color: var(--muted); font-weight: 700; text-align: center; padding: 12px 0;';
-        let tdPts = 'color: var(--accent); font-weight: 900; text-align: center; padding: 12px 0;';
+        
+        // Zrušené všetky čiary medzi bežnými riadkami
+        let rowStyle = '';
+        
+        let padB = (rank === 4) ? '16px' : '12px'; 
+        
+        let rankStyle = 'color: var(--muted); font-weight: 900; text-align: center; padding: 12px 0 ' + padB + ' 16px;';
+        let tdName = 'font-weight: 700; text-align: left; padding: 12px 0 ' + padB + ' 0;';
+        let tdMut = 'color: var(--muted); font-weight: 700; text-align: center; padding: 12px 0 ' + padB + ' 0;';
+        let tdPts = 'color: var(--accent); font-weight: 900; text-align: center; padding: 12px 16px ' + padB + ' 0;';
         
         if (rank <= 2) {
-            rowStyle += ' background: rgba(var(--accent-rgb), 0.25); border-bottom: none;';
-            rankStyle = 'color: #fff; font-weight: 900; text-align: center; padding: 12px 0;';
-            tdName = 'color: #fff; font-weight: 900; text-align: left; padding: 12px 0;';
-            tdMut = 'color: rgba(255, 255, 255, 0.8); font-weight: 800; text-align: center; padding: 12px 0;';
-            tdPts = 'color: #fff; font-weight: 900; text-align: center; padding: 12px 0; text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.8);';
+            rowStyle = 'background: rgba(var(--accent-rgb), 0.25);';
+            rankStyle = 'color: #fff; font-weight: 900; text-align: center; padding: 12px 0 ' + padB + ' 16px;';
+            tdName = 'color: #fff; font-weight: 900; text-align: left; padding: 12px 0 ' + padB + ' 0;';
+            tdMut = 'color: rgba(255, 255, 255, 0.8); font-weight: 800; text-align: center; padding: 12px 0 ' + padB + ' 0;';
+            
+            // Body (B) vrátené do akcentnej farby so žiarivým efektom
+            tdPts = 'color: var(--accent); font-weight: 900; text-align: center; text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.8); padding: 12px 16px ' + padB + ' 0;';
         }
-        if (rank === 4) {
-            rowStyle = rowStyle.replace('border-bottom: 1px solid #222;', ''); 
-        } 
         
         let pName = standings[i].name;
         let pZ = standings[i].z;
@@ -3454,9 +3458,11 @@ function renderSeason2Rest() {
         p2Html += '<td style="' + tdMut + '">' + pP + '</td>';
         p2Html += '<td style="' + tdPts + '">' + pB + '</td>';
         p2Html += '</tr>';
+
+        // Plynulá (solid) čiara a text pre postupujúcich
         if (rank === 2) {
             p2Html += '<tr>';
-            p2Html += '<td colspan="7" style="padding: 2px 12px; border-bottom: 1px dashed rgba(255, 255, 255, 0.15); text-align: left;">';
+            p2Html += '<td colspan="7" style="padding: 2px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.15); text-align: left;">';
             p2Html += '<span style="font-size: 8px; font-weight: 900; color: var(--accent); text-transform: uppercase; letter-spacing: 1px;">Postup do finále</span>';
             p2Html += '</td>';
             p2Html += '</tr>';
