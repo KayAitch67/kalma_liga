@@ -588,6 +588,10 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     
     /* DESKTOP OPTIMALIZÁCIA (GRID DASHBOARD A ROZLOŽENIE) */
+    #season-1-container.season-hidden,
+    #season-2-container.season-hidden {
+      display: none !important;
+    }
     @media (min-width: 1024px) {
       .mobile-only { display: none !important; }
       .desktop-only { display: block !important; }
@@ -639,7 +643,7 @@
       /* SEZÓNA 2 DESKTOP ŠPECIFIKÁCIE */
       .s2-desktop-split {
         display: grid;
-        grid-template-columns: 3fr 1fr; /* Presne 75% zľava, 25% sprava */
+        grid-template-columns: 13fr 7fr; /* Presne 75% zľava, 25% sprava */
         gap: 30px;
         align-items: start;
       }
@@ -758,7 +762,7 @@
 
   <main onscroll="handleMainScroll()">
     <button id="scroll-to-next-btn" onclick="scrollToNextUpcomingMatch()"><i class="fa-solid fa-arrow-down"></i></button>
-    <div id="season-1-container" style="display: none;">
+    <div id="season-1-container" class="season-hidden">
       <div class="page active" id="page-zapasy">
         <div class="desktop-page-title">
           <span>ZÁPASY</span>
@@ -875,7 +879,7 @@
     </div>
     
    <!-- Sezóna 2 je teraz defaultne zobrazená -->
-   <div id="season-2-container" style="display: block;">
+   <div id="season-2-container">
       <div class="s2-nav-wrapper" style="justify-content: center;">
           <!-- Mobilné tlačidlá (Zobrazia sa len na mobile) -->
           <button id="s2-btn-1" class="s2-nav-btn mobile-only" onclick="switchSeason2Phase(1)">STAGE 1</button>
@@ -3591,13 +3595,13 @@ function switchGlobalSeason(seasonNum) {
     
     if (seasonNum === 1) {
         if (bottomNav) bottomNav.style.display = 'grid'; 
-        if (s1Container) s1Container.style.display = 'block';
-        if (s2Container) s2Container.style.display = 'none';
+        if (s1Container) s1Container.classList.remove('season-hidden');
+        if (s2Container) s2Container.classList.add('season-hidden');
         
     } else if (seasonNum === 2) {
         if (bottomNav) bottomNav.style.display = 'none';
-        if (s1Container) s1Container.style.display = 'none';
-        if (s2Container) s2Container.style.display = 'block';
+        if (s1Container) s1Container.classList.add('season-hidden');
+        if (s2Container) s2Container.classList.remove('season-hidden');
         
         if (typeof renderSeason2Swiss === 'function') renderSeason2Swiss();
         if (typeof renderSeason2Rest === 'function') renderSeason2Rest();
