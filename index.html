@@ -875,30 +875,31 @@
     </div>
     
    <!-- Sezóna 2 je teraz defaultne zobrazená -->
-    <div id="season-2-container" style="display: block;">
+   <div id="season-2-container" style="display: block;">
       <div class="s2-nav-wrapper" style="justify-content: center;">
-          <!-- Mobilné tlačidlá -->
-          <button id="s2-btn-1" class="s2-nav-btn active mobile-only" onclick="switchSeason2Phase(1)">STAGE 1</button>
+          <!-- Mobilné tlačidlá (Zobrazia sa len na mobile) -->
+          <button id="s2-btn-1" class="s2-nav-btn mobile-only" onclick="switchSeason2Phase(1)">STAGE 1</button>
           <span class="s2-nav-arrow mobile-only">&#10095;</span>
           <button id="s2-btn-2" class="s2-nav-btn mobile-only" onclick="switchSeason2Phase(2)">STAGE 2</button>
           
-          <!-- Desktopové spojené tlačidlo -->
+          <!-- Desktopové spojené tlačidlo (Zobrazí sa len na desktope) -->
           <button id="s2-btn-12" class="s2-nav-btn desktop-only" onclick="switchSeason2Phase(12)">STAGE 1 & STAGE 2</button>
           
           <span class="s2-nav-arrow">&#10095;</span>
           <button id="s2-btn-3" class="s2-nav-btn" onclick="switchSeason2Phase(3)">GRAND FINAL</button>
       </div>
   
-      <!-- Obal, ktorý sa na desktope rozdelí na 75/25 a na mobile sa správa ako klasické prepínanie -->
+      <!-- Obal pre rozdelenie (Na desktope 75/25, na mobile osobitne) -->
       <div class="s2-desktop-split">
-          <div id="s2-phase-1" style="display: block;">
+          <div id="s2-phase-1">
               <div id="swiss-content"></div>
           </div>
-          <div id="s2-phase-2" style="display: none;">
+          <div id="s2-phase-2">
               <div id="s2-phase-2-content"></div>
           </div>
       </div>
   
+      <!-- Vycentrované finále (Osobitná podstránka) -->
       <div id="s2-phase-3" style="display: none; align-items: center; justify-content: center; min-height: 55vh; flex-direction: column;">
           <div id="s2-phase-3-content" style="width: 100%; max-width: 500px;"></div>
       </div>
@@ -3187,11 +3188,11 @@ function switchSeason2Phase(phaseNum) {
     
     if (!p1 || !p2 || !p3) return;
 
-    // Najskôr všetko vyčistíme
-    b1.classList.remove('active');
-    b2.classList.remove('active');
-    b12.classList.remove('active');
-    b3.classList.remove('active');
+    // Všetko vypneme
+    if(b1) b1.classList.remove('active');
+    if(b2) b2.classList.remove('active');
+    if(b12) b12.classList.remove('active');
+    if(b3) b3.classList.remove('active');
     
     p1.style.display = 'none';
     p2.style.display = 'none';
@@ -3200,30 +3201,39 @@ function switchSeason2Phase(phaseNum) {
     let isDesktop = window.innerWidth >= 1024;
 
     if (isDesktop) {
-        // LOGIKA PRE DESKTOP
         if (phaseNum === 3) {
             p3.style.display = 'flex';
-            b3.classList.add('active');
+            if(b3) b3.classList.add('active');
         } else {
-            // Zobrazí Fázu 1 aj Fázu 2 vedľa seba
             p1.style.display = 'block';
             p2.style.display = 'block';
-            b12.classList.add('active');
+            if(b12) b12.classList.add('active');
         }
     } else {
-        // LOGIKA PRE MOBIL
         if (phaseNum === 1 || phaseNum === 12) {
             p1.style.display = 'block';
-            b1.classList.add('active');
+            if(b1) b1.classList.add('active');
         } else if (phaseNum === 2) {
             p2.style.display = 'block';
-            b2.classList.add('active');
+            if(b2) b2.classList.add('active');
         } else {
             p3.style.display = 'flex';
-            b3.classList.add('active');
+            if(b3) b3.classList.add('active');
         }
     }
 }
+
+// Dynamické prepočítavanie pri zmene veľkosti okna
+window.addEventListener('resize', () => {
+    if (GLOBAL_CURRENT_SEASON === 2) {
+        let p3 = document.getElementById('s2-phase-3');
+        if (p3 && p3.style.display === 'flex') {
+            switchSeason2Phase(3);
+        } else {
+            switchSeason2Phase(window.innerWidth >= 1024 ? 12 : 1);
+        }
+    }
+});
   
 function renderSeason2Swiss() {
     let S2_DATA = DATA.s2_zapasy;
@@ -3539,7 +3549,8 @@ function renderSeason2Rest() {
     // ZÁPASY V GRID ROZLOŽENÍ
     p2Html += '<div style="flex: 1;">';
     p2Html += '<div class="swiss-group-title" style="margin-bottom: 10px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1px;">ZÁPASY</div>';
-    p2Html += '<div class="s2-rr-matches" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">' + groupMatchesHtml + '</div></div>';
+    // Flexibilný grid sa automaticky prispôsobí tak, aby zápasy neboli nikdy užšie ako 200px
+    p2Html += '<div class="s2-rr-matches" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">' + groupMatchesHtml + '</div></div>';
     p2Html += '</div>';
     
     let p2El = document.getElementById('s2-phase-2-content');
@@ -3587,24 +3598,20 @@ function switchGlobalSeason(seasonNum) {
         if (s1Container) s1Container.style.display = 'none';
         if (s2Container) s2Container.style.display = 'block';
         
-        if (typeof renderSeason2Swiss === 'function') {
-            renderSeason2Swiss();
-        }
-        if (typeof renderSeason2Rest === 'function') {
-            renderSeason2Rest();
+        if (typeof renderSeason2Swiss === 'function') renderSeason2Swiss();
+        if (typeof renderSeason2Rest === 'function') renderSeason2Rest();
+
+        // Inteligentné rozloženie hneď po načítaní dát
+        if (window.innerWidth >= 1024) {
+            switchSeason2Phase(12); // Zapne obe fázy naraz (Desktop)
+        } else {
+            switchSeason2Phase(1);  // Zapne len prvú fázu (Mobil)
         }
     }
     
-    // Spoločné updaty po prepnutí
-    if (typeof updateProgress === 'function') {
-        updateProgress();
-    }
-    if (typeof renderStats === 'function') {
-        renderStats();
-    }
-    if (typeof renderScorers === 'function') {
-        renderScorers();
-    }
+    if (typeof updateProgress === 'function') updateProgress();
+    if (typeof renderStats === 'function') renderStats();
+    if (typeof renderScorers === 'function') renderScorers();
 }
 loadAll();
 </script>
