@@ -589,6 +589,8 @@
     
     /* DESKTOP OPTIMALIZÁCIA (GRID DASHBOARD A ROZLOŽENIE) */
     @media (min-width: 1024px) {
+      .mobile-only { display: none !important; }
+      .desktop-only { display: block !important; }
       body { max-width: 100%; min-height: 100vh; }
       header { padding: 15px 40px; }
       
@@ -652,6 +654,7 @@
     }
     
     @media (max-width: 1023px) {
+      .desktop-only { display: none !important; }
       .desktop-settings-wrap { display: none; }
       .s2-desktop-split {
         display: flex;
@@ -737,7 +740,7 @@
         <span class="header-title">KALMA LIGA</span>
         <select class="season-dropdown" onchange="switchGlobalSeason(parseInt(this.value))">
             <option value="1">SEZÓNA 1</option>
-            <option value="2">SEZÓNA 2</option>
+            <option value="2" selected>SEZÓNA 2</option> <!-- Defaultne vybraná -->
         </select>
       </div>
     </div>
@@ -755,7 +758,7 @@
 
   <main onscroll="handleMainScroll()">
     <button id="scroll-to-next-btn" onclick="scrollToNextUpcomingMatch()"><i class="fa-solid fa-arrow-down"></i></button>
-    <div id="season-1-container" style="display: block;">
+    <div id="season-1-container" style="display: none;">
       <div class="page active" id="page-zapasy">
         <div class="desktop-page-title">
           <span>ZÁPASY</span>
@@ -871,29 +874,33 @@
       </div>
     </div>
     
-    <div id="season-2-container" style="display: none;">
-      <div class="s2-nav-wrapper">
-          <button id="s2-btn-1" class="s2-nav-btn active" onclick="switchSeason2Phase(1)">STAGE 1</button>
+   <!-- Sezóna 2 je teraz defaultne zobrazená -->
+    <div id="season-2-container" style="display: block;">
+      <div class="s2-nav-wrapper" style="justify-content: center;">
+          <!-- Mobilné tlačidlá -->
+          <button id="s2-btn-1" class="s2-nav-btn active mobile-only" onclick="switchSeason2Phase(1)">STAGE 1</button>
+          <span class="s2-nav-arrow mobile-only">&#10095;</span>
+          <button id="s2-btn-2" class="s2-nav-btn mobile-only" onclick="switchSeason2Phase(2)">STAGE 2</button>
+          
+          <!-- Desktopové spojené tlačidlo -->
+          <button id="s2-btn-12" class="s2-nav-btn desktop-only" onclick="switchSeason2Phase(12)">STAGE 1 & STAGE 2</button>
+          
           <span class="s2-nav-arrow">&#10095;</span>
-          <button id="s2-btn-2" class="s2-nav-btn" onclick="switchSeason2Phase(2)">STAGE 2</button>
-          <span class="s2-nav-arrow">&#10095;</span>
-          <button id="s2-btn-3" class="s2-nav-btn" onclick="switchSeason2Phase(3)">FINÁLE</button>
+          <button id="s2-btn-3" class="s2-nav-btn" onclick="switchSeason2Phase(3)">GRAND FINAL</button>
       </div>
   
-      <div id="s2-phase-1" style="display: block;">
-          <div id="swiss-content"></div>
-      </div>
-  
-      <div id="s2-phase-2" style="display: none;">
-          <div style="text-align: center; color: var(--muted); padding: 40px 0; font-size: 12px; font-weight: 800;">
-              ZAMKNUTÉ (ČAKÁ SA NA KONIEC FÁZY 1)
+      <!-- Obal, ktorý sa na desktope rozdelí na 75/25 a na mobile sa správa ako klasické prepínanie -->
+      <div class="s2-desktop-split">
+          <div id="s2-phase-1" style="display: block;">
+              <div id="swiss-content"></div>
+          </div>
+          <div id="s2-phase-2" style="display: none;">
+              <div id="s2-phase-2-content"></div>
           </div>
       </div>
   
-      <div id="s2-phase-3" style="display: none;">
-          <div style="text-align: center; color: var(--muted); padding: 40px 0; font-size: 12px; font-weight: 800;">
-              ZAMKNUTÉ (ČAKÁ SA NA FINALISTOV)
-          </div>
+      <div id="s2-phase-3" style="display: none; align-items: center; justify-content: center; min-height: 55vh; flex-direction: column;">
+          <div id="s2-phase-3-content" style="width: 100%; max-width: 500px;"></div>
       </div>
     </div>
   </main>
@@ -1010,7 +1017,7 @@
       </div>
     </div>
   
-    <nav id="bottom-nav">
+    <nav id="bottom-nav" style="display: none;>
       <div class="nav-drag-area" id="navDragArea">
         <div class="nav-handle"></div>
       </div>
@@ -3169,27 +3176,55 @@ function handleMainScroll() {
     }
 }
 function switchSeason2Phase(phaseNum) {
-    let phase12 = document.getElementById('s2-phase-12');
-    let phase3 = document.getElementById('s2-phase-3');
-    let btn12 = document.getElementById('s2-btn-12');
-    let btn3 = document.getElementById('s2-btn-3');
-
-    if (!phase12 || !phase3 || !btn12 || !btn3) return;
-
-    phase12.style.display = 'none';
-    phase3.style.display = 'none';
-    btn12.classList.remove('active');
-    btn3.classList.remove('active');
+    let p1 = document.getElementById('s2-phase-1');
+    let p2 = document.getElementById('s2-phase-2');
+    let p3 = document.getElementById('s2-phase-3');
     
-    if (phaseNum === 12 || phaseNum === 1 || phaseNum === 2) {
-        phase12.style.display = 'block';
-        btn12.classList.add('active');
+    let b1 = document.getElementById('s2-btn-1');
+    let b2 = document.getElementById('s2-btn-2');
+    let b12 = document.getElementById('s2-btn-12');
+    let b3 = document.getElementById('s2-btn-3');
+    
+    if (!p1 || !p2 || !p3) return;
+
+    // Najskôr všetko vyčistíme
+    b1.classList.remove('active');
+    b2.classList.remove('active');
+    b12.classList.remove('active');
+    b3.classList.remove('active');
+    
+    p1.style.display = 'none';
+    p2.style.display = 'none';
+    p3.style.display = 'none';
+
+    let isDesktop = window.innerWidth >= 1024;
+
+    if (isDesktop) {
+        // LOGIKA PRE DESKTOP
+        if (phaseNum === 3) {
+            p3.style.display = 'flex';
+            b3.classList.add('active');
+        } else {
+            // Zobrazí Fázu 1 aj Fázu 2 vedľa seba
+            p1.style.display = 'block';
+            p2.style.display = 'block';
+            b12.classList.add('active');
+        }
     } else {
-        phase3.style.display = 'flex'; // Zobrazenie ako flex (kvôli centrovaniu)
-        btn3.classList.add('active');
+        // LOGIKA PRE MOBIL
+        if (phaseNum === 1 || phaseNum === 12) {
+            p1.style.display = 'block';
+            b1.classList.add('active');
+        } else if (phaseNum === 2) {
+            p2.style.display = 'block';
+            b2.classList.add('active');
+        } else {
+            p3.style.display = 'flex';
+            b3.classList.add('active');
+        }
     }
 }
-
+  
 function renderSeason2Swiss() {
     let S2_DATA = DATA.s2_zapasy;
     if (!S2_DATA) return;
@@ -3533,7 +3568,7 @@ function renderSeason2Rest() {
     if (p3El) p3El.innerHTML = p3Html;
 }
   
-let GLOBAL_CURRENT_SEASON = 1;
+let GLOBAL_CURRENT_SEASON = 2;
 
 function switchGlobalSeason(seasonNum) {
     GLOBAL_CURRENT_SEASON = seasonNum;
