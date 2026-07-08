@@ -3340,11 +3340,11 @@ function renderSeason2Rest() {
                 }
                 
                 if (homeIdx === -1 && hTeam !== 'TBD') {
-                    standings.push({ name: hTeam, z: 0, v: 0, p: 0, b: 0 });
+                    standings.push({ name: hTeam, z: 0, v: 0, r: 0, p: 0, b: 0 });
                     homeIdx = standings.length - 1;
                 }
                 if (awayIdx === -1 && aTeam !== 'TBD') {
-                    standings.push({ name: aTeam, z: 0, v: 0, p: 0, b: 0 });
+                    standings.push({ name: aTeam, z: 0, v: 0, r: 0, p: 0, b: 0 });
                     awayIdx = standings.length - 1;
                 }
 
@@ -3364,6 +3364,8 @@ function renderSeason2Rest() {
                         standings[awayIdx].b += 3;
                         standings[homeIdx].p += 1;
                     } else {
+                        standings[homeIdx].r += 1;
+                        standings[awayIdx].r += 1;
                         standings[homeIdx].b += 1;
                         standings[awayIdx].b += 1;
                     }
@@ -3383,7 +3385,7 @@ function renderSeason2Rest() {
         let charCode = 65 + standings.length;
         let cStr = "";
         for(let k=0; k<1; k++) cStr = String.fromCharCode(charCode);
-        standings.push({ name: 'Hráč ' + cStr, z: 0, v: 0, p: 0, b: 0 });
+        standings.push({ name: 'Hráč ' + cStr, z: 0, v: 0, r: 0, p: 0, b: 0 });
     }
 
     for (let i = 0; i < standings.length; i++) {
@@ -3415,7 +3417,7 @@ function renderSeason2Rest() {
     // TABUĽKA S ROVNAKÝM PADDINGOM A ZVÝRAZNENÝMI RIADKAMI
     p2Html += '<div style="flex: 1;">';
     p2Html += '<div class="swiss-group-title" style="margin-bottom: 10px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1px;">PORADIE</div>';
-    p2Html += '<div class="s2-rr-table-wrap" style="padding: 16px;"><table class="standings-table" style="width: 100%; border-collapse: collapse; margin-bottom: 0;"><thead><tr><th style="width: 12%; text-align: center;">#</th><th style="text-align: left;">HRÁČ</th><th style="width: 12%; text-align: center;">Z</th><th style="width: 12%; text-align: center;">V</th><th style="width: 12%; text-align: center;">P</th><th style="width: 18%; text-align: center;">B</th></tr></thead><tbody>';
+    p2Html += '<div class="s2-rr-table-wrap" style="padding: 6px;"><table class="standings-table" style="width: 100%; border-collapse: collapse; margin-bottom: 0;"><thead><tr><th style="width: 10%; text-align: left;">#</th><th style="text-align: left;">HRÁČ</th><th style="width: 10%; text-align: center;">Z</th><th style="width: 10%; text-align: center;">V</th><th style="width: 10%; text-align: center;">R</th><th style="width: 10%; text-align: center;">P</th><th style="width: 10%; text-align: center;">B</th></tr></thead><tbody>';
     
     for (let i = 0; i < 4; i++) {
         let rank = i + 1;
@@ -3439,6 +3441,7 @@ function renderSeason2Rest() {
         let pName = standings[i].name;
         let pZ = standings[i].z;
         let pV = standings[i].v;
+        let pR = standings[i].r;
         let pP = standings[i].p;
         let pB = standings[i].b;
         
@@ -3447,9 +3450,17 @@ function renderSeason2Rest() {
         p2Html += '<td style="' + tdName + '">' + pName + '</td>';
         p2Html += '<td style="' + tdMut + '">' + pZ + '</td>';
         p2Html += '<td style="' + tdMut + '">' + pV + '</td>';
+        p2Html += '<td style="' + tdMut + '">' + pR + '</td>';
         p2Html += '<td style="' + tdMut + '">' + pP + '</td>';
         p2Html += '<td style="' + tdPts + '">' + pB + '</td>';
         p2Html += '</tr>';
+        if (rank === 2) {
+            p2Html += '<tr>';
+            p2Html += '<td colspan="7" style="padding: 2px 12px; border-bottom: 1px dashed rgba(255, 255, 255, 0.15); text-align: left;">';
+            p2Html += '<span style="font-size: 8px; font-weight: 900; color: var(--accent); text-transform: uppercase; letter-spacing: 1px;">Postup do finále</span>';
+            p2Html += '</td>';
+            p2Html += '</tr>';
+        }
     }
     
     p2Html += '</tbody></table></div></div>';
