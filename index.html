@@ -1018,7 +1018,7 @@
       </div>
     </div>
   
-    <nav id="bottom-nav" style="display: none;>
+    <nav id="bottom-nav" style="display: none;">
       <div class="nav-drag-area" id="navDragArea">
         <div class="nav-handle"></div>
       </div>
@@ -2022,6 +2022,7 @@ async function loadAll() {
     renderVykony();
     renderStrelci(); 
     renderPlayoff();
+    switchGlobalSeason(2);
     scrollToNextUpcomingMatch();
   } catch(err) {
     let loaders = document.querySelectorAll('.loader');
