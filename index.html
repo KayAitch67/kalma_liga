@@ -647,6 +647,20 @@
         gap: 30px;
         align-items: start;
       }
+      #s2-phase-1, #s2-phase-2 {
+        background: rgba(18, 18, 18, 0.4);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 16px;
+        padding: 20px;
+        height: 70vh;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(255,255,255,0.05), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 -1px 1px rgba(0,0,0,0.6);
+      }
+      #swiss-content, #s2-phase-2-content {
+        transform-origin: top left;
+        width: 100%;
+      }
       .swiss-board {
         display: grid !important; /* Namiesto flex-u (ktorý scrolloval) ide mriežka */
         grid-template-columns: repeat(3, 1fr);
@@ -3181,6 +3195,33 @@ function handleMainScroll() {
         btn.style.display = 'flex';
     }
 }
+function fitS2ContentToCard(cardId, contentId) {
+    let card = document.getElementById(cardId);
+    let content = document.getElementById(contentId);
+    if (!card || !content) return;
+
+    if (window.innerWidth < 1024) {
+        content.style.transform = 'none';
+        return;
+    }
+
+    content.style.transform = 'none';
+
+    requestAnimationFrame(() => {
+        let cs = getComputedStyle(card);
+        let availableH = card.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+        let contentH = content.scrollHeight;
+        if (!contentH) return;
+
+        let scaleY = Math.min(1, availableH / contentH);
+        content.style.transform = 'scaleY(' + scaleY + ')';
+    });
+}
+
+function fitAllS2Cards() {
+    fitS2ContentToCard('s2-phase-1', 'swiss-content');
+    fitS2ContentToCard('s2-phase-2', 's2-phase-2-content');
+}
 function switchSeason2Phase(phaseNum) {
     let p1 = document.getElementById('s2-phase-1');
     let p2 = document.getElementById('s2-phase-2');
@@ -3213,6 +3254,7 @@ function switchSeason2Phase(phaseNum) {
             p1.style.display = 'block';
             p2.style.display = 'block';
             if(b12) b12.classList.add('active');
+            fitAllS2Cards();
         }
     } else {
         if (phaseNum === 1 || phaseNum === 12) {
